@@ -9,8 +9,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_marginLeft="10dp"
-        android:background="@mipmap/ic_title_close"
-        android:clickable="true"/>
+        android:enabled="true"/>
 
     <Button
         android:id="@+id/title_btn_next"
@@ -18,7 +17,6 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_marginRight="10dp"
-        android:text="密码登录"
         android:textSize="20sp"
         android:background="#00000000"/>
 

@@ -36,7 +36,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="url" value="jar:file:/D:/android/android-studio/plugins/android/lib/android.jar!/images/material_design_icons/hardware/ic_phone_android_black_24dp.xml" />
+                                                <entry key="url" value="jar:file:/D:/android/android-studio/plugins/android/lib/android.jar!/images/material_design_icons/hardware/ic_keyboard_arrow_left_black_24dp.xml" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -47,7 +47,7 @@
                                   <option name="values">
                                     <map>
                                       <entry key="iconShape" value="NONE" />
-                                      <entry key="outputName" value="ic_register_phone" />
+                                      <entry key="outputName" value="ic_title_back" />
                                     </map>
                                   </option>
                                 </PersistentState>

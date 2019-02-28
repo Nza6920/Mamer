@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".RegisterPicCode">
+
+    <include layout="@layout/title"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="需要身份验证"
+            android:textColor="#000"
+            android:textSize="25sp"
+            android:gravity="center"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="2dp"
+            android:layout_marginLeft="2dp"
+            android:background="@drawable/register_phone_num_tab">
+
+            <ImageView
+                android:id="@+id/register_pic_img"
+                android:layout_width="80dp"
+                android:layout_height="50dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="5dp"/>
+
+            <EditText
+                android:id="@+id/register_pic_code"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginLeft="10dp"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
+                android:background="@drawable/register_phone_num"
+                android:maxLength="11"
+                android:textSize="16sp"
+                android:paddingLeft="10dp"
+                android:layout_gravity="center_vertical"/>
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/register_pic_change"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="看不清，换一张"
+            android:textColor="#5687f1"
+            android:textSize="16sp"
+            android:layout_gravity="end"
+            android:layout_marginTop="20dp"
+            android:enabled="true"/>
+        <Button
+            android:id="@+id/register_pic_code_btn"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:text="验证"
+            android:textColor="#fff"
+            android:textSize="16sp"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/register_phone_num_btn"
+            android:enabled="false"/>
+
+
+    </LinearLayout>
+
+</LinearLayout>

@@ -36,7 +36,7 @@
              <EditText
                  android:layout_width="wrap_content"
                  android:layout_height="50dp"
-                 android:layout_marginTop="5dp"
+                 android:layout_gravity="center_vertical"
                  android:background="@mipmap/ic_register_phone"
                  android:clickable="false"
                  android:enabled="false" />
@@ -46,11 +46,9 @@
                  android:id="@+id/register_phone_num"
                  android:layout_width="match_parent"
                  android:layout_height="40dp"
-                 android:layout_marginTop="5dp"
-                 android:layout_marginBottom="5dp"
+                 android:layout_gravity="center_vertical"
                  android:paddingTop="5dp"
                  android:paddingBottom="5dp"
-
                  android:background="@drawable/register_phone_num"
                  android:inputType="number"
                  android:text=""
@@ -62,7 +60,7 @@
          <Button
              android:id="@+id/register_phone_num_btn"
              android:layout_width="match_parent"
-             android:layout_height="40dp"
+             android:layout_height="45dp"
              android:text="登录"
              android:textColor="#fff"
              android:textSize="16sp"
