@@ -1,8 +1,6 @@
 package com.example.my.mamer;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -36,6 +34,8 @@ public class RegisterPhoneNumActivity extends AppCompatActivity {
     private TextView tvClose;
 //    密码登陆按钮
     private Button btnLogin;
+//    已注册
+    private TextView tvPhoneHad;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +90,13 @@ public class RegisterPhoneNumActivity extends AppCompatActivity {
                 Intent intent =new Intent(RegisterPhoneNumActivity.this,RegisterPicCode.class);
                 startActivity(intent);
                 RegisterPhoneNumActivity.this.finish();
+            }
+        });
+//        已注册
+        tvPhoneHad.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
             }
         });
 
