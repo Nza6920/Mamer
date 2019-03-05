@@ -2,6 +2,8 @@ package com.example.my.mamer;
 
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -10,21 +12,35 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextWatcher;
 import android.text.style.AbsoluteSizeSpan;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.my.mamer.util.HttpUtil;
+import com.example.my.mamer.util.LoadingDraw;
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.util.Locale;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+
 
 
 public class RegisterPhoneNumActivity extends AppCompatActivity {
 
+    private LoadingDraw loadingDraw;
 //    注册验证的手机号
     private EditText etPhoneNum;
     private String  phoneNum;
@@ -34,13 +50,36 @@ public class RegisterPhoneNumActivity extends AppCompatActivity {
     private TextView tvClose;
 //    密码登陆按钮
     private Button btnLogin;
+    private static final MediaType JSON=MediaType.parse("application/json;charset=utf-8");
 //    已注册
     private TextView tvPhoneHad;
+   private String address="https://mamer.club/api/captchas";
+//        UI
+    Handler msgHandler=new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what){
+                case 7:
+                    ((LoadingDraw)msg.obj).dismiss();
+                    break;
+                case 9:
+                    Toast.makeText(RegisterPhoneNumActivity.this,(String)msg.obj,Toast.LENGTH_SHORT).show();
+                    break;
+                case 422:
+                    Toast.makeText(RegisterPhoneNumActivity.this,(String)msg.obj,Toast.LENGTH_SHORT).show();
+                break;
+                default:
+                    break;
+            }
+        }
+    };
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register_phone_num);
+        loadingDraw =new LoadingDraw(this);
         init();
     }
 
@@ -49,6 +88,7 @@ public class RegisterPhoneNumActivity extends AppCompatActivity {
         btnLogin=findViewById(R.id.title_btn_next);
         etPhoneNum=findViewById(R.id.register_phone_num);
         btnPhoneNum=findViewById(R.id.register_phone_num_btn);
+        tvPhoneHad=findViewById(R.id.register_had);
 //设置
         Drawable tvClosePic=ContextCompat.getDrawable(this,R.mipmap.ic_title_close);
         tvClose.setBackground(tvClosePic);
@@ -59,6 +99,8 @@ public class RegisterPhoneNumActivity extends AppCompatActivity {
         sHint.setSpan(tSize,0,sHint.length(),Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         etPhoneNum.setHint(sHint);
         btnPhoneNum.getBackground().setAlpha(111);
+
+
 
 //关闭页面
         tvClose.setOnClickListener(new View.OnClickListener() {
@@ -83,13 +125,9 @@ public class RegisterPhoneNumActivity extends AppCompatActivity {
         btnPhoneNum.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-//函数返回的值将作为是否跳转下一个页面的标准，手机号正确就跳转，不正确就提示用户重新输入！！！
-
-
-                Intent intent =new Intent(RegisterPhoneNumActivity.this,RegisterPicCode.class);
-                startActivity(intent);
-                RegisterPhoneNumActivity.this.finish();
+                getEditString();
+                loadingDraw.show();
+                postInformation(address,phoneNum);
             }
         });
 //        已注册
@@ -107,26 +145,22 @@ public class RegisterPhoneNumActivity extends AppCompatActivity {
         @Override
         public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
         }
-
         @Override
         public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            Log.e("Tag","有变化");
         }
-
         @Override
         public void afterTextChanged(Editable editable) {
             getEditString();
             if (isPhoneNumberValid(phoneNum)){
                 btnPhoneNum.getBackground().setAlpha(255);
                 btnPhoneNum.setEnabled(true);
-
             }else {
                 btnPhoneNum.getBackground().setAlpha(111);
                 btnPhoneNum.setEnabled(false);
             }
-
         }
     };
+
 //得到输入内容
     private void getEditString(){
         phoneNum=etPhoneNum.getText().toString().trim();
@@ -134,10 +168,8 @@ public class RegisterPhoneNumActivity extends AppCompatActivity {
 
 //libphonenumber判断手机号输入是否正确
     public boolean isPhoneNumberValid(String phoneNum){
-
         PhoneNumberUtil phoneNumUtil =PhoneNumberUtil.getInstance();
         String countryCode=Locale.getDefault().getCountry();
-
         try {
             Phonenumber.PhoneNumber numberProto=phoneNumUtil.parse(phoneNum,countryCode);
             return phoneNumUtil.isValidNumber(numberProto);
@@ -146,7 +178,72 @@ public class RegisterPhoneNumActivity extends AppCompatActivity {
         }
         return false;
     }
-//                将用户输入的值提交给服务器，服务器返回的值将在下面这个函数里面
 
-//    ！！！！记住，还没有写完
+//    数据转换为json格式数据字符串
+    private String getJson(String phoneNumber)throws Exception{
+        JSONObject jsonParam=new JSONObject();
+        jsonParam.put("phone",phoneNumber);
+        return jsonParam.toString();
+    }
+
+//    POST方式！！！！
+     private void postInformation(String address,String phoneNum){
+        String jsonStr="";
+        try {
+            jsonStr=getJson(phoneNum);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        RequestBody requestBody=RequestBody.create(JSON,jsonStr);
+         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
+             @Override
+             public void onFailure(Call call, IOException e) {
+                 Message msg1=new Message();
+                 msg1.what=7;
+                 msg1.obj=loadingDraw;
+                 msgHandler.sendMessage(msg1);
+
+                 Message msg2=new Message();
+                 msg2.what=9;
+                 msg2.obj="服务器异常,请检查网络";
+                 msgHandler.sendMessage(msg2);
+             }
+
+             @Override
+             public void onResponse(Call call, Response response) throws IOException {
+                 try {
+                     JSONObject jresp=new JSONObject(response.body().string());
+
+                     if (response.code()==201){
+                         Message msg3=new Message();
+                         msg3.what=7;
+                         msg3.obj=loadingDraw;
+                         msgHandler.sendMessage(msg3);
+
+
+                         Intent intent=new Intent(RegisterPhoneNumActivity.this,RegisterPicCode.class);
+                         intent.putExtra("next_key",jresp.getString("captcha_key"));
+                         intent.putExtra("end_time",jresp.getJSONObject("expired_at").getString("date"));
+                         intent.putExtra("img",jresp.getString("captcha_image_content"));
+                         startActivity(intent);
+//                                Log.e("Tag","captcha_key:"+jresp.getString("captcha_key")+"expired_at: "+jresp.getJSONObject("expired_at").getString("date")+"captcha_image_content: "+jresp.getString("captcha_image_content"));
+                         finish();
+                     }else if (response.code()==422){
+                         Message msg4=new Message();
+                         msg4.what=7;
+                         msg4.obj=loadingDraw;
+                         msgHandler.sendMessage(msg4);
+
+                         Message msg5=new Message();
+                         msg5.what=response.code();
+                         msg5.obj=jresp.getJSONObject("errors").getString("phone");
+                         msgHandler.sendMessage(msg5);
+                     }
+                 } catch (JSONException e) {
+                     e.printStackTrace();
+                 }
+             }
+         });
+    }
+
 }

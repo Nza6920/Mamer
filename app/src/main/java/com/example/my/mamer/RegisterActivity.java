@@ -39,6 +39,7 @@ public class RegisterActivity extends AppCompatActivity {
     private String pas;
 //    邮箱
     private EditText etEmil;
+    private TextView tvInputEmil;
     private String emil;
 //    短信验证码
     private EditText etVerificationCodes;
@@ -48,8 +49,8 @@ public class RegisterActivity extends AppCompatActivity {
 //    提交
     private Button btnRegister;
 //正则
-    String regExUname="^[a-zA-Z0-9\u4e00-\u9fa5]{3,16}";
-    String regExPas="/^[\u4e00-\u9fa5\uf900-\ufa2d\u0020]{6,12}$";
+    String regExUname="^[a-zA-Z0-9\u4e00-\u9fa5]{2,15}";
+    String regExPasCN="\u4e00-\u9fa5";
     String regExEmil="^[a-z0-9A-Z]+[-|a-z0-9A-Z._]+@([a-z0-9A-Z]+(-[a-z0-9A-Z]+)?\\.)+[a-z]{2,}$";
 
     @Override
@@ -66,6 +67,7 @@ public class RegisterActivity extends AppCompatActivity {
         etPassWord=findViewById(R.id.register_password);
         tvInputPas=findViewById(R.id.register_input_pas);
         etEmil=findViewById(R.id.register_emil);
+        tvInputEmil=findViewById(R.id.register_input_emil);
         etVerificationCodes=findViewById(R.id.register_verification);
         tvVerificationAgain=findViewById(R.id.register_get_again);
         btnRegister=findViewById(R.id.register_btn);
@@ -82,8 +84,6 @@ public class RegisterActivity extends AppCompatActivity {
         setHintAll(etPassWord,passWord);
         setHintAll(etEmil,emils);
         setHintAll(etVerificationCodes,verificationCode);
-
-        btnRegister.getBackground().setAlpha(111);
 
 //        转到手机号验证页面
         tvClose.setOnClickListener(new View.OnClickListener() {
@@ -112,18 +112,18 @@ public class RegisterActivity extends AppCompatActivity {
         btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                getEditString();
-                Log.e("Tag",btnRegister.toString());
-                if (TextUtils.isEmpty(verificationCode)){
-                    btnRegister.getBackground().setAlpha(255);
-                    btnRegister.setEnabled(true);
+                if (isRegisterRight()){
                     Intent intent =new Intent(RegisterActivity.this,RegisterPhoneNumActivity.class);
                     startActivity(intent);
                     RegisterActivity.this.finish();
                 }else {
-                    btnRegister.getBackground().setAlpha(111);
-                    btnRegister.setEnabled(false);
+                    etUName.setText("");
+                    etPassWord.setText("");
+                    etEmil.setText("");
+                    etVerificationCodes.setText("");
+                    Toast.makeText(RegisterActivity.this,"存在不合法输入",Toast.LENGTH_SHORT).show();
                 }
+
             }
         });
     }
@@ -157,14 +157,10 @@ public class RegisterActivity extends AppCompatActivity {
         @Override
         public void afterTextChanged(Editable editable) {
             getEditString();
-            if (!isUserName(uName)||(!((calculatePlaces(uName)>=2)&&(calculatePlaces(uName)<=15)))){
-                Toast.makeText(RegisterActivity.this, "用户名输入不合法", Toast.LENGTH_SHORT).show();
+            if (!isUserName(uName)||(!((calculatePlaces(uName)>=3)&&(calculatePlaces(uName)<=16)))){
                 tvInputUser.setTextColor(Color.RED);
-                btnRegister.getBackground().setAlpha(111);
-                btnRegister.setEnabled(false);
             }else {
-                Toast.makeText(RegisterActivity.this, "用户名输入合法", Toast.LENGTH_SHORT).show();
-                tvInputUser.setTextColor(Color.YELLOW);
+                tvInputUser.setTextColor(Color.WHITE);
             }
         }
     };
@@ -184,13 +180,9 @@ public class RegisterActivity extends AppCompatActivity {
     public void afterTextChanged(Editable editable) {
         getEditString();
         if (!isPas(pas)||(!((calculatePlaces(pas)>=6)&&(calculatePlaces(pas)<=12)))){
-            Toast.makeText(RegisterActivity.this, "密码输不入合法", Toast.LENGTH_SHORT).show();
             tvInputPas.setTextColor(Color.RED);
-            btnRegister.getBackground().setAlpha(111);
-            btnRegister.setEnabled(false);
         }else {
-            Toast.makeText(RegisterActivity.this, "密码输入合法", Toast.LENGTH_SHORT).show();
-            tvInputPas.setTextColor(Color.YELLOW);
+            tvInputPas.setTextColor(Color.WHITE);
         }
 
     }
@@ -211,11 +203,9 @@ public class RegisterActivity extends AppCompatActivity {
     public void afterTextChanged(Editable editable) {
         getEditString();
         if (isEmil(emil)){
-            Toast.makeText(RegisterActivity.this, "邮箱输入合法", Toast.LENGTH_SHORT).show();
-            btnRegister.getBackground().setAlpha(111);
-            btnRegister.setEnabled(false);
+            tvInputEmil.setTextColor(Color.WHITE);
         }else {
-            Toast.makeText(RegisterActivity.this, "邮箱输入不合法", Toast.LENGTH_SHORT).show();
+            tvInputEmil.setTextColor(Color.RED);
         }
     }
 };
@@ -223,7 +213,6 @@ public class RegisterActivity extends AppCompatActivity {
 //    用户名输入合法判断
     private Boolean isUserName(String str) {
         if (null == str || "".equals(str)) {
-            Log.e("Tag", "用户名输入不合法");
             return false;
         } else {
             Pattern pattern = Pattern.compile(regExUname);
@@ -252,10 +241,9 @@ public class RegisterActivity extends AppCompatActivity {
 //    密码输入合法判断
     private Boolean isPas(String str) {
         if (null == str || "".equals(str)) {
-            Log.e("Tag", "密码输入不合法");
             return false;
         } else {
-            Pattern pattern = Pattern.compile(regExPas);
+            Pattern pattern = Pattern.compile(regExPasCN);
             Matcher matcher = pattern.matcher(str);
             if (!matcher.matches()) {
                 return true;
@@ -268,23 +256,28 @@ public class RegisterActivity extends AppCompatActivity {
     //    emil输入合法判断
     private Boolean isEmil(String emil){
         if (null==emil || "".equals(emil)){
-            Log.e("Tag","emil输入不合法");
             return false;
 
         }else {
             Pattern pattern =Pattern.compile(regExEmil);
             Matcher matcher=pattern.matcher(emil);
             if (!matcher.matches()){
-                Log.e("Tag","emil输入不合法1");
                 return false;
             }else {
-                Log.e("Tag","emil输入合法");
                 return true;
             }
         }
 
     }
-
+//提交入口
+    private Boolean isRegisterRight(){
+        getEditString();
+        if (TextUtils.isEmpty(uName)||TextUtils.isEmpty(emil)||TextUtils.isEmpty(pas)||TextUtils.isEmpty(verificationCode)){
+            return false;
+        }else {
+            return true;
+        }
+    }
 
 
 
