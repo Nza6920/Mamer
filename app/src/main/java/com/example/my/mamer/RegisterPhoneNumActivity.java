@@ -1,9 +1,11 @@
 package com.example.my.mamer;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -36,6 +38,12 @@ import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import static com.example.my.mamer.config.Config.DISMISS_DIALOG;
+import static com.example.my.mamer.config.Config.HTTP_ILLEGAL;
+import static com.example.my.mamer.config.Config.HTTP_OK;
+import static com.example.my.mamer.config.Config.HTTP_OVERTIME;
+import static com.example.my.mamer.config.Config.MESSAGE_ERROR;
+import static com.example.my.mamer.config.Config.PHONE_NUMBER;
 
 
 public class RegisterPhoneNumActivity extends AppCompatActivity {
@@ -53,19 +61,15 @@ public class RegisterPhoneNumActivity extends AppCompatActivity {
     private static final MediaType JSON=MediaType.parse("application/json;charset=utf-8");
 //    已注册
     private TextView tvPhoneHad;
-   private String address="https://mamer.club/api/captchas";
 //        UI
     Handler msgHandler=new Handler(){
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what){
-                case 7:
+                case DISMISS_DIALOG:
                     ((LoadingDraw)msg.obj).dismiss();
                     break;
-                case 9:
-                    Toast.makeText(RegisterPhoneNumActivity.this,(String)msg.obj,Toast.LENGTH_SHORT).show();
-                    break;
-                case 422:
+                case HTTP_ILLEGAL:
                     Toast.makeText(RegisterPhoneNumActivity.this,(String)msg.obj,Toast.LENGTH_SHORT).show();
                 break;
                 default:
@@ -80,6 +84,10 @@ public class RegisterPhoneNumActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register_phone_num);
         loadingDraw =new LoadingDraw(this);
+//        先清理
+        SharedPreferences.Editor editor=PreferenceManager.getDefaultSharedPreferences(this ).edit();
+        editor.clear().apply();
+
         init();
     }
 
@@ -127,7 +135,7 @@ public class RegisterPhoneNumActivity extends AppCompatActivity {
             public void onClick(View view) {
                 getEditString();
                 loadingDraw.show();
-                postInformation(address,phoneNum);
+                postInformation(PHONE_NUMBER,phoneNum);
             }
         });
 //        已注册
@@ -187,7 +195,7 @@ public class RegisterPhoneNumActivity extends AppCompatActivity {
     }
 
 //    POST方式！！！！
-     private void postInformation(String address,String phoneNum){
+     private void postInformation(String address, final String phoneNum){
         String jsonStr="";
         try {
             jsonStr=getJson(phoneNum);
@@ -199,12 +207,12 @@ public class RegisterPhoneNumActivity extends AppCompatActivity {
              @Override
              public void onFailure(Call call, IOException e) {
                  Message msg1=new Message();
-                 msg1.what=7;
+                 msg1.what=DISMISS_DIALOG;
                  msg1.obj=loadingDraw;
                  msgHandler.sendMessage(msg1);
 
                  Message msg2=new Message();
-                 msg2.what=9;
+                 msg2.what=MESSAGE_ERROR;
                  msg2.obj="服务器异常,请检查网络";
                  msgHandler.sendMessage(msg2);
              }
@@ -214,30 +222,36 @@ public class RegisterPhoneNumActivity extends AppCompatActivity {
                  try {
                      JSONObject jresp=new JSONObject(response.body().string());
 
-                     if (response.code()==201){
+                     switch (response.code()){
+                         case HTTP_OK:
                          Message msg3=new Message();
-                         msg3.what=7;
+                         msg3.what=DISMISS_DIALOG;
                          msg3.obj=loadingDraw;
                          msgHandler.sendMessage(msg3);
 
-
                          Intent intent=new Intent(RegisterPhoneNumActivity.this,RegisterPicCode.class);
-                         intent.putExtra("next_key",jresp.getString("captcha_key"));
-                         intent.putExtra("end_time",jresp.getJSONObject("expired_at").getString("date"));
-                         intent.putExtra("img",jresp.getString("captcha_image_content"));
+                         SharedPreferences.Editor editor=PreferenceManager.getDefaultSharedPreferences(RegisterPhoneNumActivity.this ).edit();
+                         editor.putString("next_key",jresp.getString("captcha_key"));
+                         editor.putString("end_time",jresp.getJSONObject("expired_at").getString("date"));
+                         editor.putString("img",jresp.getString("captcha_image_content"));
+                         editor.putString("phoneNum",phoneNum);
+                         editor.apply();
                          startActivity(intent);
 //                                Log.e("Tag","captcha_key:"+jresp.getString("captcha_key")+"expired_at: "+jresp.getJSONObject("expired_at").getString("date")+"captcha_image_content: "+jresp.getString("captcha_image_content"));
                          finish();
-                     }else if (response.code()==422){
-                         Message msg4=new Message();
-                         msg4.what=7;
-                         msg4.obj=loadingDraw;
-                         msgHandler.sendMessage(msg4);
+                         break;
 
-                         Message msg5=new Message();
-                         msg5.what=response.code();
-                         msg5.obj=jresp.getJSONObject("errors").getString("phone");
-                         msgHandler.sendMessage(msg5);
+                         default:
+                             Message msg1=new Message();
+                             msg1.what=DISMISS_DIALOG;
+                             msg1.obj=loadingDraw;
+                             msgHandler.sendMessage(msg1);
+
+                             Message msg2=new Message();
+                             msg2.what=HTTP_ILLEGAL;
+                             msg2.obj=jresp.getJSONObject("errors").getString("phone");
+                             msgHandler.sendMessage(msg2);
+                             break;
                      }
                  } catch (JSONException e) {
                      e.printStackTrace();

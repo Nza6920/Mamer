@@ -2,6 +2,7 @@ package com.example.my.mamer;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ShortcutManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
@@ -29,11 +30,14 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.my.mamer.util.HttpUtil;
 import com.example.my.mamer.util.LoadingDraw;
+import com.example.my.mamer.util.OverTime;
+import com.example.my.mamer.util.StringToDate;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -42,6 +46,14 @@ import okhttp3.Callback;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+
+import static com.example.my.mamer.config.Config.DISMISS_DIALOG;
+import static com.example.my.mamer.config.Config.HTTP_ILLEGAL;
+import static com.example.my.mamer.config.Config.HTTP_OK;
+import static com.example.my.mamer.config.Config.HTTP_OVERTIME;
+import static com.example.my.mamer.config.Config.MESSAGE_ERROR;
+import static com.example.my.mamer.config.Config.PHONE_NUMBER;
+import static com.example.my.mamer.config.Config.PIC_CODE;
 
 public class RegisterPicCode extends AppCompatActivity {
 
@@ -58,20 +70,22 @@ public class RegisterPicCode extends AppCompatActivity {
 //    验证按钮
     private Button btnCodeStr;
     private static final MediaType JSON=MediaType.parse("application/json;charset=utf-8");
-    private String address="https://mamer.club/api/verificationCodes";
 
     //        UI
-    Handler msgHandler=new Handler(){
+   private final Handler msgHandler=new Handler(){
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what){
-                case 7:
+                case DISMISS_DIALOG:
                     ((LoadingDraw)msg.obj).dismiss();
                     break;
-                case 9:
+                case MESSAGE_ERROR:
                     Toast.makeText(RegisterPicCode.this,(String)msg.obj,Toast.LENGTH_SHORT).show();
                     break;
-                case 422:
+                case HTTP_OVERTIME:
+                    Toast.makeText(RegisterPicCode.this,(String)msg.obj,Toast.LENGTH_SHORT).show();
+                    break;
+                case HTTP_ILLEGAL:
                     Toast.makeText(RegisterPicCode.this,(String)msg.obj,Toast.LENGTH_SHORT).show();
                     break;
                 default:
@@ -84,7 +98,7 @@ public class RegisterPicCode extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register_pic_code);
-
+        loadingDraw =new LoadingDraw(this);
         init();
     }
 
@@ -109,7 +123,6 @@ public class RegisterPicCode extends AppCompatActivity {
 //        从配置里加载
         SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(this);
         String picCode=prefs.getString("img","");
-        loadPicCodeImg(picCode);
         picCodeImg.setImageBitmap(loadPicCodeImg(picCode));
 
 
@@ -127,32 +140,22 @@ public class RegisterPicCode extends AppCompatActivity {
         tvChange.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (endTime()){
-                    SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(RegisterPicCode.this);
-                    String picCodekey=prefs.getString("next_key","");
-                    postInformation(address,picCodekey);
-                }else {
-                    Intent intent=new Intent(RegisterPicCode.this,RegisterPhoneNumActivity.class);
-                    intent.putExtra("next_key","");
-                    intent.putExtra("end_time","");
-                    intent.putExtra("img","");
-                    startActivity(intent);
-//                                Log.e("Tag","captcha_key:"+jresp.getString("captcha_key")+"expired_at: "+jresp.getJSONObject("expired_at").getString("date")+"captcha_image_content: "+jresp.getString("captcha_image_content"));
-                    finish();
+                loadingDraw.show();
+                try {
+                    requestAgain();
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
             }
         });
-//        验证按钮
+//      验证按钮
         btnCodeStr.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 loadingDraw.show();
 //      函数返回的值将作为是否跳转下一个页面的标准，验证码正确就跳转到注册页面，不正确就提示用户重新输入并且刷新验证码！！！
-                SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(RegisterPicCode.this);
-                String picCodekey=prefs.getString("next_key","");
-                postInformation(address,picCodekey);
-
-
+                postInformation(PIC_CODE);
             }
         });
     }
@@ -171,7 +174,7 @@ public class RegisterPicCode extends AppCompatActivity {
         return bitmap;
     }
 //    输入监听
-//              得到输入内容
+//    得到输入内容
     private void getEditString(){
     codeStr=etCodeStr.getText().toString().trim();
     }
@@ -194,7 +197,6 @@ public class RegisterPicCode extends AppCompatActivity {
                 btnCodeStr.getBackground().setAlpha(111);
                 btnCodeStr.setEnabled(false);
 
-
             }else {
                 btnCodeStr.getBackground().setAlpha(255);
                 btnCodeStr.setEnabled(true);
@@ -204,16 +206,16 @@ public class RegisterPicCode extends AppCompatActivity {
 
 //    提交用户输入信息，并得到返回值！！！
 //    数据转换为json格式数据字符串
-private String getJson(String codeStr)throws Exception{
+    private String getJson(String codeStr)throws Exception{
     JSONObject jsonParam=new JSONObject();
-    SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(RegisterPicCode.this);
+    SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(this);
     String picCodekey=prefs.getString("next_key","");
     jsonParam.put("captcha_key",picCodekey);
     jsonParam.put("captcha_code",codeStr);
     return jsonParam.toString();
 }
-    //    POST方式！！！！
-    private void postInformation(String address,String codeStr){
+//    POST方式！！！！
+    private void postInformation(String address){
         String jsonStr="";
         try {
             jsonStr=getJson(codeStr);
@@ -225,12 +227,12 @@ private String getJson(String codeStr)throws Exception{
             @Override
             public void onFailure(Call call, IOException e) {
                 Message msg1=new Message();
-                msg1.what=7;
+                msg1.what=DISMISS_DIALOG;
                 msg1.obj=loadingDraw;
                 msgHandler.sendMessage(msg1);
 
                 Message msg2=new Message();
-                msg2.what=9;
+                msg2.what=MESSAGE_ERROR;
                 msg2.obj="服务器异常,请检查网络";
                 msgHandler.sendMessage(msg2);
             }
@@ -240,29 +242,46 @@ private String getJson(String codeStr)throws Exception{
                 try {
                     JSONObject jresp=new JSONObject(response.body().string());
 
-                    if (response.code()==201){
+                    switch (response.code()){
+                        case HTTP_OK:
                         Message msg3=new Message();
-                        msg3.what=7;
+                        msg3.what=DISMISS_DIALOG;
                         msg3.obj=loadingDraw;
                         msgHandler.sendMessage(msg3);
 
-
                         Intent intent=new Intent(RegisterPicCode.this,RegisterActivity.class);
-                        intent.putExtra("next_key",jresp.getString("captcha_key"));
-                        intent.putExtra("end_time",jresp.getJSONObject("expired_at").getString("date"));
+                        SharedPreferences.Editor editor=PreferenceManager.getDefaultSharedPreferences(RegisterPicCode.this ).edit();
+                        editor.putString("next_key",jresp.getString("verification_key"));
+                        editor.apply();
                         startActivity(intent);
 //                                Log.e("Tag","captcha_key:"+jresp.getString("captcha_key")+"expired_at: "+jresp.getJSONObject("expired_at").getString("date")+"captcha_image_content: "+jresp.getString("captcha_image_content"));
                         finish();
-                    }else {
-                        Message msg4=new Message();
-                        msg4.what=7;
-                        msg4.obj=loadingDraw;
-                        msgHandler.sendMessage(msg4);
+                        case HTTP_OVERTIME:
+                            Message msg4=new Message();
+                            msg4.what=DISMISS_DIALOG;
+                            msg4.obj=loadingDraw;
+                            msgHandler.sendMessage(msg4);
 
-                        Message msg5=new Message();
-                        msg5.what=response.code();
-                        msg5.obj=jresp.getJSONObject("errors").getString("phone");
-                        msgHandler.sendMessage(msg5);
+                            Message msg5=new Message();
+                            msg5.what=response.code();
+                            msg5.obj=jresp.getString("message");
+                            msgHandler.sendMessage(msg5);
+                            Toast.makeText(RegisterPicCode.this,"即将跳转到手机验证...",Toast.LENGTH_SHORT).show();
+                            previous();
+                            break;
+                        case HTTP_ILLEGAL:
+                            Message msg1=new Message();
+                            msg1.what=DISMISS_DIALOG;
+                            msg1.obj=loadingDraw;
+                            msgHandler.sendMessage(msg1);
+
+                            Message msg2=new Message();
+                            msg2.what=response.code();
+                            msg2.obj=jresp.getString("message");
+                            msgHandler.sendMessage(msg2);
+                            break;
+                            default:
+                                break;
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -270,22 +289,91 @@ private String getJson(String codeStr)throws Exception{
             }
         });
     }
-//截至请求时间
-    private Boolean endTime(){
-        SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(RegisterPicCode.this);
-        String picCodeEndTime=prefs.getString("end_time","");
-        Date endDate=new Date(picCodeEndTime);
-//        获取当前时间
-        SimpleDateFormat simPletDateFormat=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Date date=new Date(System.currentTimeMillis());
-        Long subDate=endDate.getTime()-date.getTime();
-//        超过时间不可点击
-        if (subDate<0||subDate==0){
-            return false;
-        }else {
-            return true;
-        }
+//    重新请求
+    private void requestAgain() throws JSONException {
+        SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(this);
+        String phoneNum=prefs.getString("phoneNum","");
+        JSONObject jsonParam=new JSONObject();
+        jsonParam.put("phone",phoneNum);
+        String jsonStr=jsonParam.toString();
+
+        RequestBody requestBody=RequestBody.create(JSON,jsonStr);
+        HttpUtil.sendOkHttpRequest(PHONE_NUMBER, requestBody, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(RegisterPicCode.this);
+                String picCodeEndTime=prefs.getString("end_time","");
+                try {
+                    OverTime overTimeStr=new OverTime();
+                    boolean overTime=overTimeStr.endTime(picCodeEndTime);
+                    if (overTime){ Message msg1=new Message();
+                        msg1.what=DISMISS_DIALOG;
+                        msg1.obj=loadingDraw;
+                        msgHandler.sendMessage(msg1);
+
+                        Message msg2=new Message();
+                        msg2.what=MESSAGE_ERROR;
+                        msg2.obj="服务器异常,请检查网络";
+                        msgHandler.sendMessage(msg2);
+                    }else {
+                        Message msg3=new Message();
+                        msg3.what=DISMISS_DIALOG;
+                        msg3.obj=loadingDraw;
+                        msgHandler.sendMessage(msg3);
+
+                        Message msg4=new Message();
+                        msg4.what=HTTP_OVERTIME;
+                        msg4.obj="当前验证码已失效，无法再次请求";
+                        msgHandler.sendMessage(msg4);
+                        previous();
+                    }
+                } catch (ParseException pe) {
+                    pe.printStackTrace();
+                }
+            }
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                try {
+                    JSONObject jresp=new JSONObject(response.body().string());
+                    Message msg1=new Message();
+                    msg1.what=DISMISS_DIALOG;
+                    msg1.obj=loadingDraw;
+                    msgHandler.sendMessage(msg1);
+
+                    SharedPreferences.Editor editor=PreferenceManager.getDefaultSharedPreferences(RegisterPicCode.this ).edit();
+                    editor.putString("next_key",jresp.getString("captcha_key"));
+                    editor.putString("end_time",jresp.getJSONObject("expired_at").getString("date"));
+                    editor.putString("img",jresp.getString("captcha_image_content"));
+                    editor.apply();
+//更新UI
+                    new Thread(){
+                        public void run(){
+                            msgHandler.post(setImgRunable);
+                        }
+                    }.start();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
 
     }
-
+//    跳转
+    private void previous(){
+        Intent intent=new Intent(RegisterPicCode.this,RegisterPhoneNumActivity.class);
+        SharedPreferences.Editor editor=PreferenceManager.getDefaultSharedPreferences(this ).edit();
+        editor.clear().apply();
+        startActivity(intent);
+        finish();
+    }
+//UI
+    Runnable setImgRunable=new Runnable() {
+    @Override
+    public void run() {
+        SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(RegisterPicCode.this);
+        String picCode=prefs.getString("img","");
+        picCodeImg.setImageBitmap(loadPicCodeImg(picCode));
+    }
+};
 }
