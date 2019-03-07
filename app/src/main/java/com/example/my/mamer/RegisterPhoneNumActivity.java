@@ -42,6 +42,7 @@ import static com.example.my.mamer.config.Config.DISMISS_DIALOG;
 import static com.example.my.mamer.config.Config.HTTP_ILLEGAL;
 import static com.example.my.mamer.config.Config.HTTP_OK;
 import static com.example.my.mamer.config.Config.HTTP_OVERTIME;
+import static com.example.my.mamer.config.Config.JSON;
 import static com.example.my.mamer.config.Config.MESSAGE_ERROR;
 import static com.example.my.mamer.config.Config.PHONE_NUMBER;
 
@@ -58,7 +59,7 @@ public class RegisterPhoneNumActivity extends AppCompatActivity {
     private TextView tvClose;
 //    密码登陆按钮
     private Button btnLogin;
-    private static final MediaType JSON=MediaType.parse("application/json;charset=utf-8");
+
 //    已注册
     private TextView tvPhoneHad;
 //        UI
@@ -122,7 +123,9 @@ public class RegisterPhoneNumActivity extends AppCompatActivity {
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                Intent intent=new Intent(RegisterPhoneNumActivity.this,LoginActivity.class);
+                startActivity(intent);
+                finish();
             }
         });
 //        输入监听
@@ -142,7 +145,9 @@ public class RegisterPhoneNumActivity extends AppCompatActivity {
         tvPhoneHad.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                Intent intent=new Intent(RegisterPhoneNumActivity.this,LoginActivity.class);
+                startActivity(intent);
+                finish();
             }
         });
 
@@ -241,7 +246,7 @@ public class RegisterPhoneNumActivity extends AppCompatActivity {
                          finish();
                          break;
 
-                         default:
+                         case HTTP_OVERTIME:
                              Message msg1=new Message();
                              msg1.what=DISMISS_DIALOG;
                              msg1.obj=loadingDraw;
@@ -251,6 +256,8 @@ public class RegisterPhoneNumActivity extends AppCompatActivity {
                              msg2.what=HTTP_ILLEGAL;
                              msg2.obj=jresp.getJSONObject("errors").getString("phone");
                              msgHandler.sendMessage(msg2);
+                             break;
+                             default:
                              break;
                      }
                  } catch (JSONException e) {

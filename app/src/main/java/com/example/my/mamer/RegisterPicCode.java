@@ -50,7 +50,9 @@ import okhttp3.Response;
 import static com.example.my.mamer.config.Config.DISMISS_DIALOG;
 import static com.example.my.mamer.config.Config.HTTP_ILLEGAL;
 import static com.example.my.mamer.config.Config.HTTP_OK;
+import static com.example.my.mamer.config.Config.HTTP_OVERNUM;
 import static com.example.my.mamer.config.Config.HTTP_OVERTIME;
+import static com.example.my.mamer.config.Config.JSON;
 import static com.example.my.mamer.config.Config.MESSAGE_ERROR;
 import static com.example.my.mamer.config.Config.PHONE_NUMBER;
 import static com.example.my.mamer.config.Config.PIC_CODE;
@@ -69,7 +71,6 @@ public class RegisterPicCode extends AppCompatActivity {
     private TextView tvChange;
 //    验证按钮
     private Button btnCodeStr;
-    private static final MediaType JSON=MediaType.parse("application/json;charset=utf-8");
 
     //        UI
    private final Handler msgHandler=new Handler(){
@@ -251,7 +252,8 @@ public class RegisterPicCode extends AppCompatActivity {
 
                         Intent intent=new Intent(RegisterPicCode.this,RegisterActivity.class);
                         SharedPreferences.Editor editor=PreferenceManager.getDefaultSharedPreferences(RegisterPicCode.this ).edit();
-                        editor.putString("next_key",jresp.getString("verification_key"));
+                        editor.putString("new_key",jresp.getString("key"));
+                        editor.putString("captcha_code",codeStr);
                         editor.apply();
                         startActivity(intent);
 //                                Log.e("Tag","captcha_key:"+jresp.getString("captcha_key")+"expired_at: "+jresp.getJSONObject("expired_at").getString("date")+"captcha_image_content: "+jresp.getString("captcha_image_content"));
@@ -266,7 +268,6 @@ public class RegisterPicCode extends AppCompatActivity {
                             msg5.what=response.code();
                             msg5.obj=jresp.getString("message");
                             msgHandler.sendMessage(msg5);
-                            Toast.makeText(RegisterPicCode.this,"即将跳转到手机验证...",Toast.LENGTH_SHORT).show();
                             previous();
                             break;
                         case HTTP_ILLEGAL:
@@ -280,6 +281,16 @@ public class RegisterPicCode extends AppCompatActivity {
                             msg2.obj=jresp.getString("message");
                             msgHandler.sendMessage(msg2);
                             break;
+                        case HTTP_OVERNUM:
+                            Message msg6=new Message();
+                            msg6.what=DISMISS_DIALOG;
+                            msg6.obj=loadingDraw;
+                            msgHandler.sendMessage(msg6);
+
+                            Message msg7=new Message();
+                            msg7.what=response.code();
+                            msg7.obj="请求次数过多,请稍后再试";
+                            msgHandler.sendMessage(msg7);
                             default:
                                 break;
                     }
@@ -292,8 +303,10 @@ public class RegisterPicCode extends AppCompatActivity {
 //    重新请求
     private void requestAgain() throws JSONException {
         SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(this);
+        String picCodekey=prefs.getString("next_key","");
         String phoneNum=prefs.getString("phoneNum","");
         JSONObject jsonParam=new JSONObject();
+        jsonParam.put("next_key",picCodekey);
         jsonParam.put("phone",phoneNum);
         String jsonStr=jsonParam.toString();
 

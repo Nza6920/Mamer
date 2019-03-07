@@ -7,35 +7,32 @@ import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
-import android.support.annotation.DrawableRes;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
-import android.text.InputFilter;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.style.AbsoluteSizeSpan;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.my.mamer.util.HttpUtil;
 import com.example.my.mamer.util.LoadingDraw;
+import com.example.my.mamer.util.OverTime;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -46,8 +43,11 @@ import okhttp3.Response;
 import static com.example.my.mamer.config.Config.DISMISS_DIALOG;
 import static com.example.my.mamer.config.Config.HTTP_ILLEGAL;
 import static com.example.my.mamer.config.Config.HTTP_OK;
+import static com.example.my.mamer.config.Config.HTTP_OVERNUM;
 import static com.example.my.mamer.config.Config.HTTP_OVERTIME;
+import static com.example.my.mamer.config.Config.JSON;
 import static com.example.my.mamer.config.Config.MESSAGE_ERROR;
+import static com.example.my.mamer.config.Config.PHONE_NUMBER;
 import static com.example.my.mamer.config.Config.REGISTER;
 
 public class RegisterActivity extends AppCompatActivity {
@@ -78,10 +78,10 @@ public class RegisterActivity extends AppCompatActivity {
     String regExPasCN="\u4e00-\u9fa5";
     String regExEmil="^[a-z0-9A-Z]+[-|a-z0-9A-Z._]+@([a-z0-9A-Z]+(-[a-z0-9A-Z]+)?\\.)+[a-z]{2,}$";
 
-    private static final MediaType JSON=MediaType.parse("application/json;charset=utf-8");
+
 
     //        UI
-    private final Handler msgHandler=new Handler(){
+    private  final Handler msgHandler=new Handler(){
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what){
@@ -107,6 +107,8 @@ public class RegisterActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+
+        loadingDraw =new LoadingDraw(this);
         init();
     }
 
@@ -139,9 +141,7 @@ public class RegisterActivity extends AppCompatActivity {
         tvClose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent =new Intent(RegisterActivity.this,RegisterPhoneNumActivity.class);
-                startActivity(intent);
-                RegisterActivity.this.finish();
+              previous();
             }
         });
 //        姓名由汉字英文数字组成
@@ -150,12 +150,15 @@ public class RegisterActivity extends AppCompatActivity {
         etPassWord.addTextChangedListener(etWatcherPas);
 //         邮箱格式，在提交按钮事件中判断
         etEmil.addTextChangedListener(etWatcherEmil);
-//        验证码判断
 //        获取新的验证码,验证码失效前到规定时间后可以点击
         tvVerificationAgain.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                try {
+                    requestAgain();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         });
 //        提交,判断各项均填写了
@@ -163,18 +166,17 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 loadingDraw.show();
-                postInformation(REGISTER);
-
                 if (isRegisterRight()){
-                    Intent intent =new Intent(RegisterActivity.this,RegisterPhoneNumActivity.class);
-                    startActivity(intent);
-                    RegisterActivity.this.finish();
+                    postInformation(REGISTER);
                 }else {
-                    etUName.setText("");
-                    etPassWord.setText("");
-                    etEmil.setText("");
-                    etVerificationCodes.setText("");
+                    Message msg1=new Message();
+                    msg1.what=DISMISS_DIALOG;
+                    msg1.obj=loadingDraw;
+                    msgHandler.sendMessage(msg1);
+
                     Toast.makeText(RegisterActivity.this,"存在不合法输入",Toast.LENGTH_SHORT).show();
+
+
                 }
 
             }
@@ -184,7 +186,7 @@ public class RegisterActivity extends AppCompatActivity {
     private void setHintAll(EditText editText,String s){
         SpannableString sHint=new SpannableString(s);
         AbsoluteSizeSpan tSize =new AbsoluteSizeSpan(15,true);
-        sHint.setSpan(tSize,0,sHint.length(),Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        sHint.setSpan(tSize, 0,sHint.length(),Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         editText.setHint(sHint);
     }
 //    获取用户输入的值
@@ -324,6 +326,7 @@ public class RegisterActivity extends AppCompatActivity {
     }
 //提交入口
     private Boolean isRegisterRight(){
+        getEditString();
         if (TextUtils.isEmpty(uName)||TextUtils.isEmpty(emil)||TextUtils.isEmpty(pas)||TextUtils.isEmpty(verificationCode)){
             return false;
         }else {
@@ -334,16 +337,17 @@ public class RegisterActivity extends AppCompatActivity {
     private String getJson(String verificationCode,String uName,String pas,String emil)throws Exception{
         JSONObject jsonParam=new JSONObject();
         SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(this);
-        String verification_key=prefs.getString("next_key","");
+        String verification_key=prefs.getString("new_key","");
         jsonParam.put("verification_key",verification_key);
         jsonParam.put("verification_code",verificationCode);
         jsonParam.put("name",uName);
         jsonParam.put("password",pas);
-        jsonParam.put("emil",emil);
+        jsonParam.put("email",emil);
         return jsonParam.toString();
     }
 //    POST方式！！！！
     private void postInformation(String address){
+        getEditString();
         String jsonStr="";
         try {
             jsonStr=getJson(verificationCode,uName,pas,emil);
@@ -390,9 +394,8 @@ public class RegisterActivity extends AppCompatActivity {
 
                             Message msg5=new Message();
                             msg5.what=response.code();
-                            msg5.obj=jresp.getString("message");
+                            msg5.obj=jresp.getJSONObject("error").getString("verification_key");
                             msgHandler.sendMessage(msg5);
-                            Toast.makeText(RegisterActivity.this,"即将跳转到手机验证...",Toast.LENGTH_SHORT).show();
                             previous();
                             break;
                         case HTTP_ILLEGAL:
@@ -406,6 +409,16 @@ public class RegisterActivity extends AppCompatActivity {
                             msg2.obj=jresp.getString("message");
                             msgHandler.sendMessage(msg2);
                             break;
+                        case HTTP_OVERNUM:
+                            Message msg6=new Message();
+                            msg6.what=DISMISS_DIALOG;
+                            msg6.obj=loadingDraw;
+                            msgHandler.sendMessage(msg6);
+
+                            Message msg7=new Message();
+                            msg7.what=response.code();
+                            msg7.obj="请求次数过多,请稍后再试";
+                            msgHandler.sendMessage(msg7);
                         default:
                             break;
                     }
@@ -415,6 +428,75 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
     }
+
+
+//    再次请求
+private void requestAgain() throws JSONException {
+    SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(this);
+    String picCodekey=prefs.getString("next_key","");
+    String codeStr=prefs.getString("captcha_code","");
+    JSONObject jsonParam=new JSONObject();
+    jsonParam.put("captcha_key",picCodekey);
+    jsonParam.put("captcha_code",codeStr);
+    String jsonStr=jsonParam.toString();
+
+    RequestBody requestBody=RequestBody.create(JSON,jsonStr);
+    HttpUtil.sendOkHttpRequest(PHONE_NUMBER, requestBody, new Callback() {
+        @Override
+        public void onFailure(Call call, IOException e) {
+            SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(RegisterActivity.this);
+            String picCodeEndTime=prefs.getString("end_time","");
+            try {
+                OverTime overTimeStr=new OverTime();
+                boolean overTime=overTimeStr.endTime(picCodeEndTime);
+                if (overTime){
+                    Message msg1=new Message();
+                    msg1.what=DISMISS_DIALOG;
+                    msg1.obj=loadingDraw;
+                    msgHandler.sendMessage(msg1);
+
+                    Message msg2=new Message();
+                    msg2.what=MESSAGE_ERROR;
+                    msg2.obj="服务器异常,请检查网络";
+                    msgHandler.sendMessage(msg2);
+                }else {
+                    Message msg3=new Message();
+                    msg3.what=DISMISS_DIALOG;
+                    msg3.obj=loadingDraw;
+                    msgHandler.sendMessage(msg3);
+
+                    Message msg4=new Message();
+                    msg4.what=HTTP_OVERTIME;
+                    msg4.obj="当前验证码已失效，无法再次请求";
+                    msgHandler.sendMessage(msg4);
+                    previous();
+                }
+            } catch (ParseException pe) {
+                pe.printStackTrace();
+            }
+        }
+        @Override
+        public void onResponse(Call call, Response response) throws IOException {
+            try {
+                JSONObject jresp=new JSONObject(response.body().string());
+                Message msg1=new Message();
+                msg1.what=DISMISS_DIALOG;
+                msg1.obj=loadingDraw;
+                msgHandler.sendMessage(msg1);
+
+                SharedPreferences.Editor editor=PreferenceManager.getDefaultSharedPreferences(RegisterActivity.this ).edit();
+                editor.putString("next_key",jresp.getString("key"));
+                editor.putString("end_time",jresp.getJSONObject("expired_at").getString("date"));
+                editor.apply();
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+        }
+    });
+
+}
     //    跳转手机验证
     private void previous(){
         Intent intent=new Intent(RegisterActivity.this,RegisterPhoneNumActivity.class);
