@@ -2,7 +2,6 @@ package com.example.my.mamer;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.ShortcutManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
@@ -19,7 +18,6 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.style.AbsoluteSizeSpan;
 import android.util.Base64;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -27,31 +25,26 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
 import com.example.my.mamer.util.HttpUtil;
 import com.example.my.mamer.util.LoadingDraw;
 import com.example.my.mamer.util.OverTime;
-import com.example.my.mamer.util.StringToDate;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
 import static com.example.my.mamer.config.Config.DISMISS_DIALOG;
-import static com.example.my.mamer.config.Config.HTTP_ILLEGAL;
 import static com.example.my.mamer.config.Config.HTTP_OK;
 import static com.example.my.mamer.config.Config.HTTP_OVERNUM;
-import static com.example.my.mamer.config.Config.HTTP_OVERTIME;
+import static com.example.my.mamer.config.Config.HTTP_USER_ERROR;
+import static com.example.my.mamer.config.Config.HTTP_USER_NULL;
 import static com.example.my.mamer.config.Config.JSON;
 import static com.example.my.mamer.config.Config.MESSAGE_ERROR;
 import static com.example.my.mamer.config.Config.PHONE_NUMBER;
@@ -83,10 +76,10 @@ public class RegisterPicCode extends AppCompatActivity {
                 case MESSAGE_ERROR:
                     Toast.makeText(RegisterPicCode.this,(String)msg.obj,Toast.LENGTH_SHORT).show();
                     break;
-                case HTTP_OVERTIME:
+                case HTTP_USER_ERROR:
                     Toast.makeText(RegisterPicCode.this,(String)msg.obj,Toast.LENGTH_SHORT).show();
                     break;
-                case HTTP_ILLEGAL:
+                case HTTP_USER_NULL:
                     Toast.makeText(RegisterPicCode.this,(String)msg.obj,Toast.LENGTH_SHORT).show();
                     break;
                 default:
@@ -253,12 +246,13 @@ public class RegisterPicCode extends AppCompatActivity {
                         Intent intent=new Intent(RegisterPicCode.this,RegisterActivity.class);
                         SharedPreferences.Editor editor=PreferenceManager.getDefaultSharedPreferences(RegisterPicCode.this ).edit();
                         editor.putString("new_key",jresp.getString("key"));
+                        editor.putString("new_time",jresp.getString("expired_at"));
                         editor.putString("captcha_code",codeStr);
                         editor.apply();
                         startActivity(intent);
 //                                Log.e("Tag","captcha_key:"+jresp.getString("captcha_key")+"expired_at: "+jresp.getJSONObject("expired_at").getString("date")+"captcha_image_content: "+jresp.getString("captcha_image_content"));
                         finish();
-                        case HTTP_OVERTIME:
+                        case HTTP_USER_ERROR:
                             Message msg4=new Message();
                             msg4.what=DISMISS_DIALOG;
                             msg4.obj=loadingDraw;
@@ -270,7 +264,7 @@ public class RegisterPicCode extends AppCompatActivity {
                             msgHandler.sendMessage(msg5);
                             previous();
                             break;
-                        case HTTP_ILLEGAL:
+                        case HTTP_USER_NULL:
                             Message msg1=new Message();
                             msg1.what=DISMISS_DIALOG;
                             msg1.obj=loadingDraw;
@@ -335,7 +329,7 @@ public class RegisterPicCode extends AppCompatActivity {
                         msgHandler.sendMessage(msg3);
 
                         Message msg4=new Message();
-                        msg4.what=HTTP_OVERTIME;
+                        msg4.what=HTTP_USER_NULL;
                         msg4.obj="当前验证码已失效，无法再次请求";
                         msgHandler.sendMessage(msg4);
                         previous();

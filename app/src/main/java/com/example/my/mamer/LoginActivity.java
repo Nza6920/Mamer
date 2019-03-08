@@ -15,6 +15,7 @@ import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.style.AbsoluteSizeSpan;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -35,10 +36,10 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 import static com.example.my.mamer.config.Config.DISMISS_DIALOG;
-import static com.example.my.mamer.config.Config.HTTP_ILLEGAL;
 import static com.example.my.mamer.config.Config.HTTP_OK;
 import static com.example.my.mamer.config.Config.HTTP_OVERNUM;
-import static com.example.my.mamer.config.Config.HTTP_OVERTIME;
+import static com.example.my.mamer.config.Config.HTTP_USER_ERROR;
+import static com.example.my.mamer.config.Config.HTTP_USER_NULL;
 import static com.example.my.mamer.config.Config.JSON;
 import static com.example.my.mamer.config.Config.LOGIN;
 import static com.example.my.mamer.config.Config.MESSAGE_ERROR;
@@ -66,10 +67,10 @@ public class LoginActivity extends AppCompatActivity {
             case MESSAGE_ERROR:
                 Toast.makeText(LoginActivity.this,(String)msg.obj,Toast.LENGTH_SHORT).show();
                 break;
-            case HTTP_OVERTIME:
+            case HTTP_USER_NULL:
                 Toast.makeText(LoginActivity.this,(String)msg.obj,Toast.LENGTH_SHORT).show();
                 break;
-            case HTTP_ILLEGAL:
+            case HTTP_USER_ERROR:
                 Toast.makeText(LoginActivity.this,(String)msg.obj,Toast.LENGTH_SHORT).show();
                 break;
             default:
@@ -196,7 +197,8 @@ public class LoginActivity extends AppCompatActivity {
                             Intent intent=new Intent(LoginActivity.this,RegisterPhoneNumActivity.class);
                             startActivity(intent);
                             finish();
-                        case HTTP_OVERTIME:
+                            break;
+                        case HTTP_USER_NULL:
                             Message msg4=new Message();
                             msg4.what=DISMISS_DIALOG;
                             msg4.obj=loadingDraw;
@@ -204,11 +206,11 @@ public class LoginActivity extends AppCompatActivity {
 
                             Message msg5=new Message();
                             msg5.what=response.code();
-                            msg5.obj=jresp.getJSONObject("error").getString("verification_key");
+                            msg5.obj=jresp.getString("message");
                             msgHandler.sendMessage(msg5);
                             previous();
                             break;
-                        case HTTP_ILLEGAL:
+                        case HTTP_USER_ERROR:
                             Message msg1=new Message();
                             msg1.what=DISMISS_DIALOG;
                             msg1.obj=loadingDraw;

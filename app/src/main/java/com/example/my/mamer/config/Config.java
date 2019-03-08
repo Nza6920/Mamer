@@ -11,8 +11,8 @@ public class Config {
 
     //    http返回码
     public final static int HTTP_OK=201;
-    public final static int HTTP_ILLEGAL=401;
-    public final static int HTTP_OVERTIME=422;
+    public final static int HTTP_USER_ERROR=401;
+    public final static int HTTP_USER_NULL=422;
     public final static int HTTP_OVERNUM=500;
 //    循环消息常量
     public final static int DISMISS_DIALOG=7;

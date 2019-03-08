@@ -34,14 +34,12 @@ import java.util.Locale;
 
 import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
 import static com.example.my.mamer.config.Config.DISMISS_DIALOG;
-import static com.example.my.mamer.config.Config.HTTP_ILLEGAL;
 import static com.example.my.mamer.config.Config.HTTP_OK;
-import static com.example.my.mamer.config.Config.HTTP_OVERTIME;
+import static com.example.my.mamer.config.Config.HTTP_USER_NULL;
 import static com.example.my.mamer.config.Config.JSON;
 import static com.example.my.mamer.config.Config.MESSAGE_ERROR;
 import static com.example.my.mamer.config.Config.PHONE_NUMBER;
@@ -70,7 +68,7 @@ public class RegisterPhoneNumActivity extends AppCompatActivity {
                 case DISMISS_DIALOG:
                     ((LoadingDraw)msg.obj).dismiss();
                     break;
-                case HTTP_ILLEGAL:
+                case HTTP_USER_NULL:
                     Toast.makeText(RegisterPhoneNumActivity.this,(String)msg.obj,Toast.LENGTH_SHORT).show();
                 break;
                 default:
@@ -246,14 +244,14 @@ public class RegisterPhoneNumActivity extends AppCompatActivity {
                          finish();
                          break;
 
-                         case HTTP_OVERTIME:
+                         case HTTP_USER_NULL:
                              Message msg1=new Message();
                              msg1.what=DISMISS_DIALOG;
                              msg1.obj=loadingDraw;
                              msgHandler.sendMessage(msg1);
 
                              Message msg2=new Message();
-                             msg2.what=HTTP_ILLEGAL;
+                             msg2.what=HTTP_USER_NULL;
                              msg2.obj=jresp.getJSONObject("errors").getString("phone");
                              msgHandler.sendMessage(msg2);
                              break;

@@ -25,26 +25,29 @@ import android.widget.Toast;
 import com.example.my.mamer.util.HttpUtil;
 import com.example.my.mamer.util.LoadingDraw;
 import com.example.my.mamer.util.OverTime;
+import com.example.my.mamer.util.StringToDate;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
 import static com.example.my.mamer.config.Config.DISMISS_DIALOG;
-import static com.example.my.mamer.config.Config.HTTP_ILLEGAL;
 import static com.example.my.mamer.config.Config.HTTP_OK;
 import static com.example.my.mamer.config.Config.HTTP_OVERNUM;
-import static com.example.my.mamer.config.Config.HTTP_OVERTIME;
+import static com.example.my.mamer.config.Config.HTTP_USER_ERROR;
+import static com.example.my.mamer.config.Config.HTTP_USER_NULL;
 import static com.example.my.mamer.config.Config.JSON;
 import static com.example.my.mamer.config.Config.MESSAGE_ERROR;
 import static com.example.my.mamer.config.Config.PHONE_NUMBER;
@@ -91,10 +94,10 @@ public class RegisterActivity extends AppCompatActivity {
                 case MESSAGE_ERROR:
                     Toast.makeText(RegisterActivity.this,(String)msg.obj,Toast.LENGTH_SHORT).show();
                     break;
-                case HTTP_OVERTIME:
+                case HTTP_USER_ERROR:
                     Toast.makeText(RegisterActivity.this,(String)msg.obj,Toast.LENGTH_SHORT).show();
                     break;
-                case HTTP_ILLEGAL:
+                case HTTP_USER_NULL:
                     Toast.makeText(RegisterActivity.this,(String)msg.obj,Toast.LENGTH_SHORT).show();
                     break;
                 default:
@@ -155,10 +158,17 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 try {
-                    requestAgain();
-                } catch (JSONException e) {
+                    if (countDown()){
+                        try {
+                            requestAgain();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                } catch (ParseException e) {
                     e.printStackTrace();
                 }
+
             }
         });
 //        提交,判断各项均填写了
@@ -257,7 +267,9 @@ public class RegisterActivity extends AppCompatActivity {
     @Override
     public void afterTextChanged(Editable editable) {
         getEditString();
-        if (isEmil(emil)){
+        Pattern pattern =Pattern.compile(regExEmil);
+        Matcher matcher=pattern.matcher(emil);
+        if (matcher.matches()){
             tvInputEmil.setTextColor(Color.WHITE);
         }else {
             tvInputEmil.setTextColor(Color.RED);
@@ -307,23 +319,6 @@ public class RegisterActivity extends AppCompatActivity {
             }
         }
     }
-
-    //    emil输入合法判断
-    private Boolean isEmil(String emil){
-        if (null==emil || "".equals(emil)){
-            return false;
-
-        }else {
-            Pattern pattern =Pattern.compile(regExEmil);
-            Matcher matcher=pattern.matcher(emil);
-            if (!matcher.matches()){
-                return false;
-            }else {
-                return true;
-            }
-        }
-
-    }
 //提交入口
     private Boolean isRegisterRight(){
         getEditString();
@@ -371,9 +366,6 @@ public class RegisterActivity extends AppCompatActivity {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                try {
-                    JSONObject jresp=new JSONObject(response.body().string());
-
                     switch (response.code()){
                         case HTTP_OK:
                             Message msg3=new Message();
@@ -381,34 +373,49 @@ public class RegisterActivity extends AppCompatActivity {
                             msg3.obj=loadingDraw;
                             msgHandler.sendMessage(msg3);
 
-                            Intent intent=new Intent(RegisterActivity.this,LoginActivity.class);
                             SharedPreferences.Editor editor=PreferenceManager.getDefaultSharedPreferences(RegisterActivity.this ).edit();
                             editor.clear().apply();
+                            Intent intent=new Intent(RegisterActivity.this,LoginActivity.class);
                             startActivity(intent);
                             finish();
-                        case HTTP_OVERTIME:
+                        case HTTP_USER_NULL:
                             Message msg4=new Message();
                             msg4.what=DISMISS_DIALOG;
                             msg4.obj=loadingDraw;
                             msgHandler.sendMessage(msg4);
+                            try {
+                                JSONArray jresp=new JSONArray(response.body().string());
+                                for (int i=0;i<jresp.length();i++){
+                                    JSONObject jrespMessage=jresp.getJSONObject(i);
+                                    String messageStr=jrespMessage.getString("message");
+                                    JSONObject  errors=jrespMessage.getJSONObject("errors");
+                                    if (errors!=null){
+                                        String email=errors.getString("email");
+                                        String name=errors.getString("name");
+                                        String password=errors.getString("password");
+                                        String verification_key=errors.getString("verification_key");
+                                        String verification_code=errors.getString("verification_code");
 
-                            Message msg5=new Message();
-                            msg5.what=response.code();
-                            msg5.obj=jresp.getJSONObject("error").getString("verification_key");
-                            msgHandler.sendMessage(msg5);
-                            previous();
-                            break;
-                        case HTTP_ILLEGAL:
-                            Message msg1=new Message();
-                            msg1.what=DISMISS_DIALOG;
-                            msg1.obj=loadingDraw;
-                            msgHandler.sendMessage(msg1);
+                                        Message msg5=new Message();
+                                        msg5.what=response.code();
+                                        msg5.obj=email+name+password+verification_code+verification_key;
+                                        msgHandler.sendMessage(msg5);
+                                    }else {
+                                        Message msg5=new Message();
+                                        msg5.what=response.code();
+                                        msg5.obj=messageStr;
+                                        msgHandler.sendMessage(msg5);
+                                        previous();
+                                    }
 
-                            Message msg2=new Message();
-                            msg2.what=response.code();
-                            msg2.obj=jresp.getString("message");
-                            msgHandler.sendMessage(msg2);
+                                }
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
                             break;
+
+
                         case HTTP_OVERNUM:
                             Message msg6=new Message();
                             msg6.what=DISMISS_DIALOG;
@@ -421,9 +428,7 @@ public class RegisterActivity extends AppCompatActivity {
                             msgHandler.sendMessage(msg7);
                         default:
                             break;
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
+
                 }
             }
         });
@@ -466,7 +471,7 @@ private void requestAgain() throws JSONException {
                     msgHandler.sendMessage(msg3);
 
                     Message msg4=new Message();
-                    msg4.what=HTTP_OVERTIME;
+                    msg4.what=HTTP_USER_NULL;
                     msg4.obj="当前验证码已失效，无法再次请求";
                     msgHandler.sendMessage(msg4);
                     previous();
@@ -505,6 +510,21 @@ private void requestAgain() throws JSONException {
         startActivity(intent);
         finish();
     }
+//    倒计时
+    private Boolean countDown() throws ParseException {
+        SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(RegisterActivity.this);
+        String informationTime=prefs.getString("new_time","");
+        StringToDate end=new StringToDate();
+        Date endTime=end.stringToDate(informationTime);
+        Long subTime=endTime.getTime()-3600*9;
+        if (subTime==3600||subTime>3600){
+            return true;
+        }else {
+            return false;
+        }
+
+    }
+
 
 
 }
