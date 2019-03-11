@@ -23,9 +23,8 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="color" value="444444" />
+                                                <entry key="color" value="12a3e9" />
                                                 <entry key="paddingPercent" value="20" />
-                                                <entry key="trimmed" value="true" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -36,7 +35,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="url" value="jar:file:/D:/android/android-studio/plugins/android/lib/android.jar!/images/material_design_icons/image/ic_rotate_right_black_24dp.xml" />
+                                                <entry key="url" value="jar:file:/D:/android/android-studio/plugins/android/lib/android.jar!/images/material_design_icons/action/ic_accessibility_black_24dp.xml" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -58,7 +57,7 @@
                                   <option name="values">
                                     <map>
                                       <entry key="iconShape" value="NONE" />
-                                      <entry key="outputName" value="ic_dialog_wait" />
+                                      <entry key="outputName" value="ic_personal_change" />
                                     </map>
                                   </option>
                                 </PersistentState>

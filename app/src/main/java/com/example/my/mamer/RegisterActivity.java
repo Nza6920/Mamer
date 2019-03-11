@@ -16,6 +16,7 @@ import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.style.AbsoluteSizeSpan;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -24,17 +25,12 @@ import android.widget.Toast;
 
 import com.example.my.mamer.util.HttpUtil;
 import com.example.my.mamer.util.LoadingDraw;
-import com.example.my.mamer.util.OverTime;
-import com.example.my.mamer.util.StringToDate;
 
-import org.json.JSONArray;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -50,7 +46,6 @@ import static com.example.my.mamer.config.Config.HTTP_USER_ERROR;
 import static com.example.my.mamer.config.Config.HTTP_USER_NULL;
 import static com.example.my.mamer.config.Config.JSON;
 import static com.example.my.mamer.config.Config.MESSAGE_ERROR;
-import static com.example.my.mamer.config.Config.PHONE_NUMBER;
 import static com.example.my.mamer.config.Config.REGISTER;
 
 public class RegisterActivity extends AppCompatActivity {
@@ -72,8 +67,6 @@ public class RegisterActivity extends AppCompatActivity {
 //    短信验证码
     private EditText etVerificationCodes;
     private String verificationCode;
-//    再次获得验证码
-    private TextView tvVerificationAgain;
 //    提交
     private Button btnRegister;
 //正则
@@ -124,7 +117,6 @@ public class RegisterActivity extends AppCompatActivity {
         etEmil=findViewById(R.id.register_emil);
         tvInputEmil=findViewById(R.id.register_input_emil);
         etVerificationCodes=findViewById(R.id.register_verification);
-        tvVerificationAgain=findViewById(R.id.register_get_again);
         btnRegister=findViewById(R.id.register_btn);
 
 //        设置
@@ -153,24 +145,6 @@ public class RegisterActivity extends AppCompatActivity {
         etPassWord.addTextChangedListener(etWatcherPas);
 //         邮箱格式，在提交按钮事件中判断
         etEmil.addTextChangedListener(etWatcherEmil);
-//        获取新的验证码,验证码失效前到规定时间后可以点击
-        tvVerificationAgain.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-                    if (countDown()){
-                        try {
-                            requestAgain();
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-
-            }
-        });
 //        提交,判断各项均填写了
         btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -222,7 +196,7 @@ public class RegisterActivity extends AppCompatActivity {
         @Override
         public void afterTextChanged(Editable editable) {
             getEditString();
-            if (!isUserName(uName)||(!((calculatePlaces(uName)>=3)&&(calculatePlaces(uName)<=16)))){
+            if (!isUserName(uName)||(!((calculatePlaces(uName)>1)&&(calculatePlaces(uName)<=12)))){
                 tvInputUser.setTextColor(Color.RED);
             }else {
                 tvInputUser.setTextColor(Color.WHITE);
@@ -244,10 +218,24 @@ public class RegisterActivity extends AppCompatActivity {
     @Override
     public void afterTextChanged(Editable editable) {
         getEditString();
-        if (!isPas(pas)||(!((calculatePlaces(pas)>=6)&&(calculatePlaces(pas)<=12)))){
+        Pattern pattern = Pattern.compile(regExUname);
+        Matcher matcher = pattern.matcher(editable);
+        if (matcher.matches()) {
+            int prior=editable.length()-1;
+            editable.delete(prior,prior+1);
             tvInputPas.setTextColor(Color.RED);
-        }else {
+
+        }else if(editable.length()>0){
+            int prior=editable.length()-1;
+            if ( "".equals(editable)) {
+                editable.delete(prior,prior+1);
+                tvInputPas.setTextColor(Color.RED);
+            }
+        }else if (!((calculatePlaces(pas)>=6)&&(calculatePlaces(pas)<=16))){
+            tvInputPas.setTextColor(Color.RED);
+        } else {
             tvInputPas.setTextColor(Color.WHITE);
+
         }
 
     }
@@ -307,7 +295,7 @@ public class RegisterActivity extends AppCompatActivity {
     }
 //    密码输入合法判断
     private Boolean isPas(String str) {
-        if (null == str || "".equals(str)) {
+        if (null == str ||"".equals(str)) {
             return false;
         } else {
             Pattern pattern = Pattern.compile(regExPasCN);
@@ -349,7 +337,7 @@ public class RegisterActivity extends AppCompatActivity {
         }catch (Exception e){
             e.printStackTrace();
         }
-        RequestBody requestBody=RequestBody.create(JSON,jsonStr);
+        final RequestBody requestBody=RequestBody.create(JSON,jsonStr);
         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -365,8 +353,11 @@ public class RegisterActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                    switch (response.code()){
+            public void onResponse(Call call, Response response) throws  IOException {
+                try {
+                    JSONObject jresp=new JSONObject(response.body().string());
+
+                switch (response.code()){
                         case HTTP_OK:
                             Message msg3=new Message();
                             msg3.what=DISMISS_DIALOG;
@@ -378,44 +369,67 @@ public class RegisterActivity extends AppCompatActivity {
                             Intent intent=new Intent(RegisterActivity.this,LoginActivity.class);
                             startActivity(intent);
                             finish();
+                            break;
                         case HTTP_USER_NULL:
-                            Message msg4=new Message();
-                            msg4.what=DISMISS_DIALOG;
-                            msg4.obj=loadingDraw;
-                            msgHandler.sendMessage(msg4);
-                            try {
-                                JSONArray jresp=new JSONArray(response.body().string());
-                                for (int i=0;i<jresp.length();i++){
-                                    JSONObject jrespMessage=jresp.getJSONObject(i);
-                                    String messageStr=jrespMessage.getString("message");
-                                    JSONObject  errors=jrespMessage.getJSONObject("errors");
-                                    if (errors!=null){
-                                        String email=errors.getString("email");
-                                        String name=errors.getString("name");
-                                        String password=errors.getString("password");
-                                        String verification_key=errors.getString("verification_key");
-                                        String verification_code=errors.getString("verification_code");
+                                Message msg4=new Message();
+                                msg4.what=DISMISS_DIALOG;
+                                msg4.obj=loadingDraw;
+                                msgHandler.sendMessage(msg4);
 
+                                 if (jresp.has("errors")){
+                                    JSONObject errors=jresp.getJSONObject("errors");
+                                    if (errors.has("verification_code")){
                                         Message msg5=new Message();
                                         msg5.what=response.code();
-                                        msg5.obj=email+name+password+verification_code+verification_key;
+                                        msg5.obj=errors.getString("verification_code");
+                                        msgHandler.sendMessage(msg5);
+                                    }else if (errors.has("name")){
+                                        Message msg5=new Message();
+                                        msg5.what=response.code();
+                                        msg5.obj=errors.getString("name");
+                                        msgHandler.sendMessage(msg5);
+                                    }else if (errors.has("email")){
+                                        Message msg5=new Message();
+                                        msg5.what=response.code();
+                                        msg5.obj=errors.getString("email");
+                                        msgHandler.sendMessage(msg5);
+                                    }else if (errors.has("password")){
+                                        Message msg5=new Message();
+                                        msg5.what=response.code();
+                                        msg5.obj=errors.getString("password");
                                         msgHandler.sendMessage(msg5);
                                     }else {
                                         Message msg5=new Message();
                                         msg5.what=response.code();
-                                        msg5.obj=messageStr;
+                                        msg5.obj="输入不合法";
                                         msgHandler.sendMessage(msg5);
-                                        previous();
                                     }
 
                                 }
 
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
                             break;
+//                                401
+                    case HTTP_USER_ERROR:
+                        Message msg8=new Message();
+                        msg8.what=DISMISS_DIALOG;
+                        msg8.obj=loadingDraw;
+                        msgHandler.sendMessage(msg8);
 
+                        String messageStr=jresp.getString("message");
+                        if (messageStr.equals("验证码失效")){
+                            Message msg9=new Message();
+                            msg9.what=response.code();
+                            msg9.obj=jresp.getString("message");
+                            msgHandler.sendMessage(msg9);
+                            previous();
+                        }else {
+                            Message msg9=new Message();
+                            msg9.what=response.code();
+                            msg9.obj=jresp.getString("message");
+                            msgHandler.sendMessage(msg9);
+                        }
 
+                        break;
                         case HTTP_OVERNUM:
                             Message msg6=new Message();
                             msg6.what=DISMISS_DIALOG;
@@ -429,79 +443,13 @@ public class RegisterActivity extends AppCompatActivity {
                         default:
                             break;
 
+                }} catch (JSONException e) {
+                    e.printStackTrace();
                 }
             }
         });
     }
 
-
-//    再次请求
-private void requestAgain() throws JSONException {
-    SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(this);
-    String picCodekey=prefs.getString("next_key","");
-    String codeStr=prefs.getString("captcha_code","");
-    JSONObject jsonParam=new JSONObject();
-    jsonParam.put("captcha_key",picCodekey);
-    jsonParam.put("captcha_code",codeStr);
-    String jsonStr=jsonParam.toString();
-
-    RequestBody requestBody=RequestBody.create(JSON,jsonStr);
-    HttpUtil.sendOkHttpRequest(PHONE_NUMBER, requestBody, new Callback() {
-        @Override
-        public void onFailure(Call call, IOException e) {
-            SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(RegisterActivity.this);
-            String picCodeEndTime=prefs.getString("end_time","");
-            try {
-                OverTime overTimeStr=new OverTime();
-                boolean overTime=overTimeStr.endTime(picCodeEndTime);
-                if (overTime){
-                    Message msg1=new Message();
-                    msg1.what=DISMISS_DIALOG;
-                    msg1.obj=loadingDraw;
-                    msgHandler.sendMessage(msg1);
-
-                    Message msg2=new Message();
-                    msg2.what=MESSAGE_ERROR;
-                    msg2.obj="服务器异常,请检查网络";
-                    msgHandler.sendMessage(msg2);
-                }else {
-                    Message msg3=new Message();
-                    msg3.what=DISMISS_DIALOG;
-                    msg3.obj=loadingDraw;
-                    msgHandler.sendMessage(msg3);
-
-                    Message msg4=new Message();
-                    msg4.what=HTTP_USER_NULL;
-                    msg4.obj="当前验证码已失效，无法再次请求";
-                    msgHandler.sendMessage(msg4);
-                    previous();
-                }
-            } catch (ParseException pe) {
-                pe.printStackTrace();
-            }
-        }
-        @Override
-        public void onResponse(Call call, Response response) throws IOException {
-            try {
-                JSONObject jresp=new JSONObject(response.body().string());
-                Message msg1=new Message();
-                msg1.what=DISMISS_DIALOG;
-                msg1.obj=loadingDraw;
-                msgHandler.sendMessage(msg1);
-
-                SharedPreferences.Editor editor=PreferenceManager.getDefaultSharedPreferences(RegisterActivity.this ).edit();
-                editor.putString("next_key",jresp.getString("key"));
-                editor.putString("end_time",jresp.getJSONObject("expired_at").getString("date"));
-                editor.apply();
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-        }
-    });
-
-}
     //    跳转手机验证
     private void previous(){
         Intent intent=new Intent(RegisterActivity.this,RegisterPhoneNumActivity.class);
@@ -510,20 +458,7 @@ private void requestAgain() throws JSONException {
         startActivity(intent);
         finish();
     }
-//    倒计时
-    private Boolean countDown() throws ParseException {
-        SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(RegisterActivity.this);
-        String informationTime=prefs.getString("new_time","");
-        StringToDate end=new StringToDate();
-        Date endTime=end.stringToDate(informationTime);
-        Long subTime=endTime.getTime()-3600*9;
-        if (subTime==3600||subTime>3600){
-            return true;
-        }else {
-            return false;
-        }
 
-    }
 
 
 

@@ -262,7 +262,6 @@ public class RegisterPicCode extends AppCompatActivity {
                             msg5.what=response.code();
                             msg5.obj=jresp.getString("message");
                             msgHandler.sendMessage(msg5);
-                            previous();
                             break;
                         case HTTP_USER_NULL:
                             Message msg1=new Message();
@@ -274,6 +273,7 @@ public class RegisterPicCode extends AppCompatActivity {
                             msg2.what=response.code();
                             msg2.obj=jresp.getString("message");
                             msgHandler.sendMessage(msg2);
+                            previous();
                             break;
                         case HTTP_OVERNUM:
                             Message msg6=new Message();

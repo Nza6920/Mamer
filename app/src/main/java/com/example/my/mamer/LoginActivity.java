@@ -1,11 +1,9 @@
 package com.example.my.mamer;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Message;
-import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -15,7 +13,9 @@ import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.style.AbsoluteSizeSpan;
-import android.util.Log;
+import android.view.ActionMode;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -24,6 +24,7 @@ import android.widget.Toast;
 
 import com.example.my.mamer.util.HttpUtil;
 import com.example.my.mamer.util.LoadingDraw;
+import com.example.my.mamer.util.NCopyPaste;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -37,7 +38,7 @@ import okhttp3.Response;
 
 import static com.example.my.mamer.config.Config.DISMISS_DIALOG;
 import static com.example.my.mamer.config.Config.HTTP_OK;
-import static com.example.my.mamer.config.Config.HTTP_OVERNUM;
+import static com.example.my.mamer.config.Config.HTTP_OVERTIME;
 import static com.example.my.mamer.config.Config.HTTP_USER_ERROR;
 import static com.example.my.mamer.config.Config.HTTP_USER_NULL;
 import static com.example.my.mamer.config.Config.JSON;
@@ -73,6 +74,9 @@ public class LoginActivity extends AppCompatActivity {
             case HTTP_USER_ERROR:
                 Toast.makeText(LoginActivity.this,(String)msg.obj,Toast.LENGTH_SHORT).show();
                 break;
+            case HTTP_OVERTIME:
+                Toast.makeText(LoginActivity.this,(String)msg.obj,Toast.LENGTH_SHORT).show();
+                break;
             default:
                 break;
         }
@@ -98,10 +102,16 @@ public class LoginActivity extends AppCompatActivity {
         Drawable tvClosePic=ContextCompat.getDrawable(this,R.mipmap.ic_title_close);
         tvClose.setBackground(tvClosePic);
 
-        final String userName="请输入姓名";
+        final String userName="请输入手机号或邮箱";
         String passWord="请输入密码";
         setHintAll(etUName,userName);
         setHintAll(etPas,passWord);
+
+        etUName.setCustomSelectionActionModeCallback(new NCopyPaste());
+        etUName.setLongClickable(false);
+        etPas.setTextIsSelectable(false);
+        etPas.setCustomSelectionActionModeCallback(new NCopyPaste());
+        etPas.setLongClickable(false);
 
         btnLogin.getBackground().setAlpha(111);
 //        监听，点击事件
@@ -194,22 +204,33 @@ public class LoginActivity extends AppCompatActivity {
                             msg3.obj=loadingDraw;
                             msgHandler.sendMessage(msg3);
 
-                            Intent intent=new Intent(LoginActivity.this,RegisterPhoneNumActivity.class);
+                            Intent intent=new Intent(LoginActivity.this,MainActivity.class);
                             startActivity(intent);
                             finish();
                             break;
+//                            422
                         case HTTP_USER_NULL:
                             Message msg4=new Message();
                             msg4.what=DISMISS_DIALOG;
                             msg4.obj=loadingDraw;
                             msgHandler.sendMessage(msg4);
 
-                            Message msg5=new Message();
-                            msg5.what=response.code();
-                            msg5.obj=jresp.getString("message");
-                            msgHandler.sendMessage(msg5);
-                            previous();
+                            String jrespStr=jresp.getString("errors");
+                            JSONObject  errorStr=jresp.getJSONObject(jrespStr);
+                            if (errorStr.has("username")){
+                                Message msg5=new Message();
+                                msg5.what=response.code();
+                                msg5.obj=errorStr.getString("username");
+                                msgHandler.sendMessage(msg5);
+                            }else {
+                                Message msg5=new Message();
+                                msg5.what=response.code();
+                                msg5.obj=errorStr.getString("password");
+                                msgHandler.sendMessage(msg5);
+                            }
+
                             break;
+//                            401
                         case HTTP_USER_ERROR:
                             Message msg1=new Message();
                             msg1.what=DISMISS_DIALOG;
@@ -221,7 +242,8 @@ public class LoginActivity extends AppCompatActivity {
                             msg2.obj=jresp.getString("message");
                             msgHandler.sendMessage(msg2);
                             break;
-                        case HTTP_OVERNUM:
+//                            500
+                        case HTTP_OVERTIME:
                             Message msg6=new Message();
                             msg6.what=DISMISS_DIALOG;
                             msg6.obj=loadingDraw;
@@ -231,6 +253,7 @@ public class LoginActivity extends AppCompatActivity {
                             msg7.what=response.code();
                             msg7.obj="请求次数过多,请稍后再试";
                             msgHandler.sendMessage(msg7);
+                            break;
                         default:
                             break;
                     }
@@ -240,6 +263,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
     }
+//    返回主页面
     private void previous(){
         Intent intent=new Intent(LoginActivity.this,RegisterPhoneNumActivity.class);
         startActivity(intent);
