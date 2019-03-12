@@ -15,7 +15,7 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <activity android:name=".MainActivity" />
-        <activity android:name=".RegisterPhoneNumActivity"></activity>
+        <activity android:name=".RegisterPhoneNumActivity" />
         <activity android:name=".RegisterPicCode" />
         <activity android:name=".RegisterActivity">
             <intent-filter>
@@ -26,7 +26,9 @@
         </activity>
         <activity android:name=".TestActivity" />
         <activity android:name=".LoginActivity" />
-        <activity android:name=".CenterActivity"></activity>
+        <activity android:name=".CenterActivity" />
+        <activity android:name=".UserHomePageActivity" />
+        <activity android:name=".UserEditorInformationActivity"></activity>
     </application>
 
 </manifest>

@@ -50,48 +50,52 @@ import static com.example.my.mamer.config.Config.REGISTER;
 
 public class RegisterActivity extends AppCompatActivity {
     private LoadingDraw loadingDraw;
-//    关闭按钮
+    //    关闭按钮
     private TextView tvClose;
-//    用户名
+    //    用户名
     private EditText etUName;
     private TextView tvInputUser;
     private String uName;
-//    密码
+    //    密码
     private EditText etPassWord;
     private TextView tvInputPas;
     private String pas;
-//    邮箱
+    //    again
+    private EditText etPassWordAgain;
+    private String pasAgain;
+    private TextView tvInputPasAgain;
+
+    //    邮箱
     private EditText etEmil;
     private TextView tvInputEmil;
     private String emil;
-//    短信验证码
+    //    短信验证码
     private EditText etVerificationCodes;
     private String verificationCode;
-//    提交
+    //    提交
     private Button btnRegister;
-//正则
-    String regExUname="^[a-zA-Z0-9\u4e00-\u9fa5]{2,15}";
-    String regExPasCN="\u4e00-\u9fa5";
-    String regExEmil="^[a-z0-9A-Z]+[-|a-z0-9A-Z._]+@([a-z0-9A-Z]+(-[a-z0-9A-Z]+)?\\.)+[a-z]{2,}$";
-
+    //正则
+    String regExUname = "^[a-zA-Z0-9\u4e00-\u9fa5]{2,15}";
+    String regExPasCN = "[\u4e00-\u9fa5]";
+    String regExEmil = "^[a-z0-9A-Z]+[-|a-z0-9A-Z._]+@([a-z0-9A-Z]+(-[a-z0-9A-Z]+)?\\.)+[a-z]{2,}$";
 
 
     //        UI
-    private  final Handler msgHandler=new Handler(){
+    private final Handler msgHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            switch (msg.what){
+            switch (msg.what) {
                 case DISMISS_DIALOG:
-                    ((LoadingDraw)msg.obj).dismiss();
+                    ((LoadingDraw) msg.obj).dismiss();
                     break;
                 case MESSAGE_ERROR:
-                    Toast.makeText(RegisterActivity.this,(String)msg.obj,Toast.LENGTH_SHORT).show();
+                    Toast.makeText(RegisterActivity.this, (String) msg.obj, Toast.LENGTH_SHORT).show();
                     break;
                 case HTTP_USER_ERROR:
-                    Toast.makeText(RegisterActivity.this,(String)msg.obj,Toast.LENGTH_SHORT).show();
+                    Toast.makeText(RegisterActivity.this, (String) msg.obj, Toast.LENGTH_SHORT).show();
                     break;
                 case HTTP_USER_NULL:
-                    Toast.makeText(RegisterActivity.this,(String)msg.obj,Toast.LENGTH_SHORT).show();
+                    Toast.makeText(RegisterActivity.this, (String) msg.obj, Toast.LENGTH_SHORT).show();
                     break;
                 default:
                     break;
@@ -104,45 +108,51 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        loadingDraw =new LoadingDraw(this);
+        loadingDraw = new LoadingDraw(this);
         init();
     }
 
-    private void init(){
-        tvClose=findViewById(R.id.title_tv_close);
-        etUName=findViewById(R.id.register_username);
-        tvInputUser=findViewById(R.id.register_input_user);
-        etPassWord=findViewById(R.id.register_password);
-        tvInputPas=findViewById(R.id.register_input_pas);
-        etEmil=findViewById(R.id.register_emil);
-        tvInputEmil=findViewById(R.id.register_input_emil);
-        etVerificationCodes=findViewById(R.id.register_verification);
-        btnRegister=findViewById(R.id.register_btn);
+    private void init() {
+        tvClose = findViewById(R.id.title_tv_close);
+        etUName = findViewById(R.id.register_username);
+        tvInputUser = findViewById(R.id.register_input_user);
+        etPassWord = findViewById(R.id.register_password);
+        etPassWordAgain = findViewById(R.id.register_password_again);
+        tvInputPas = findViewById(R.id.register_input_pas);
+        tvInputPasAgain=findViewById(R.id.register_input_pas_again);
+        etEmil = findViewById(R.id.register_emil);
+        tvInputEmil = findViewById(R.id.register_input_emil);
+        etVerificationCodes = findViewById(R.id.register_verification);
+        btnRegister = findViewById(R.id.register_btn);
 
 //        设置
-        Drawable tvClosePic=ContextCompat.getDrawable(this,R.mipmap.ic_title_back);
+        Drawable tvClosePic = ContextCompat.getDrawable(this, R.mipmap.ic_title_back);
         tvClose.setBackground(tvClosePic);
 
-        String userName="请输入姓名";
-        final String passWord="请输入密码";
-        String emils="请输入邮箱";
-        final String verificationCode="请输入验证码";
-        setHintAll(etUName,userName);
-        setHintAll(etPassWord,passWord);
-        setHintAll(etEmil,emils);
-        setHintAll(etVerificationCodes,verificationCode);
+        String userName = "请输入姓名";
+        final String passWord = "请输入密码";
+        String pasWordAgain = "请再次输入密码";
+        String emils = "请输入邮箱";
+        final String verificationCode = "请输入验证码";
+        setHintAll(etUName, userName);
+        setHintAll(etPassWord, passWord);
+        setHintAll(etPassWordAgain, pasWordAgain);
+        setHintAll(etEmil, emils);
+        setHintAll(etVerificationCodes, verificationCode);
 
 //        转到手机号验证页面
         tvClose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-              previous();
+                previous();
             }
         });
 //        姓名由汉字英文数字组成
         etUName.addTextChangedListener(etWatcher);
 //        密码由英文数字符号组成
         etPassWord.addTextChangedListener(etWatcherPas);
+//        2
+        etPassWordAgain.addTextChangedListener(etWatcherPasAgain);
 //         邮箱格式，在提交按钮事件中判断
         etEmil.addTextChangedListener(etWatcherEmil);
 //        提交,判断各项均填写了
@@ -150,15 +160,15 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 loadingDraw.show();
-                if (isRegisterRight()){
+                if (isRegisterRight()) {
                     postInformation(REGISTER);
-                }else {
-                    Message msg1=new Message();
-                    msg1.what=DISMISS_DIALOG;
-                    msg1.obj=loadingDraw;
+                } else {
+                    Message msg1 = new Message();
+                    msg1.what = DISMISS_DIALOG;
+                    msg1.obj = loadingDraw;
                     msgHandler.sendMessage(msg1);
 
-                    Toast.makeText(RegisterActivity.this,"存在不合法输入",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(RegisterActivity.this, "存在不合法输入", Toast.LENGTH_SHORT).show();
 
 
                 }
@@ -166,23 +176,27 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
     }
-//    hint设置
-    private void setHintAll(EditText editText,String s){
-        SpannableString sHint=new SpannableString(s);
-        AbsoluteSizeSpan tSize =new AbsoluteSizeSpan(15,true);
-        sHint.setSpan(tSize, 0,sHint.length(),Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+    //    hint设置
+    private void setHintAll(EditText editText, String s) {
+        SpannableString sHint = new SpannableString(s);
+        AbsoluteSizeSpan tSize = new AbsoluteSizeSpan(15, true);
+        sHint.setSpan(tSize, 0, sHint.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         editText.setHint(sHint);
     }
-//    获取用户输入的值
-    private void getEditString(){
-        uName=etUName.getText().toString().trim();
-        pas=etPassWord.getText().toString().trim();
-        emil=etEmil.getText().toString().trim();
-        verificationCode=etVerificationCodes.getText().toString().trim();
+
+    //    获取用户输入的值
+    private void getEditString() {
+        uName = etUName.getText().toString().trim();
+        pas = etPassWord.getText().toString().trim();
+        pasAgain=etPassWordAgain.getText().toString().trim();
+        emil = etEmil.getText().toString().trim();
+        verificationCode = etVerificationCodes.getText().toString().trim();
 
     }
-//    输入监听，用户名
-    TextWatcher etWatcher=new TextWatcher() {
+
+    //    输入监听，用户名
+    TextWatcher etWatcher = new TextWatcher() {
         @Override
         public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
@@ -196,52 +210,41 @@ public class RegisterActivity extends AppCompatActivity {
         @Override
         public void afterTextChanged(Editable editable) {
             getEditString();
-            if (!isUserName(uName)||(!((calculatePlaces(uName)>1)&&(calculatePlaces(uName)<=12)))){
+            if (!isUserName(uName) || (!((calculatePlaces(uName) > 1) && (calculatePlaces(uName) <= 12)))) {
                 tvInputUser.setTextColor(Color.RED);
-            }else {
+            } else {
                 tvInputUser.setTextColor(Color.WHITE);
             }
         }
     };
-//    密码
+
+    //    密码
     TextWatcher etWatcherPas=new TextWatcher() {
-    @Override
-    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        @Override
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
-    }
+        }
 
-    @Override
-    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        @Override
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
-    }
+        }
 
-    @Override
-    public void afterTextChanged(Editable editable) {
-        getEditString();
-        Pattern pattern = Pattern.compile(regExUname);
-        Matcher matcher = pattern.matcher(editable);
-        if (matcher.matches()) {
-            int prior=editable.length()-1;
-            editable.delete(prior,prior+1);
-            tvInputPas.setTextColor(Color.RED);
-
-        }else if(editable.length()>0){
-            int prior=editable.length()-1;
-            if ( "".equals(editable)) {
-                editable.delete(prior,prior+1);
+        @Override
+        public void afterTextChanged(Editable editable) {
+            getEditString();
+            Pattern pattern = Pattern.compile(regExPasCN);
+            Matcher matcher = pattern.matcher(pas);
+            if (matcher.find()) {
                 tvInputPas.setTextColor(Color.RED);
+            } else {
+                tvInputPas.setTextColor(Color.WHITE);
             }
-        }else if (!((calculatePlaces(pas)>=6)&&(calculatePlaces(pas)<=16))){
-            tvInputPas.setTextColor(Color.RED);
-        } else {
-            tvInputPas.setTextColor(Color.WHITE);
-
         }
 
-    }
-};
-//    邮箱
-    TextWatcher etWatcherEmil=new TextWatcher() {
+    };
+//2
+    TextWatcher etWatcherPasAgain=new TextWatcher() {
     @Override
     public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
@@ -254,18 +257,40 @@ public class RegisterActivity extends AppCompatActivity {
 
     @Override
     public void afterTextChanged(Editable editable) {
-        getEditString();
-        Pattern pattern =Pattern.compile(regExEmil);
-        Matcher matcher=pattern.matcher(emil);
-        if (matcher.matches()){
-            tvInputEmil.setTextColor(Color.WHITE);
+        if (isPasSame()){
+           tvInputPasAgain.setTextColor(Color.WHITE);
         }else {
-            tvInputEmil.setTextColor(Color.RED);
+            tvInputPasAgain.setTextColor(Color.RED);
         }
     }
 };
 
-//    用户名输入合法判断
+    //    邮箱
+    TextWatcher etWatcherEmil = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+        }
+
+        @Override
+        public void afterTextChanged(Editable editable) {
+            getEditString();
+            Pattern pattern = Pattern.compile(regExEmil);
+            Matcher matcher = pattern.matcher(emil);
+            if (matcher.matches()) {
+                tvInputEmil.setTextColor(Color.WHITE);
+            } else {
+                tvInputEmil.setTextColor(Color.RED);
+            }
+        }
+    };
+
+    //    用户名输入合法判断
     private Boolean isUserName(String str) {
         if (null == str || "".equals(str)) {
             return false;
@@ -277,34 +302,49 @@ public class RegisterActivity extends AppCompatActivity {
             } else {
                 return true;
             }
+            }
         }
-    }
-//    计算位数
-    private static int calculatePlaces(String str){
-        int m=0;
-        char arr[]=str.toCharArray();
-        for (int i=0;i<arr.length;i++){
-            char c =arr[i];
+
+
+    //    计算位数
+    private static int calculatePlaces(String str) {
+        int m = 0;
+        char arr[] = str.toCharArray();
+        for (int i = 0; i < arr.length; i++) {
+            char c = arr[i];
 //            中文字符
-            if ((c>=0x0391 && c<=0xFFE5)){
-                m=m+2;
-            }else if ((c>=0x0000 && c<=0x00FF)){
-                m=m+1;
+            if ((c >= 0x0391 && c <= 0xFFE5)) {
+                m = m + 2;
+            } else if ((c >= 0x0000 && c <= 0x00FF)) {
+                m = m + 1;
             }
-        } return m;
+        }
+        return m;
     }
-//    密码输入合法判断
-    private Boolean isPas(String str) {
-        if (null == str ||"".equals(str)) {
+
+    //    密码输入合法判断
+//    private Boolean isPasCN(String str) {
+//        if ( null==str||"".equals(str)) {
+//            return false;
+//        }else{
+//            Pattern pattern=Pattern.compile(regExPasCN);
+//            Matcher matcher = pattern.matcher(str);
+//            if (!matcher.matches()){
+//                return true;
+//            } else {
+//                return false;
+//            }
+//        }
+//
+//    }
+
+//再次输入密码合法判断
+    private Boolean isPasSame(){
+        getEditString();
+        if (pas.equals(pasAgain)){
+            return true;
+        }else {
             return false;
-        } else {
-            Pattern pattern = Pattern.compile(regExPasCN);
-            Matcher matcher = pattern.matcher(str);
-            if (!matcher.matches()) {
-                return true;
-            } else {
-                return false;
-            }
         }
     }
 //提交入口
@@ -313,9 +353,10 @@ public class RegisterActivity extends AppCompatActivity {
         if (TextUtils.isEmpty(uName)||TextUtils.isEmpty(emil)||TextUtils.isEmpty(pas)||TextUtils.isEmpty(verificationCode)){
             return false;
         }else {
-            return true;
+                return true;
+            }
         }
-    }
+
 //    数据转换为json格式数据字符串
     private String getJson(String verificationCode,String uName,String pas,String emil)throws Exception{
         JSONObject jsonParam=new JSONObject();

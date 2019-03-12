@@ -42,7 +42,7 @@
                 android:layout_gravity="center_vertical"
                 android:paddingTop="5dp"
                 android:paddingBottom="5dp"
-                android:maxLength="11"
+                android:maxLength="12"
                 android:textSize="16sp"
                 android:paddingLeft="10dp"/>
 
@@ -76,7 +76,8 @@
                 android:paddingTop="5dp"
                 android:paddingBottom="5dp"
                 android:textSize="16sp"
-                android:paddingLeft="10dp"/>
+                android:paddingLeft="10dp"
+                android:maxLength="16"/>
         </LinearLayout>
         <TextView
             android:id="@+id/register_input_pas"
@@ -107,9 +108,19 @@
                 android:paddingTop="5dp"
                 android:paddingBottom="5dp"
                 android:textSize="16sp"
-                android:paddingLeft="10dp"/>
+                android:paddingLeft="10dp"
+                android:maxLength="16"
+                android:inputType="textPassword"/>
         </LinearLayout>
-
+        <TextView
+            android:id="@+id/register_input_pas_again"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="两次密码不同"
+            android:textColor="#717171"
+            android:textSize="10sp"
+            android:layout_gravity="end"
+            android:enabled="false"/>
 
         <LinearLayout
             android:layout_width="match_parent"
