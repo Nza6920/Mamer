@@ -78,6 +78,7 @@ public class RegisterActivity extends AppCompatActivity {
     String regExUname = "^[a-zA-Z0-9\u4e00-\u9fa5]{2,15}";
     String regExPasCN = "[\u4e00-\u9fa5]";
     String regExEmil = "^[a-z0-9A-Z]+[-|a-z0-9A-Z._]+@([a-z0-9A-Z]+(-[a-z0-9A-Z]+)?\\.)+[a-z]{2,}$";
+    String regExNull="\\s+";
 
 
     //        UI
@@ -235,7 +236,10 @@ public class RegisterActivity extends AppCompatActivity {
             getEditString();
             Pattern pattern = Pattern.compile(regExPasCN);
             Matcher matcher = pattern.matcher(pas);
-            if (matcher.find()) {
+
+            Pattern patternNull = Pattern.compile(regExNull);
+            Matcher matcherNull = patternNull.matcher(pas);
+            if (matcher.find() || matcherNull.find() || (!(calculatePlaces(pas) > 5))) {
                 tvInputPas.setTextColor(Color.RED);
             } else {
                 tvInputPas.setTextColor(Color.WHITE);

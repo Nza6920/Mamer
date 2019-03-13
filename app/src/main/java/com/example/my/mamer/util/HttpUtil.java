@@ -12,11 +12,15 @@ public class HttpUtil {
     public static void sendOkHttpRequest(final String address, final RequestBody requestBody, final okhttp3.Callback callback){
 //        创建okHttpClient对象
         OkHttpClient client=new OkHttpClient();
-
 //        创建一个Request
         Request request=new Request.Builder().url(address).post(requestBody).build();
         client.newCall(request).enqueue(callback);
+    }
 
+    public static void sendOkHttpRequestGet(String address,okhttp3.Callback callback){
+        OkHttpClient client=new OkHttpClient();
+        Request request=new Request.Builder().url(address).build();
+        client.newCall(request).enqueue(callback);
     }
 
 }

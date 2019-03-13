@@ -28,6 +28,7 @@
                     android:layout_height="20dp"
                     android:background="@mipmap/ic_user_home_page_editor"/>
                 <TextView
+                    android:id="@+id/user_home_page_editor"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -35,7 +36,8 @@
                     android:textSize="11sp"
                     android:textColor="#ffffff"
                     android:layout_marginRight="5dp"
-                    android:background="@drawable/user_information_introduction"/>
+                    android:background="@drawable/user_information_introduction"
+                    android:enabled="true"/>
 
             </LinearLayout>
 
@@ -67,7 +69,7 @@
                             android:clickable="false"
                             android:enabled="false"/>
                         <TextView
-                            android:id="@+id/user_information_name"
+                            android:id="@+id/user_home_page_name"
                             android:layout_width="match_parent"
                             android:layout_height="40dp"
                             android:layout_gravity="center_vertical"

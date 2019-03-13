@@ -2,9 +2,12 @@ package com.example.my.mamer;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+
+import com.example.my.mamer.config.User;
 
 import org.json.JSONObject;
 
@@ -49,6 +52,9 @@ public class TestActivity extends AppCompatActivity {
                 });
             }
         });
+        User user=new User();
+        user.getUserPassKey();
+        Log.e("Tag",user.getUserPassKey());
 
     }
 
@@ -83,5 +89,6 @@ public class TestActivity extends AppCompatActivity {
             }
         });
     }
+
 
 }

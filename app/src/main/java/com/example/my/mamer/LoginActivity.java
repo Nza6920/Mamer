@@ -22,6 +22,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.my.mamer.config.User;
 import com.example.my.mamer.util.HttpUtil;
 import com.example.my.mamer.util.LoadingDraw;
 import com.example.my.mamer.util.NCopyPaste;
@@ -82,8 +83,6 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 };
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -204,7 +203,9 @@ public class LoginActivity extends AppCompatActivity {
                             msg3.obj=loadingDraw;
                             msgHandler.sendMessage(msg3);
 
-                            Intent intent=new Intent(LoginActivity.this,MainActivity.class);
+                            String userPassKey=jresp.getString("access_token");
+                            User.setUserPassKey(userPassKey);
+                            Intent intent=new Intent(LoginActivity.this,UserHomePageActivity.class);
                             startActivity(intent);
                             finish();
                             break;
