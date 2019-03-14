@@ -7,6 +7,7 @@ public class User {
     private static String userIntroduction;
     private static String userPassKey;
     private static String userImg;
+    public static String  userPassKey_type;
 
     public User() {
     }
@@ -57,5 +58,13 @@ public class User {
 
     public static void setUserImg(String userImg) {
         User.userImg = userImg;
+    }
+
+    public static String getUserPassKey_type() {
+        return userPassKey_type;
+    }
+
+    public static void setUserPassKey_type(String userPassKey_type) {
+        User.userPassKey_type = userPassKey_type;
     }
 }

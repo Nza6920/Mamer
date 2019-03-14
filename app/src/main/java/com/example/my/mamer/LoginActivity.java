@@ -204,7 +204,9 @@ public class LoginActivity extends AppCompatActivity {
                             msgHandler.sendMessage(msg3);
 
                             String userPassKey=jresp.getString("access_token");
+                            String userPassKey_type=jresp.getString("token_type");
                             User.setUserPassKey(userPassKey);
+                            User.setUserPassKey_type(userPassKey_type);
                             Intent intent=new Intent(LoginActivity.this,UserHomePageActivity.class);
                             startActivity(intent);
                             finish();

@@ -1,5 +1,7 @@
 package com.example.my.mamer.util;
 
+import com.example.my.mamer.config.User;
+
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -19,8 +21,10 @@ public class HttpUtil {
 
     public static void sendOkHttpRequestGet(String address,okhttp3.Callback callback){
         OkHttpClient client=new OkHttpClient();
-        Request request=new Request.Builder().url(address).build();
+        Request request=new Request.Builder().addHeader("Authorization", User.getUserPassKey_type()+User.getUserPassKey()).url(address).build();
         client.newCall(request).enqueue(callback);
     }
+
+//    public static void sendOkHttpRequestRefresh(String)
 
 }

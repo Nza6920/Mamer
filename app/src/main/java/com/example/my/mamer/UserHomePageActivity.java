@@ -1,16 +1,19 @@
 package com.example.my.mamer;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.Spanned;
+import android.text.TextUtils;
 import android.text.style.AbsoluteSizeSpan;
 import android.util.Base64;
 import android.util.Log;
@@ -20,6 +23,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.my.mamer.config.User;
+import com.example.my.mamer.util.CircleImageView;
 import com.example.my.mamer.util.HttpUtil;
 import com.example.my.mamer.util.LoadingDraw;
 
@@ -28,9 +32,12 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 
+import okhttp3.Authenticator;
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.Request;
 import okhttp3.Response;
+import okhttp3.Route;
 
 import static com.example.my.mamer.config.Config.DISMISS_DIALOG;
 import static com.example.my.mamer.config.Config.HTTP_OVERTIME;
@@ -83,27 +90,30 @@ public class UserHomePageActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_home_page);
 
+
+
+
+
+        loadingDraw=new LoadingDraw(this);
+        try {
+                getInformationRequest();
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        init();
 //        登录了
-//        if (user.getUserPassKey()!=null){
+//        if (TextUtils.isEmpty(User.getUserPassKey())){
 //            Log.e("Tag","Login IN");
 //            try {
 //                getInformationRequest();
-//                loadPicCodeImg(user.getUserImg());
+//
 //            } catch (JSONException e) {
 //                e.printStackTrace();
 //            }
 //        }else {
 ////            未登录
-//            Log.e("Tag","Login OFF");
 //        }
-        loadingDraw=new LoadingDraw(this);
-        init();
-        try {
-            getInformationRequest();
-            loadPicCodeImg(User.getUserImg());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
     }
 
     private void init(){
@@ -154,7 +164,7 @@ public class UserHomePageActivity extends AppCompatActivity {
     }
 //    GET方式
     private void getInformationRequest() throws JSONException {
-        String address="https://mamer.club/api/user?Authorization="+"Bearer "+User.getUserPassKey();
+        String address="https://mamer.club/api/user";
         HttpUtil.sendOkHttpRequestGet(address, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -185,6 +195,12 @@ public class UserHomePageActivity extends AppCompatActivity {
                              User.setUserEmail(jresp.getString("email"));
                             JSONObject imgCode=jresp.getJSONObject("avatar");
                             User.setUserImg(imgCode.getString("encoded"));
+
+                            new Thread(){
+                                public void run(){
+                                    msgHandler.post(setImgRunable);
+                                }
+                            }.start();
                             break;
 //                            令牌失效，重新请求
                         case HTTP_USER_ERROR:
@@ -193,6 +209,13 @@ public class UserHomePageActivity extends AppCompatActivity {
                             msg4.obj=loadingDraw;
                             msgHandler.sendMessage(msg4);
 
+                            Authenticator authenticator=new Authenticator() {
+                                @Override
+                                public Request authenticate( Route route, Response response) throws IOException {
+//    刷新token
+                                    return response.request().newBuilder().addHeader("Authorization", User.getUserPassKey_type()+User.getUserPassKey()).build();
+                                }
+                            };
                             break;
                             default:
                                 break;
@@ -215,6 +238,15 @@ public class UserHomePageActivity extends AppCompatActivity {
         }catch (Exception e){
             e.printStackTrace();
         }
+//        CircleImageView bitmapImg=new CircleImageView();
         return bitmap;
     }
+    Runnable setImgRunable=new Runnable() {
+        @Override
+        public void run() {
+            imgUserAvatar.setImageBitmap(loadPicCodeImg(User.getUserImg()));
+        }
+    };
+
+
 }
