@@ -5,30 +5,32 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".UserHomePageActivity"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="#00ffffff">
 
         <include layout="@layout/title"/>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginTop="20dp">
-            <ImageView
+            android:orientation="vertical">
+
+            <com.example.my.mamer.util.CircleImageView
                 android:id="@+id/user_home_page_avatar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="10dp"/>
+                android:layout_gravity="center"/>
+
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="20dp"
                 android:background="@drawable/user_home_page_editor">
                 <TextView
                     android:layout_width="20dp"
                     android:layout_height="20dp"
-                    android:background="@mipmap/ic_user_home_page_editor"/>
+                    android:background="@mipmap/ic_user_home_page_editor"
+                    android:enabled="true"/>
                 <TextView
                     android:id="@+id/user_home_page_editor"
                     android:layout_width="wrap_content"
@@ -126,9 +128,29 @@
                             android:paddingTop="5dp"
                             android:paddingBottom="5dp"
                             android:textSize="16sp"
-                            android:paddingLeft="10dp"
-                            android:maxLength="16"/>
+                            android:paddingLeft="10dp" />
                     </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:layout_gravity="bottom">
+                        <TextView
+                            android:layout_weight="2"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:text="注册时间:"
+                            android:textSize="16sp"
+                            android:gravity="start" />
+                        <TextView
+                            android:id="@+id/user_home_page_create_time"
+                            android:layout_weight="5"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:textSize="16sp"
+                            android:gravity="start"/>
+                    </LinearLayout>
+
 
                 </LinearLayout>
                 <LinearLayout
@@ -136,8 +158,8 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"/>
             </LinearLayout>
+
+
         </LinearLayout>
-    <com.example.my.mamer.util.CircleImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+
 </LinearLayout>

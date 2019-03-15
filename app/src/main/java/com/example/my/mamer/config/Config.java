@@ -8,6 +8,8 @@ public class Config {
     public static final String PIC_CODE="https://mamer.club/api/verificationCodes";
     public static final String REGISTER="https://mamer.club/api/users";
     public static final String LOGIN="https://mamer.club/api/authorizations";
+    public static final String USER_INFORMATION="https://mamer.club/api/user";
+    public static final String USER_AVATAR_IMG="https://mamer.club/api/images";
 
     //    http返回码
     public final static int HTTP_OK=201;
@@ -19,6 +21,7 @@ public class Config {
 //    循环消息常量
     public final static int DISMISS_DIALOG=7;
     public final static int MESSAGE_ERROR=9;
+    public final static int USER_SET_INFORMATION=5;
 //
     public static final MediaType JSON=MediaType.parse("application/json;charset=utf-8");
 }

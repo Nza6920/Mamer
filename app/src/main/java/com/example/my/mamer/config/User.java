@@ -7,7 +7,11 @@ public class User {
     private static String userIntroduction;
     private static String userPassKey;
     private static String userImg;
-    public static String  userPassKey_type;
+    private static String userImgId;
+    private static String userImgAvatar;
+    private static String userPassKey_type;
+    private static Boolean boundPhone;
+    private static String userBornDate;
 
     public User() {
     }
@@ -60,11 +64,43 @@ public class User {
         User.userImg = userImg;
     }
 
+    public static String getUserImgId() {
+        return userImgId;
+    }
+
+    public static void setUserImgId(String userImgId) {
+        User.userImgId = userImgId;
+    }
+
     public static String getUserPassKey_type() {
         return userPassKey_type;
     }
 
     public static void setUserPassKey_type(String userPassKey_type) {
         User.userPassKey_type = userPassKey_type;
+    }
+
+    public static Boolean getBoundPhone() {
+        return boundPhone;
+    }
+
+    public static void setBoundPhone(Boolean boundPhone) {
+        User.boundPhone = boundPhone;
+    }
+
+    public static String getUserBornDate() {
+        return userBornDate;
+    }
+
+    public static void setUserBornDate(String userBornDate) {
+        User.userBornDate = userBornDate;
+    }
+
+    public static String getUserImgAvatar() {
+        return userImgAvatar;
+    }
+
+    public static void setUserImgAvatar(String userImgAvatar) {
+        User.userImgAvatar = userImgAvatar;
     }
 }

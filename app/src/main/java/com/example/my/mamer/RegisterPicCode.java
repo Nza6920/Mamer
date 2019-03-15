@@ -355,6 +355,7 @@ public class RegisterPicCode extends AppCompatActivity {
 //更新UI
                     new Thread(){
                         public void run(){
+
                             msgHandler.post(setImgRunable);
                         }
                     }.start();

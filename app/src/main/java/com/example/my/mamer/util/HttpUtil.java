@@ -25,6 +25,18 @@ public class HttpUtil {
         client.newCall(request).enqueue(callback);
     }
 
-//    public static void sendOkHttpRequestRefresh(String)
+    public static void sendOkHttpRequestPatch(String address,final  RequestBody requestBody,final okhttp3.Callback callback){
+        OkHttpClient client=new OkHttpClient();
+
+        Request request=new Request.Builder().patch(requestBody).addHeader("Authorization", User.getUserPassKey_type()+User.getUserPassKey()).url(address).build();
+        client.newCall(request).enqueue(callback);
+    }
+
+    public static void sendOkHttpRequestAvatar(String address,final okhttp3.Callback callback){
+        OkHttpClient client=new OkHttpClient();
+        Request request=new Request.Builder().url(address).build();
+        client.newCall(request).enqueue(callback);
+    }
+
 
 }

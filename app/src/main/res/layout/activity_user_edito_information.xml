@@ -6,23 +6,39 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".UserEditorInformationActivity">
+
     <include layout="@layout/title"/>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
-        <ImageView
+        android:orientation="vertical"
+        android:layout_marginTop="20dp">
+        <com.example.my.mamer.util.CircleImageView
             android:id="@+id/user_information_avatar"
             android:layout_width="wrap_content"
-            android:layout_height="60dp"
-            android:layout_gravity="center" />
-        <TextView
-            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="更换头像"
-            android:textSize="13sp"
+            android:layout_gravity="center"
             android:layout_marginTop="10dp"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="15dp"
+            android:background="@drawable/user_home_page_editor">
+            <TextView
+                android:id="@+id/user_information_editor"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="修改头像"
+                android:textSize="11sp"
+                android:textColor="#ffffff"
+                android:background="@drawable/user_information_introduction"
+                android:enabled="true"/>
+        </LinearLayout>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -37,7 +53,7 @@
                     android:layout_weight="5"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="20dp"
                     android:orientation="vertical">
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -64,7 +80,7 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="50dp"
-                        android:layout_marginTop="10dp">
+                        android:layout_marginTop="20dp">
 
                         <EditText
                             android:layout_width="wrap_content"
@@ -73,7 +89,7 @@
                             android:background="@mipmap/ic_user_information_email"
                             android:clickable="false"
                             android:enabled="false"/>
-                        <EditText
+                        <TextView
                             android:id="@+id/user_information_email"
                             android:layout_width="match_parent"
                             android:layout_height="40dp"
@@ -82,12 +98,14 @@
                             android:paddingBottom="5dp"
                             android:textSize="16sp"
                             android:paddingLeft="10dp"
-                            android:maxLength="16"/>
+                            android:maxLength="16"
+                            android:enabled="false"
+                            android:background="#f5dbdb"/>
                     </LinearLayout>
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
+                        android:layout_marginTop="20dp"
                         android:background="@drawable/register_phone_num_tab">
 
                         <ImageView
