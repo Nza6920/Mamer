@@ -18,7 +18,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.my.mamer.config.User;
 import com.example.my.mamer.util.CircleImageView;
@@ -42,6 +41,7 @@ import okhttp3.Response;
 import okhttp3.Route;
 
 import static com.example.my.mamer.config.Config.DISMISS_DIALOG;
+import static com.example.my.mamer.config.Config.HTTP_OK;
 import static com.example.my.mamer.config.Config.HTTP_USER_ERROR;
 import static com.example.my.mamer.config.Config.HTTP_USER_GET_INFORMATION;
 import static com.example.my.mamer.config.Config.HTTP_USER_NULL;
@@ -238,6 +238,9 @@ public class UserEditorInformationActivity extends AppCompatActivity {
                                     return response.request().newBuilder().addHeader("Authorization", User.getUserPassKey_type()+User.getUserPassKey()).build();
                                 }
                             };
+                            break;
+                            default:
+                                break;
 
 
                     }
@@ -292,18 +295,19 @@ public class UserEditorInformationActivity extends AppCompatActivity {
 
                 int pathsIndex=cursor.getColumnIndex(filePaths[0]);
                 final String photoPath=cursor.getString(pathsIndex);
-
+                imgUpLoad(photoPath);
+                cursor.close();
 
             }else if (requestCode==RESULT_CAMERA_IMAGE){
 //                实时拍照
                 Bitmap bitmap=null;
-
+                
 
             }
         }
 
     }
-
+//上传头像
     private void imgUpLoad(String localPath){
         File file=new File(localPath);
         MediaType MEDIA_TYPE=MediaType.parse("image/*");
@@ -313,14 +317,94 @@ public class UserEditorInformationActivity extends AppCompatActivity {
         HttpUtil.sendOkHttpRequestAvatars(USER_AVATAR_IMG, requestBody, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                Toast.makeText(UserEditorInformationActivity.this,"上传失败",Toast.LENGTH_SHORT).show();
+                Message msg1=new Message();
+                msg1.what=DISMISS_DIALOG;
+                msg1.obj=loadingDraw;
+                msgHandler.sendMessage(msg1);
+
+                Message msg2=new Message();
+                msg2.what=MESSAGE_ERROR;
+                msg2.obj="上传失败";
+                msgHandler.sendMessage(msg2);
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                
+                try {
+                    JSONObject jresp=new JSONObject(response.body().string());
+                    switch (response.code()){
+//                        201
+                        case HTTP_OK:
+                            Message msg3=new Message();
+                            msg3.what=DISMISS_DIALOG;
+                            msg3.obj=loadingDraw;
+                            msgHandler.sendMessage(msg3);
+
+                            User.setUserImgId(jresp.getString("id"));
+                            User.setUserId(jresp.getString("user_id"));
+                            User.setUserPassKey_type(jresp.getString("type"));
+                            User.setUserImgAvatar(jresp.getString("path"));
+                            getAvatarRequest();
+                            break;
+//                    401
+                        case HTTP_USER_ERROR:
+                            Message msg6=new Message();
+                            msg6.what=DISMISS_DIALOG;
+                            msg6.obj=loadingDraw;
+                            msgHandler.sendMessage(msg6);
+
+                            Authenticator authenticator=new Authenticator() {
+                                @Override
+                                public Request authenticate(Route route, Response response) throws IOException {
+//    刷新token
+                                    return response.request().newBuilder().addHeader("Authorization", User.getUserPassKey_type()+User.getUserPassKey()).build();
+                                }
+                            };
+                            default:
+                                break;
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
 
             }
         });
     }
+    //    获取修改后的头像
+    private void getAvatarRequest() {
+        //                            上传了头像后，下载头像
+        HttpUtil.sendOkHttpRequestAvatar(User.getUserImgAvatar(), new Callback() {
+
+            @Override
+            public void onFailure(Call call, IOException e) {
+
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+//                            上传成功，将图片显示
+                byte[] bytes = (byte[]) response.body().bytes();
+                final Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                imgUserInformationAvatar.setBitmap(bitmap);
+                imgUserInformationAvatar.setmWidth(bitmap.getWidth());
+                imgUserInformationAvatar.setmHeight(bitmap.getHeight());
+                User.setUserImgBitmap(bitmap);
+
+                Log.e("Tag", String.valueOf(User.getUserImgBitmap()));
+                final Runnable setAvatarRunable = new Runnable() {
+                    @Override
+                    public void run() {
+                        imgUserInformationAvatar.setImageBitmap(bitmap);
+                    }
+                };
+                new Thread() {
+                    public void run() {
+                        msgHandler.post(setAvatarRunable);
+                    }
+                }.start();
+            }
+        });
+    }
+
 }

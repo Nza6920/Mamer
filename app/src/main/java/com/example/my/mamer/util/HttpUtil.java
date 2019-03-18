@@ -41,7 +41,7 @@ public class HttpUtil {
     public static void sendOkHttpRequestAvatars(String address, final RequestBody requestBody,final okhttp3.Callback callback){
         OkHttpClient client=new OkHttpClient();
 
-        Request request=new Request.Builder().url(address).post(requestBody).build();
+        Request request=new Request.Builder().addHeader("Authorization", User.getUserPassKey_type()+User.getUserPassKey()).url(address).post(requestBody).build();
         client.newCall(request).enqueue(callback);
     }
 
