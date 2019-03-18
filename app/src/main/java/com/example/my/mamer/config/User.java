@@ -1,5 +1,7 @@
 package com.example.my.mamer.config;
 
+import android.graphics.Bitmap;
+
 public class User {
     private static String userId;
     private static String userName;
@@ -9,6 +11,7 @@ public class User {
     private static String userImg;
     private static String userImgId;
     private static String userImgAvatar;
+    private static Bitmap userImgBitmap;
     private static String userPassKey_type;
     private static Boolean boundPhone;
     private static String userBornDate;
@@ -102,5 +105,13 @@ public class User {
 
     public static void setUserImgAvatar(String userImgAvatar) {
         User.userImgAvatar = userImgAvatar;
+    }
+
+    public static Bitmap getUserImgBitmap() {
+        return userImgBitmap;
+    }
+
+    public static void setUserImgBitmap(Bitmap userImgBitmap) {
+        User.userImgBitmap = userImgBitmap;
     }
 }

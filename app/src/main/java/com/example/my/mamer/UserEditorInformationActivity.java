@@ -1,19 +1,24 @@
 package com.example.my.mamer;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.MediaStore;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.my.mamer.config.User;
 import com.example.my.mamer.util.CircleImageView;
@@ -23,12 +28,14 @@ import com.example.my.mamer.util.LoadingDraw;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.IOException;
 
 import okhttp3.Authenticator;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
@@ -39,12 +46,15 @@ import static com.example.my.mamer.config.Config.HTTP_USER_ERROR;
 import static com.example.my.mamer.config.Config.HTTP_USER_GET_INFORMATION;
 import static com.example.my.mamer.config.Config.HTTP_USER_NULL;
 import static com.example.my.mamer.config.Config.MESSAGE_ERROR;
+import static com.example.my.mamer.config.Config.RESULT_CAMERA_IMAGE;
+import static com.example.my.mamer.config.Config.RESULT_LODA_IMAGE;
+import static com.example.my.mamer.config.Config.USER_AVATAR_IMG;
 import static com.example.my.mamer.config.Config.USER_INFORMATION;
 
 public class UserEditorInformationActivity extends AppCompatActivity {
     private static final MediaType XWWW=MediaType.parse("application/x-www-form-urlencoded;charset=utf-8");
 //    头像
-    private CircleImageView imgUserAvatar;
+    private CircleImageView imgUserInformationAvatar;
     private String userAvatar;
 //    头像按钮
     private TextView tvUserEditor;
@@ -65,6 +75,10 @@ public class UserEditorInformationActivity extends AppCompatActivity {
         @Override
         public void handleMessage(Message msg){
             switch (msg.what){
+                case DISMISS_DIALOG:
+                    ((LoadingDraw)msg.obj).dismiss();
+                    break;
+
                 default:
                     break;
             }
@@ -84,20 +98,41 @@ public class UserEditorInformationActivity extends AppCompatActivity {
     private void init(){
         tvBack=findViewById(R.id.title_tv_close);
         btnFinish=findViewById(R.id.title_btn_next);
-        imgUserAvatar=findViewById(R.id.user_information_avatar);
+        imgUserInformationAvatar=findViewById(R.id.user_information_avatar);
         tvUserEditor=findViewById(R.id.user_information_editor);
         etUserName=findViewById(R.id.user_information_name);
         etUserEmail=findViewById(R.id.user_information_email);
         etUserIntroduction=findViewById(R.id.user_information_introduction);
 
-        Drawable tvClosePic=ContextCompat.getDrawable(this,R.mipmap.ic_title_close);
+        Drawable tvClosePic=ContextCompat.getDrawable(this,R.mipmap.ic_title_back);
         tvBack.setBackground(tvClosePic);
         btnFinish.setText("完成");
-        new Thread(){
-            public void run(){
-                msgHandler.post(setImgRunable);
-            }
-        }.start();
+
+        if (User.getUserImgBitmap()!=null){
+            Message msg3=new Message();
+            msg3.what=DISMISS_DIALOG;
+            msg3.obj=loadingDraw;
+            msgHandler.sendMessage(msg3);
+
+            new Thread(){
+                public void run(){
+                    msgHandler.post(setAvatarBitmapRunable);
+                }
+            }.start();
+        }else {
+            Message msg3=new Message();
+            msg3.what=DISMISS_DIALOG;
+            msg3.obj=loadingDraw;
+            msgHandler.sendMessage(msg3);
+
+            new Thread(){
+                public void run(){
+                    msgHandler.post(setImgRunable);
+                }
+            }.start();
+        }
+
+
         etUserName.setText(User.getUserName());
         etUserEmail.setText(User.getUserEmail());
         etUserIntroduction.setText(User.getUserIntroduction());
@@ -221,9 +256,9 @@ public class UserEditorInformationActivity extends AppCompatActivity {
         try {
             byte[] bitmapArray=Base64.decode(bicCodes.split(",")[1],Base64.DEFAULT);
             bitmap=BitmapFactory.decodeByteArray(bitmapArray,0,bitmapArray.length);
-            imgUserAvatar.setBitmap(bitmap);
-            imgUserAvatar.setmWidth(bitmap.getWidth());
-            imgUserAvatar.setmHeight(bitmap.getHeight());
+            imgUserInformationAvatar.setBitmap(bitmap);
+            imgUserInformationAvatar.setmWidth(bitmap.getWidth());
+            imgUserInformationAvatar.setmHeight(bitmap.getHeight());
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -232,7 +267,60 @@ public class UserEditorInformationActivity extends AppCompatActivity {
     Runnable setImgRunable=new Runnable() {
         @Override
         public void run() {
-            imgUserAvatar.setImageBitmap(loadPicCodeImg(User.getUserImg()));
+            imgUserInformationAvatar.setImageBitmap(loadPicCodeImg(User.getUserImg()));
         }
     };
+    Runnable setAvatarBitmapRunable=new Runnable() {
+        @Override
+        public void run() {
+            imgUserInformationAvatar.setImageBitmap(User.getUserImgBitmap());
+            Log.e("Tag", String.valueOf(User.getUserImgBitmap()));
+        }
+    };
+
+//得到拍摄的图片
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode,Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode==RESULT_OK){
+//            从相册获取
+            if (requestCode==RESULT_LODA_IMAGE&& null!=data){
+                Uri selectedImg=data.getData();
+                String[] filePaths={MediaStore.Images.Media.DATA};
+                Cursor cursor=getContentResolver().query(selectedImg,filePaths,null,null,null);
+                cursor.moveToFirst();
+
+                int pathsIndex=cursor.getColumnIndex(filePaths[0]);
+                final String photoPath=cursor.getString(pathsIndex);
+
+
+            }else if (requestCode==RESULT_CAMERA_IMAGE){
+//                实时拍照
+                Bitmap bitmap=null;
+
+
+            }
+        }
+
+    }
+
+    private void imgUpLoad(String localPath){
+        File file=new File(localPath);
+        MediaType MEDIA_TYPE=MediaType.parse("image/*");
+        MultipartBody.Builder builder=new MultipartBody.Builder().setType(MultipartBody.FORM);
+        builder.addFormDataPart("file",file.getName(),RequestBody.create(MEDIA_TYPE,file));
+        final MultipartBody requestBody=builder.build();
+        HttpUtil.sendOkHttpRequestAvatars(USER_AVATAR_IMG, requestBody, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Toast.makeText(UserEditorInformationActivity.this,"上传失败",Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                
+
+            }
+        });
+    }
 }

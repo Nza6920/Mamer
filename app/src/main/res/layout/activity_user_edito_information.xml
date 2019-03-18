@@ -12,21 +12,20 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginTop="20dp">
+        android:orientation="vertical">
+
         <com.example.my.mamer.util.CircleImageView
             android:id="@+id/user_information_avatar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="10dp"/>
+            android:layout_width="250dp"
+            android:layout_height="250dp"
+            android:layout_gravity="center"/>
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="15dp"
-            android:background="@drawable/user_home_page_editor">
+            android:background="@drawable/user_home_page_editor"
+            android:layout_marginTop="10dp">
             <TextView
                 android:id="@+id/user_information_editor"
                 android:layout_width="wrap_content"

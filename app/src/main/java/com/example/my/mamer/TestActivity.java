@@ -1,13 +1,16 @@
 package com.example.my.mamer;
 
-import android.support.v7.app.AppCompatActivity;
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.my.mamer.config.User;
+import com.example.my.mamer.util.PhotoPopupWindow;
 
 import org.json.JSONObject;
 
@@ -20,11 +23,16 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import static com.example.my.mamer.config.Config.RESULT_CAMERA_IMAGE;
+import static com.example.my.mamer.config.Config.RESULT_LODA_IMAGE;
+
 public class TestActivity extends AppCompatActivity {
     private static final MediaType JSON=MediaType.parse("application/json;charset=utf-8");
     private String address="https://mamer.club/api/captchas";
     private Button btn_test;
     private TextView tv_test;
+    private PhotoPopupWindow photoPopupWindow;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,6 +97,7 @@ public class TestActivity extends AppCompatActivity {
             }
         });
     }
+
 
 
 }

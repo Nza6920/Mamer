@@ -42,16 +42,8 @@ public class CircleImageView extends android.support.v7.widget.AppCompatImageVie
         this.bitmap = bitmap;
     }
 
-    public int getmWidth() {
-        return mWidth;
-    }
-
     public void setmWidth(int mWidth) {
         this.mWidth = mWidth;
-    }
-
-    public int getmHeight() {
-        return mHeight;
     }
 
     public void setmHeight(int mHeight) {
@@ -92,7 +84,7 @@ public class CircleImageView extends android.support.v7.widget.AppCompatImageVie
 //        抗锯齿
         mPaintCircle.setAntiAlias(true);
 //        图片边界宽度
-//        mPaintCircle.setStrokeWidth(5);
+        mPaintCircle.setStrokeWidth(5);
 
 //       图形加边框
        mPaintBorder=new Paint();
@@ -127,10 +119,10 @@ public class CircleImageView extends android.support.v7.widget.AppCompatImageVie
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
-        mWidth=getmWidth();
-        mHeight=getmHeight();
+        mWidth=getWidth();
+        mHeight=getHeight();
         int mCircleSize=Math.min(mHeight,mWidth);
-        radius=mCircleSize/2-2;
+        radius=mCircleSize/2-mCircleBorderWidth;
     }
 
     @Override

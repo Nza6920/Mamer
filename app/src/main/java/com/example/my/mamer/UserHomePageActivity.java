@@ -10,6 +10,7 @@ import android.os.Message;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -199,6 +200,7 @@ public class UserHomePageActivity extends AppCompatActivity {
                                 }catch (Exception e){
                                     String userAvatar=jresp.getString("avatar");
                                     User.setUserImgAvatar(userAvatar);
+
                                     getAvatarRequest();
 
 
@@ -294,6 +296,8 @@ public class UserHomePageActivity extends AppCompatActivity {
                 imgUserAvatar.setBitmap(bitmap);
                 imgUserAvatar.setmWidth(bitmap.getWidth());
                 imgUserAvatar.setmHeight(bitmap.getHeight());
+                User.setUserImgBitmap(bitmap);
+                Log.e("Tag", String.valueOf(User.getUserImgBitmap()));
                 final Runnable setAvatarRunable=new Runnable() {
                     @Override
                     public void run() {

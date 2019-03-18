@@ -5,6 +5,11 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <user-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+
+
+
 
     <application
         android:allowBackup="true"
@@ -15,7 +20,9 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <activity android:name=".MainActivity" />
-        <activity android:name=".RegisterPhoneNumActivity" />
+        <activity android:name=".RegisterPhoneNumActivity" >
+
+        </activity>
         <activity android:name=".RegisterPicCode" />
         <activity android:name=".RegisterActivity" />
         <activity android:name=".TestActivity" />
@@ -31,4 +38,13 @@
         <activity android:name=".UserEditorInformationActivity" />
     </application>
 
+    <provider
+        android:name="android.support.v4.content.FileProvider"
+        android:authorities="com.example.my.mamer.fileProvider"
+        android:grantUriPermission="true"
+        android:exported="false">
+        <meta-data
+            android:name="android.support.FILE_PROVIDER_PATHS"
+            android:resource="@xml/file_paths"/>
+    </provider>
 </manifest>
