@@ -3,7 +3,7 @@
 <!--path:需要临时授权访问的路径；name:路径名-->
     <external-path
         name="files_root"
-        path="Android/data/com.example.my.mamer"/>
+        path="Android/data/com.example.my.mamer/"/>
     <external-path
         name="external_storage_root"
         path="."/>

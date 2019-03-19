@@ -28,7 +28,7 @@ public class HttpUtil {
     public static void sendOkHttpRequestPatch(String address,final  RequestBody requestBody,final okhttp3.Callback callback){
         OkHttpClient client=new OkHttpClient();
 
-        Request request=new Request.Builder().patch(requestBody).addHeader("Authorization", User.getUserPassKey_type()+User.getUserPassKey()).url(address).build();
+        Request request=new Request.Builder().patch(requestBody).addHeader("Authorization", User.getUserPassKey_type()+User.getUserPassKey()).addHeader("Content-Type","application/x-www-form-urlencoded").url(address).build();
         client.newCall(request).enqueue(callback);
     }
 //下载头像

@@ -38,7 +38,7 @@ public class PhotoPopupWindow extends PopupWindow{
         PhotoPopupWindow.cameraPhotoPath = cameraPhotoPath;
     }
 
-    public PhotoPopupWindow(Activity context){
+    public PhotoPopupWindow(final Activity context){
         super(context);
         initView(context);
     }
@@ -60,14 +60,17 @@ public class PhotoPopupWindow extends PopupWindow{
         popupWindow.setOutsideTouchable(true);
 
 //        点击事件
+//        相册
         tvAlbum.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent=new Intent(Intent.ACTION_PICK,MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                Intent intent=new Intent("android.intent.action.GET_CONTENT");
+                intent.setType("image/*");
                 context.startActivityForResult(intent,RESULT_LODA_IMAGE);
                 popupWindow.dismiss();
             }
         });
+//        拍照
         tvCamera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -76,6 +79,7 @@ public class PhotoPopupWindow extends PopupWindow{
 
             }
         });
+//        取消
         tvCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -108,7 +112,8 @@ public class PhotoPopupWindow extends PopupWindow{
 //            android7.0以上获取文件uri
             if (photoFile!=null){
                 if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.N) {
-                    Uri contentUri = FileProvider.getUriForFile(mContext, BuildConfig.APPLICATION_ID + ".fileProvader", photoFile);
+                    Uri contentUri = FileProvider.getUriForFile(mContext, BuildConfig.APPLICATION_ID + ".fileProvider", photoFile);
+//                    将拍照的照片，保存到指定uri
                     takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, contentUri);
                 }else {
                     takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
@@ -140,42 +145,7 @@ public class PhotoPopupWindow extends PopupWindow{
         setCameraPhotoPath(image.getAbsolutePath());
         return image;
     }
-////        保存图片到存储卡
-//    public static void savePhotoToSDCard(String path, String photoName, Bitmap photoBitmap){
-//        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
-////            创建路径
-//            File imgDir =new File(path);
-//            if (!imgDir.exists()){
-//                imgDir.mkdirs();
-//            }
-////            在指定路径下创建文件
-//            File photoFile =new File(path,photoName);
-//            FileOutputStream fileOutputStream=null;
-//            try{
-//                fileOutputStream =new FileOutputStream(photoFile);
-//                if (photoBitmap!=null){
-//                    if (photoBitmap.compress(Bitmap.CompressFormat.JPEG,100,fileOutputStream)){
-//                        fileOutputStream.flush();
-//                        fileOutputStream.close();
-//                    }
-//                }
-//            } catch (FileNotFoundException e) {
-//                photoFile.delete();
-//                e.printStackTrace();
-//            } catch (IOException e) {
-//                photoFile.delete();
-//                e.printStackTrace();
-//            }finally {
-//                try {
-//                    fileOutputStream.close();
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }
-//    }
 
-//
 
 
 

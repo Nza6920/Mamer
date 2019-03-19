@@ -1,5 +1,6 @@
 package com.example.my.mamer;
 
+import android.content.ContentUris;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -9,6 +10,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -18,11 +20,13 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.my.mamer.config.User;
 import com.example.my.mamer.util.CircleImageView;
 import com.example.my.mamer.util.HttpUtil;
 import com.example.my.mamer.util.LoadingDraw;
+import com.example.my.mamer.util.PhotoPopupWindow;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -45,16 +49,18 @@ import static com.example.my.mamer.config.Config.HTTP_OK;
 import static com.example.my.mamer.config.Config.HTTP_USER_ERROR;
 import static com.example.my.mamer.config.Config.HTTP_USER_GET_INFORMATION;
 import static com.example.my.mamer.config.Config.HTTP_USER_NULL;
+import static com.example.my.mamer.config.Config.JSON;
+import static com.example.my.mamer.config.Config.MEDIA_TYPE_IMAGE;
 import static com.example.my.mamer.config.Config.MESSAGE_ERROR;
-import static com.example.my.mamer.config.Config.RESULT_CAMERA_IMAGE;
 import static com.example.my.mamer.config.Config.RESULT_LODA_IMAGE;
 import static com.example.my.mamer.config.Config.USER_AVATAR_IMG;
 import static com.example.my.mamer.config.Config.USER_INFORMATION;
 
 public class UserEditorInformationActivity extends AppCompatActivity {
-    private static final MediaType XWWW=MediaType.parse("application/x-www-form-urlencoded;charset=utf-8");
+    private static final MediaType XWWW=MediaType.parse("application/x-www-form-urlencoded");
 //    头像
     private CircleImageView imgUserInformationAvatar;
+    private PhotoPopupWindow photoPopupWindow;
     private String userAvatar;
 //    头像按钮
     private TextView tvUserEditor;
@@ -77,6 +83,9 @@ public class UserEditorInformationActivity extends AppCompatActivity {
             switch (msg.what){
                 case DISMISS_DIALOG:
                     ((LoadingDraw)msg.obj).dismiss();
+                    break;
+                case HTTP_USER_NULL:
+                    Toast.makeText(UserEditorInformationActivity.this,(String)msg.obj,Toast.LENGTH_SHORT).show();
                     break;
 
                 default:
@@ -152,11 +161,19 @@ public class UserEditorInformationActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 try {
-                    getEditString();
+                    loadingDraw.show();
                     patchInformation();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+            }
+        });
+//        修改头像
+        tvUserEditor.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                photoPopupWindow=new PhotoPopupWindow(UserEditorInformationActivity.this);
             }
         });
 
@@ -169,12 +186,13 @@ public class UserEditorInformationActivity extends AppCompatActivity {
     }
 //    PATC提交信息
     private void patchInformation() throws JSONException {
+        getEditString();
         JSONObject jsonParam=new JSONObject();
         jsonParam.put("name",userName);
         jsonParam.put("introduction",userInformation);
         String jsonStr=jsonParam.toString();
 
-        RequestBody requestBody=RequestBody.create(XWWW,jsonStr);
+        RequestBody requestBody=RequestBody.create(JSON,jsonStr);
         HttpUtil.sendOkHttpRequestPatch(USER_INFORMATION,requestBody, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -193,7 +211,7 @@ public class UserEditorInformationActivity extends AppCompatActivity {
             public void onResponse(Call call, Response response) throws IOException {
 
                 try {
-                    JSONObject jresp=new JSONObject(response.body().string());
+                      JSONObject jresp=new JSONObject(response.body().string());
                     switch (response.code()){
                         case HTTP_USER_GET_INFORMATION:
                             Message msg3=new Message();
@@ -281,39 +299,38 @@ public class UserEditorInformationActivity extends AppCompatActivity {
         }
     };
 
-//得到拍摄的图片
+//回调图片
     @Override
     protected void onActivityResult(int requestCode, int resultCode,Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode==RESULT_OK){
 //            从相册获取
             if (requestCode==RESULT_LODA_IMAGE&& null!=data){
-                Uri selectedImg=data.getData();
-                String[] filePaths={MediaStore.Images.Media.DATA};
-                Cursor cursor=getContentResolver().query(selectedImg,filePaths,null,null,null);
-                cursor.moveToFirst();
-
-                int pathsIndex=cursor.getColumnIndex(filePaths[0]);
-                final String photoPath=cursor.getString(pathsIndex);
-                imgUpLoad(photoPath);
-                cursor.close();
-
-            }else if (requestCode==RESULT_CAMERA_IMAGE){
-//                实时拍照
-                Bitmap bitmap=null;
-                
-
+//判断手机系统版本号
+                try {
+                    handleImageOnKitKat(data);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
+//            else if (requestCode==RESULT_CAMERA_IMAGE){
+////                实时拍照
+//                Bitmap bitmap=null;
+//
+//
+//            }
         }
 
     }
-//上传头像
-    private void imgUpLoad(String localPath){
-        File file=new File(localPath);
-        MediaType MEDIA_TYPE=MediaType.parse("image/*");
+//     上传头像
+    private void imgUpLoad(String localPath) throws JSONException {
+        loadingDraw.show();
+
         MultipartBody.Builder builder=new MultipartBody.Builder().setType(MultipartBody.FORM);
-        builder.addFormDataPart("file",file.getName(),RequestBody.create(MEDIA_TYPE,file));
-        final MultipartBody requestBody=builder.build();
+        File file=new File(localPath);
+        builder.addFormDataPart("image",file.getName(),RequestBody.create(MEDIA_TYPE_IMAGE,file))
+               .addFormDataPart("type","avatar");
+        MultipartBody requestBody=builder.build();
         HttpUtil.sendOkHttpRequestAvatars(USER_AVATAR_IMG, requestBody, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -346,12 +363,34 @@ public class UserEditorInformationActivity extends AppCompatActivity {
                             User.setUserImgAvatar(jresp.getString("path"));
                             getAvatarRequest();
                             break;
+//                            422
+                        case HTTP_USER_NULL:
+                            Message msg4=new Message();
+                            msg4.what=DISMISS_DIALOG;
+                            msg4.obj=loadingDraw;
+                            msgHandler.sendMessage(msg4);
+
+                            String jrespStr=jresp.getString("errors");
+                            JSONObject  errorStr=jresp.getJSONObject(jrespStr);
+                            if (errorStr.has("type")){
+                                Message msg5=new Message();
+                                msg5.what=response.code();
+                                msg5.obj=errorStr.getString("type");
+                                msgHandler.sendMessage(msg5);
+                            }else if (errorStr.has("image")){
+                                Message msg6=new Message();
+                                msg6.what=response.code();
+                                msg6.obj=errorStr.getString("image");
+                                msgHandler.sendMessage(msg6);
+                        }
+
+                            break;
 //                    401
                         case HTTP_USER_ERROR:
-                            Message msg6=new Message();
-                            msg6.what=DISMISS_DIALOG;
-                            msg6.obj=loadingDraw;
-                            msgHandler.sendMessage(msg6);
+                            Message msg7=new Message();
+                            msg7.what=DISMISS_DIALOG;
+                            msg7.obj=loadingDraw;
+                            msgHandler.sendMessage(msg7);
 
                             Authenticator authenticator=new Authenticator() {
                                 @Override
@@ -371,7 +410,7 @@ public class UserEditorInformationActivity extends AppCompatActivity {
             }
         });
     }
-    //    获取修改后的头像
+//    获取修改后的头像
     private void getAvatarRequest() {
         //                            上传了头像后，下载头像
         HttpUtil.sendOkHttpRequestAvatar(User.getUserImgAvatar(), new Callback() {
@@ -406,5 +445,42 @@ public class UserEditorInformationActivity extends AppCompatActivity {
             }
         });
     }
+//    处理图片
+    private void handleImageOnKitKat(Intent data) throws JSONException {
+        String imagePath=null;
+        Uri uri=data.getData();
+        if (DocumentsContract.isDocumentUri(this,uri)){
+            String docId=DocumentsContract.getDocumentId(uri);
+            if ("com.android.providers.media.documents".equals(uri.getAuthority())){
+//                解析出数字格式id
+                String id=docId.split(":")[1];
+                String selection=MediaStore.Images.Media._ID+"="+id;
+                imagePath=getImagePath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,selection);
+            }else if ("com.android.providers.downloads.documents".equals(uri.getAuthority())){
+                Uri contentUri=ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"),Long.valueOf(docId));
+                imagePath=getImagePath(contentUri,null);
+            }
+        }else if ("content".equalsIgnoreCase(uri.getScheme())){
+            imagePath=getImagePath(uri,null);
+        }else if ("file".equalsIgnoreCase(uri.getScheme())){
+            imagePath=uri.getPath();
+        }
+
+        imgUpLoad(imagePath);
+//        displayImage(imagePath);
+    }
+//    图片路径
+    private String getImagePath(Uri uri,String selection){
+        String path=null;
+        Cursor cursor=getContentResolver().query(uri,null,selection,null,null);
+        if (cursor!=null){
+            if (cursor.moveToFirst()){
+                path=cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
+            }
+            cursor.close();
+        }
+        return path;
+    }
+
 
 }

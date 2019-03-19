@@ -79,9 +79,9 @@ public class UserHomePageActivity extends AppCompatActivity {
                     tvUserName.setText(User.getUserName());
                     tvUserEmail.setText(User.getUserEmail());
                     if (User.getUserIntroduction()==null){
-                        tvUserIntroduction.setText(User.getUserIntroduction());
-                    }else {
                         tvUserIntroduction.setText("Tomorrow will be better！");
+                    }else {
+                        tvUserIntroduction.setText(User.getUserIntroduction());
 
                     }
                     tvUserCreateTime.setText(User.getUserBornDate());
@@ -200,10 +200,7 @@ public class UserHomePageActivity extends AppCompatActivity {
                                 }catch (Exception e){
                                     String userAvatar=jresp.getString("avatar");
                                     User.setUserImgAvatar(userAvatar);
-
                                     getAvatarRequest();
-
-
                                 }
                             }
                             User.setUserIntroduction(jresp.getString("introduction"));

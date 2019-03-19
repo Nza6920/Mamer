@@ -22,8 +22,14 @@ public class Config {
     public final static int DISMISS_DIALOG=7;
     public final static int MESSAGE_ERROR=9;
     public final static int USER_SET_INFORMATION=5;
+
+//    拍摄
     public final static int RESULT_CAMERA_IMAGE=6;
+//    相册
     public final static int RESULT_LODA_IMAGE=8;
+//    裁剪
+    public final static int RESULT_CROP=13;
 //
     public static final MediaType JSON=MediaType.parse("application/json;charset=utf-8");
+    public static final MediaType MEDIA_TYPE_IMAGE=MediaType.parse("image/*");
 }
