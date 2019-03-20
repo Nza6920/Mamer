@@ -31,5 +31,6 @@ public class Config {
     public final static int RESULT_CROP=13;
 //
     public static final MediaType JSON=MediaType.parse("application/json;charset=utf-8");
+    public static final String CONTENT_TYPEs="application/x-www-form-urlencoded;charset=utf-8";
     public static final MediaType MEDIA_TYPE_IMAGE=MediaType.parse("image/*");
 }

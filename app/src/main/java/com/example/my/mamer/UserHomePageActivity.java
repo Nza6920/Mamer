@@ -137,7 +137,7 @@ public class UserHomePageActivity extends AppCompatActivity {
                 finish();
             }
         });
-//        点击头像上传照片
+//
         imgUserAvatar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -185,6 +185,7 @@ public class UserHomePageActivity extends AppCompatActivity {
                             User.setUserId(jresp.getString("id"));
                             User.setUserName(jresp.getString("name"));
                             User.setUserEmail(jresp.getString("email"));
+//                            默认头像
                             if (jresp.has("avatar")){
                                 try {
                                     JSONObject imgCode=jresp.getJSONObject("avatar");
@@ -198,13 +199,16 @@ public class UserHomePageActivity extends AppCompatActivity {
                                         }.start();
                                     }
                                 }catch (Exception e){
+//                                    给的网址
                                     String userAvatar=jresp.getString("avatar");
                                     User.setUserImgAvatar(userAvatar);
+                                    Log.e("Tag",userAvatar);
                                     getAvatarRequest();
                                 }
                             }
                             User.setUserIntroduction(jresp.getString("introduction"));
                             User.setBoundPhone(jresp.getBoolean("bound_phone"));
+                            User.setEmail_verified(jresp.getBoolean("email_verified"));
                             User.setUserBornDate(jresp.getString("created_at"));
 
                             new Thread(){

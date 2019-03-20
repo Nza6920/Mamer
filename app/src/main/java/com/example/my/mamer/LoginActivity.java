@@ -13,6 +13,7 @@ import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.style.AbsoluteSizeSpan;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -202,6 +203,7 @@ public class LoginActivity extends AppCompatActivity {
 
                             String userPassKey=jresp.getString("access_token");
                             String userPassKey_type=jresp.getString("token_type");
+                            Log.d("Tag",userPassKey);
                             User.setUserPassKey(userPassKey);
                             User.setUserPassKey_type(userPassKey_type);
                             Intent intent=new Intent(LoginActivity.this,UserHomePageActivity.class);

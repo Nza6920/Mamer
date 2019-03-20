@@ -7,6 +7,8 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 
+import static com.example.my.mamer.config.Config.CONTENT_TYPEs;
+
 public class HttpUtil {
 
     private static final MediaType JSON=MediaType.parse("application/json;charset=utf-8");
@@ -24,11 +26,11 @@ public class HttpUtil {
         Request request=new Request.Builder().addHeader("Authorization", User.getUserPassKey_type()+User.getUserPassKey()).url(address).build();
         client.newCall(request).enqueue(callback);
     }
-
+//获取用户信息
     public static void sendOkHttpRequestPatch(String address,final  RequestBody requestBody,final okhttp3.Callback callback){
         OkHttpClient client=new OkHttpClient();
 
-        Request request=new Request.Builder().patch(requestBody).addHeader("Authorization", User.getUserPassKey_type()+User.getUserPassKey()).addHeader("Content-Type","application/x-www-form-urlencoded").url(address).build();
+        Request request=new Request.Builder().patch(requestBody).addHeader("Authorization", User.getUserPassKey_type()+User.getUserPassKey()).addHeader("Content-Type",CONTENT_TYPEs).url(address).build();
         client.newCall(request).enqueue(callback);
     }
 //下载头像

@@ -8,13 +8,18 @@ public class User {
     private static String userEmail;
     private static String userIntroduction;
     private static String userPassKey;
+//    默认头像
     private static String userImg;
+//    头像id
     private static String userImgId;
+//    修改后的头像网址
     private static String userImgAvatar;
+//    修改后的头像Bitmap头像
     private static Bitmap userImgBitmap;
     private static String userPassKey_type;
     private static Boolean boundPhone;
     private static String userBornDate;
+    private static Boolean email_verified;
 
     public User() {
     }
@@ -113,5 +118,13 @@ public class User {
 
     public static void setUserImgBitmap(Bitmap userImgBitmap) {
         User.userImgBitmap = userImgBitmap;
+    }
+
+    public static Boolean getEmail_verified() {
+        return email_verified;
+    }
+
+    public static void setEmail_verified(Boolean email_verified) {
+        User.email_verified = email_verified;
     }
 }

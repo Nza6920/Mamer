@@ -5,14 +5,12 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
 import android.util.Log;
@@ -37,6 +35,7 @@ import java.io.IOException;
 import okhttp3.Authenticator;
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.FormBody;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.Request;
@@ -49,7 +48,6 @@ import static com.example.my.mamer.config.Config.HTTP_OK;
 import static com.example.my.mamer.config.Config.HTTP_USER_ERROR;
 import static com.example.my.mamer.config.Config.HTTP_USER_GET_INFORMATION;
 import static com.example.my.mamer.config.Config.HTTP_USER_NULL;
-import static com.example.my.mamer.config.Config.JSON;
 import static com.example.my.mamer.config.Config.MEDIA_TYPE_IMAGE;
 import static com.example.my.mamer.config.Config.MESSAGE_ERROR;
 import static com.example.my.mamer.config.Config.RESULT_LODA_IMAGE;
@@ -87,7 +85,10 @@ public class UserEditorInformationActivity extends AppCompatActivity {
                 case HTTP_USER_NULL:
                     Toast.makeText(UserEditorInformationActivity.this,(String)msg.obj,Toast.LENGTH_SHORT).show();
                     break;
+                case HTTP_OK:
+                    Toast.makeText(UserEditorInformationActivity.this,(String)msg.obj,Toast.LENGTH_SHORT).show();
 
+                    break;
                 default:
                     break;
             }
@@ -113,8 +114,8 @@ public class UserEditorInformationActivity extends AppCompatActivity {
         etUserEmail=findViewById(R.id.user_information_email);
         etUserIntroduction=findViewById(R.id.user_information_introduction);
 
-        Drawable tvClosePic=ContextCompat.getDrawable(this,R.mipmap.ic_title_back);
-        tvBack.setBackground(tvClosePic);
+//        Drawable tvClosePic=ContextCompat.getDrawable(this,R.mipmap.ic_title_back);
+//        tvBack.setBackground(tvClosePic);
         btnFinish.setText("完成");
 
         if (User.getUserImgBitmap()!=null){
@@ -148,14 +149,14 @@ public class UserEditorInformationActivity extends AppCompatActivity {
 
 //        点击事件
 //        返回
-        tvBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent=new Intent(UserEditorInformationActivity.this,UserHomePageActivity.class);
-                startActivity(intent);
-                finish();
-            }
-        });
+//        tvBack.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Intent intent=new Intent(UserEditorInformationActivity.this,UserHomePageActivity.class);
+//                startActivity(intent);
+//                finish();
+//            }
+//        });
 //        提交
         btnFinish.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -187,86 +188,186 @@ public class UserEditorInformationActivity extends AppCompatActivity {
 //    PATC提交信息
     private void patchInformation() throws JSONException {
         getEditString();
-        JSONObject jsonParam=new JSONObject();
-        jsonParam.put("name",userName);
-        jsonParam.put("introduction",userInformation);
-        String jsonStr=jsonParam.toString();
+        if (User.getUserImgId()!=null){
+//            修改头像
+            RequestBody requestBody=new FormBody.Builder()
+                    .add("avatar_image_id",User.getUserImgId())
+                    .add("name",userName)
+                    .add("introduction",userInformation)
+                    .build();
 
-        RequestBody requestBody=RequestBody.create(JSON,jsonStr);
-        HttpUtil.sendOkHttpRequestPatch(USER_INFORMATION,requestBody, new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                Message msg1=new Message();
-                msg1.what=DISMISS_DIALOG;
-                msg1.obj=loadingDraw;
-                msgHandler.sendMessage(msg1);
 
-                Message msg2=new Message();
-                msg2.what=MESSAGE_ERROR;
-                msg2.obj="服务器异常,请检查网络";
-                msgHandler.sendMessage(msg2);
-            }
+            HttpUtil.sendOkHttpRequestPatch(USER_INFORMATION,requestBody, new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    Message msg1=new Message();
+                    msg1.what=DISMISS_DIALOG;
+                    msg1.obj=loadingDraw;
+                    msgHandler.sendMessage(msg1);
 
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
+                    Message msg2=new Message();
+                    msg2.what=MESSAGE_ERROR;
+                    msg2.obj="服务器异常,请检查网络";
+                    msgHandler.sendMessage(msg2);
+                }
 
-                try {
-                      JSONObject jresp=new JSONObject(response.body().string());
-                    switch (response.code()){
-                        case HTTP_USER_GET_INFORMATION:
-                            Message msg3=new Message();
-                            msg3.what=DISMISS_DIALOG;
-                            msg3.obj=loadingDraw;
-                            msgHandler.sendMessage(msg3);
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
 
-                            Intent intent=new Intent(UserEditorInformationActivity.this,UserHomePageActivity.class);
-                            User.setUserId(jresp.getString("id"));
-                            User.setUserName(jresp.getString("name"));
-                            User.setUserIntroduction(jresp.getString("introduction"));
-                            User.setUserBornDate(jresp.getString("bound_phone"));
-                            startActivity(intent);
-                            finish();
+                    try {
+                        JSONObject jresp=new JSONObject(response.body().string());
+
+                        switch (response.code()){
+                            case HTTP_USER_GET_INFORMATION:
+                                Message msg3=new Message();
+                                msg3.what=DISMISS_DIALOG;
+                                msg3.obj=loadingDraw;
+                                msgHandler.sendMessage(msg3);
+
+                                User.setUserId(jresp.getString("id"));
+                                User.setUserName(jresp.getString("name"));
+                                User.setUserImgAvatar(jresp.getString("avatar"));
+                                User.setUserIntroduction(jresp.getString("introduction"));
+                                User.setEmail_verified(jresp.getBoolean("email_verified"));
+                                User.setUserBornDate(jresp.getString("bound_phone"));
+                                Log.e("Tag","修改后"+String.valueOf(User.getUserImgAvatar()));
+
+                                Intent intent=new Intent(UserEditorInformationActivity.this,UserHomePageActivity.class);
+                                startActivity(intent);
+                                finish();
+                                break;
 //                            422
-                        case HTTP_USER_NULL:
-                            Message msg4=new Message();
-                            msg4.what=DISMISS_DIALOG;
-                            msg4.obj=loadingDraw;
-                            msgHandler.sendMessage(msg4);
+                            case HTTP_USER_NULL:
+                                Message msg4=new Message();
+                                msg4.what=DISMISS_DIALOG;
+                                msg4.obj=loadingDraw;
+                                msgHandler.sendMessage(msg4);
 
-                            String jrespStr=jresp.getString("errors");
-                            JSONObject  errorStr=jresp.getJSONObject(jrespStr);
-                            if (errorStr.has("name")){
-                                Message msg5=new Message();
-                                msg5.what=response.code();
-                                msg5.obj=errorStr.getString("name");
-                                msgHandler.sendMessage(msg5);
-                            }
-                            break;
-//                            401,令牌失效，重新请求
-                        case HTTP_USER_ERROR:
-                            Message msg6=new Message();
-                            msg6.what=DISMISS_DIALOG;
-                            msg6.obj=loadingDraw;
-                            msgHandler.sendMessage(msg6);
-
-                            Authenticator authenticator=new Authenticator() {
-                                @Override
-                                public Request authenticate(Route route, Response response) throws IOException {
-//    刷新token
-                                    return response.request().newBuilder().addHeader("Authorization", User.getUserPassKey_type()+User.getUserPassKey()).build();
+                                String jrespStr=jresp.getString("errors");
+                                JSONObject  errorStr=jresp.getJSONObject(jrespStr);
+                                if (errorStr.has("name")){
+                                    Message msg5=new Message();
+                                    msg5.what=response.code();
+                                    msg5.obj=errorStr.getString("name");
+                                    msgHandler.sendMessage(msg5);
                                 }
-                            };
-                            break;
+                                break;
+//                            401,令牌失效，重新请求
+                            case HTTP_USER_ERROR:
+                                Message msg6=new Message();
+                                msg6.what=DISMISS_DIALOG;
+                                msg6.obj=loadingDraw;
+                                msgHandler.sendMessage(msg6);
+
+                                Authenticator authenticator=new Authenticator() {
+                                    @Override
+                                    public Request authenticate(Route route, Response response) throws IOException {
+//    刷新token
+                                        return response.request().newBuilder().addHeader("Authorization", User.getUserPassKey_type()+User.getUserPassKey()).build();
+                                    }
+                                };
+
+                                break;
                             default:
                                 break;
 
 
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
                 }
-            }
-        });
+            });
+        }else {
+//            未修改头像
+            RequestBody requestBody=new FormBody.Builder()
+                    .add("name",userName)
+                    .add("introduction",userInformation)
+                    .build();
+            HttpUtil.sendOkHttpRequestPatch(USER_INFORMATION,requestBody, new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    Message msg1=new Message();
+                    msg1.what=DISMISS_DIALOG;
+                    msg1.obj=loadingDraw;
+                    msgHandler.sendMessage(msg1);
+
+                    Message msg2=new Message();
+                    msg2.what=MESSAGE_ERROR;
+                    msg2.obj="服务器异常,请检查网络";
+                    msgHandler.sendMessage(msg2);
+                }
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+
+                    try {
+                        JSONObject jresp=new JSONObject(response.body().string());
+                        switch (response.code()){
+                            case HTTP_USER_GET_INFORMATION:
+                                Message msg3=new Message();
+                                msg3.what=DISMISS_DIALOG;
+                                msg3.obj=loadingDraw;
+                                msgHandler.sendMessage(msg3);
+
+                                User.setUserId(jresp.getString("id"));
+                                User.setUserName(jresp.getString("name"));
+                                User.setUserImgAvatar(jresp.getString("avatar"));
+                                User.setUserIntroduction(jresp.getString("introduction"));
+                                User.setEmail_verified(jresp.getBoolean("email_verified"));
+                                User.setUserBornDate(jresp.getString("bound_phone"));
+                                Log.e("Tag","修改后"+String.valueOf(User.getUserImgAvatar()));
+
+                                Intent intent=new Intent(UserEditorInformationActivity.this,UserHomePageActivity.class);
+                                startActivity(intent);
+                                finish();
+                                break;
+//                            422
+                            case HTTP_USER_NULL:
+                                Message msg4=new Message();
+                                msg4.what=DISMISS_DIALOG;
+                                msg4.obj=loadingDraw;
+                                msgHandler.sendMessage(msg4);
+
+                                String jrespStr=jresp.getString("errors");
+                                JSONObject  errorStr=jresp.getJSONObject(jrespStr);
+                                if (errorStr.has("name")){
+                                    Message msg5=new Message();
+                                    msg5.what=response.code();
+                                    msg5.obj=errorStr.getString("name");
+                                    msgHandler.sendMessage(msg5);
+                                }
+                                break;
+//                            401,令牌失效，重新请求
+                            case HTTP_USER_ERROR:
+                                Message msg6=new Message();
+                                msg6.what=DISMISS_DIALOG;
+                                msg6.obj=loadingDraw;
+                                msgHandler.sendMessage(msg6);
+
+                                Authenticator authenticator=new Authenticator() {
+                                    @Override
+                                    public Request authenticate(Route route, Response response) throws IOException {
+//    刷新token
+                                        return response.request().newBuilder().addHeader("Authorization", User.getUserPassKey_type()+User.getUserPassKey()).build();
+                                    }
+                                };
+
+                                break;
+                            default:
+                                break;
+
+
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
+
+
+
 
 
     }
@@ -323,7 +424,7 @@ public class UserEditorInformationActivity extends AppCompatActivity {
 
     }
 //     上传头像
-    private void imgUpLoad(String localPath) throws JSONException {
+    private void imgUpLoad(final String localPath) throws JSONException {
         loadingDraw.show();
 
         MultipartBody.Builder builder=new MultipartBody.Builder().setType(MultipartBody.FORM);
@@ -359,9 +460,9 @@ public class UserEditorInformationActivity extends AppCompatActivity {
 
                             User.setUserImgId(jresp.getString("id"));
                             User.setUserId(jresp.getString("user_id"));
-                            User.setUserPassKey_type(jresp.getString("type"));
                             User.setUserImgAvatar(jresp.getString("path"));
-                            getAvatarRequest();
+                            Log.e("Tag","修改后，，"+String.valueOf(User.getUserImgAvatar()));
+                            displayImage(localPath);
                             break;
 //                            422
                         case HTTP_USER_NULL:
@@ -410,41 +511,6 @@ public class UserEditorInformationActivity extends AppCompatActivity {
             }
         });
     }
-//    获取修改后的头像
-    private void getAvatarRequest() {
-        //                            上传了头像后，下载头像
-        HttpUtil.sendOkHttpRequestAvatar(User.getUserImgAvatar(), new Callback() {
-
-            @Override
-            public void onFailure(Call call, IOException e) {
-
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-//                            上传成功，将图片显示
-                byte[] bytes = (byte[]) response.body().bytes();
-                final Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                imgUserInformationAvatar.setBitmap(bitmap);
-                imgUserInformationAvatar.setmWidth(bitmap.getWidth());
-                imgUserInformationAvatar.setmHeight(bitmap.getHeight());
-                User.setUserImgBitmap(bitmap);
-
-                Log.e("Tag", String.valueOf(User.getUserImgBitmap()));
-                final Runnable setAvatarRunable = new Runnable() {
-                    @Override
-                    public void run() {
-                        imgUserInformationAvatar.setImageBitmap(bitmap);
-                    }
-                };
-                new Thread() {
-                    public void run() {
-                        msgHandler.post(setAvatarRunable);
-                    }
-                }.start();
-            }
-        });
-    }
 //    处理图片
     private void handleImageOnKitKat(Intent data) throws JSONException {
         String imagePath=null;
@@ -467,7 +533,6 @@ public class UserEditorInformationActivity extends AppCompatActivity {
         }
 
         imgUpLoad(imagePath);
-//        displayImage(imagePath);
     }
 //    图片路径
     private String getImagePath(Uri uri,String selection){
@@ -481,6 +546,28 @@ public class UserEditorInformationActivity extends AppCompatActivity {
         }
         return path;
     }
+//    显示头像
+    private void displayImage(String imagePath){
+        if (imagePath!=null){
+           final Bitmap bitmap=BitmapFactory.decodeFile(imagePath);
+            imgUserInformationAvatar.setBitmap(bitmap);
+            imgUserInformationAvatar.setmWidth(bitmap.getWidth());
+            imgUserInformationAvatar.setmHeight(bitmap.getHeight());
+            User.setUserImgBitmap(bitmap);
 
-
+            final Runnable setAvatarRunable = new Runnable() {
+                    @Override
+                    public void run() {
+                        imgUserInformationAvatar.setImageBitmap(bitmap);
+                    }
+                };
+                new Thread() {
+                    public void run() {
+                        msgHandler.post(setAvatarRunable);
+                    }
+                }.start();
+        }else {
+            Toast.makeText(this,"显示失败",Toast.LENGTH_SHORT).show();
+        }
+    }
 }
