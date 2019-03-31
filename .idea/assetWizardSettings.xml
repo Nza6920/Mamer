@@ -23,7 +23,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="color" value="12a3e9" />
+                                                <entry key="color" value="444444" />
                                                 <entry key="paddingPercent" value="20" />
                                               </map>
                                             </option>
@@ -57,7 +57,7 @@
                                   <option name="values">
                                     <map>
                                       <entry key="iconShape" value="NONE" />
-                                      <entry key="outputName" value="ic_topics_selected" />
+                                      <entry key="outputName" value="ic_topics_none" />
                                     </map>
                                   </option>
                                 </PersistentState>

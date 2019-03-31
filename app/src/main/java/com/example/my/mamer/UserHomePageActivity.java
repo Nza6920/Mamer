@@ -132,7 +132,7 @@ public class UserHomePageActivity extends AppCompatActivity {
         tvBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent=new Intent(UserHomePageActivity.this,CenterActivity.class);
+                Intent intent=new Intent(UserHomePageActivity.this,BottomNavigationBarActivity.class);
                 startActivity(intent);
                 finish();
             }
