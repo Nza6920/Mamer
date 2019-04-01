@@ -1,9 +1,11 @@
 package com.example.my.mamer;
 
+import android.graphics.Color;
+import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.view.Gravity;
 
 import com.ashokvarma.bottomnavigation.BottomNavigationBar;
 import com.ashokvarma.bottomnavigation.BottomNavigationItem;
@@ -45,10 +47,10 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
                 .setInActiveColor("#999999")
 //              未选中时的图片资源
                 .setInactiveIconResource(R.mipmap.ic_topics_none))
-            .addItem(new BottomNavigationItem(R.mipmap.ic_personal,"我的")
+            .addItem(new BottomNavigationItem(R.mipmap.ic_personal_change,"我的")
             .setActiveColor("#12A3E9")
             .setInActiveColor("#999999")
-            .setInactiveIconResource(R.mipmap.ic_personal_change))
+            .setInactiveIconResource(R.mipmap.ic_personal))
 //                设置默认选中项
                 .setFirstSelectedPosition(lastSelectionedPosition)
                 .initialise();
@@ -107,7 +109,39 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
     private ShapeBadgeItem shapeBadgeItem;
 //    展示消息点
     private void showNumberAndShape(){
+//        消息
+        textBadgeItem=new TextBadgeItem()
+//                显示的文本
+                .setText("m")
+//                文本颜色
+        .setTextColor("#ffffff")
+//                圆环宽度
+        .setBorderWidth(5)
+//                圆环颜色
+        .setBorderColor(Color.parseColor("#000000"))
+//                背景颜色
+        .setBackgroundColor("#FF4081")
+//                选中是否隐藏
+        .setHideOnSelect(true)
+//                隐藏与动画的过渡时间
+        .setAnimationDuration(300)
+//                位置，默认右上角
+        .setGravity(Gravity.RIGHT|Gravity.TOP);
 
+//        形状
+        shapeBadgeItem=new ShapeBadgeItem()
+//                也可以设置为常量,形状
+        .setShape(ShapeBadgeItem.SHAPE_OVAL)
+//                颜色
+        .setShapeColor(Color.RED)
+//                距离item的边距，dp
+        .setEdgeMarginInDp(this,0)
+//                高宽值
+        .setSizeInDp(this,15,15)
+//                隐藏和展示的动画速度mm，和setHideOnSelect一起用
+        .setAnimationDuration(300)
+//                当选中状态时消失
+        .setHideOnSelect(true);
     }
 
     @Override
@@ -119,4 +153,5 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
     public void onTabReselected(int position) {
 
     }
+
 }
