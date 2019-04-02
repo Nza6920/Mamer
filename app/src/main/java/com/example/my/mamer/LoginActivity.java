@@ -2,11 +2,11 @@ package com.example.my.mamer;
 
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.text.Editable;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -206,7 +206,7 @@ public class LoginActivity extends AppCompatActivity {
                             Log.d("Tag",userPassKey);
                             User.setUserPassKey(userPassKey);
                             User.setUserPassKey_type(userPassKey_type);
-                            Intent intent=new Intent(LoginActivity.this,UserHomePageActivity.class);
+                            Intent intent=new Intent(LoginActivity.this,BottomNavigationBarActivity.class);
                             startActivity(intent);
                             finish();
                             break;

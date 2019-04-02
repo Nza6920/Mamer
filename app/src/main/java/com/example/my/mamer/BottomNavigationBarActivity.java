@@ -76,18 +76,36 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
         hideFragment(transaction);
         switch (position){
             case 0:
+//                没有topics就创建topics
                 if (topicsFragment==null){
                     topicsFragment=new TopicsFragment();
+                }
+//                是否已加入布局
+                if (!topicsFragment.isAdded()) {
                     transaction.add(R.id.fragment_content,topicsFragment);
                 }else {
+//                    如果userFragment不为空，则隐藏userFragment
+                    if (userFragment!=null){
+                        transaction.hide(userFragment);
+                    }
+//                    显示topicsFragment
                     transaction.show(topicsFragment);
                 }
                 break;
             case 1:
-                if (userFragment==null){
-                    userFragment=new UserFragment();
+//                没有userFragment就创建
+                if (userFragment==null) {
+                    userFragment = new UserFragment();
+                }
+//                是否已加入布局
+                if (!userFragment.isAdded()){
                     transaction.add(R.id.fragment_content,userFragment);
                 }else {
+//                    如果topicsFragment不为空，则隐藏
+                    if (topicsFragment!=null){
+                        transaction.hide(topicsFragment);
+                    }
+//                    显示userFragment
                     transaction.show(userFragment);
                 }
                 break;
@@ -153,5 +171,4 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
     public void onTabReselected(int position) {
 
     }
-
 }

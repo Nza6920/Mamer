@@ -121,12 +121,6 @@ public class UserHomePageActivity extends AppCompatActivity {
         Drawable tvClosePic=ContextCompat.getDrawable(this,R.mipmap.ic_title_back);
         tvBack.setBackground(tvClosePic);
 
-
-
-
-
-
-
 //        监听
 //        点击返回
         tvBack.setOnClickListener(new View.OnClickListener() {
@@ -248,7 +242,7 @@ public class UserHomePageActivity extends AppCompatActivity {
         });
 
     }
-//加载头像
+//    加载头像
     private Bitmap loadPicCodeImg(String bicCodes){
 
         Bitmap bitmap=null;
