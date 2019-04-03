@@ -46,6 +46,7 @@ import okhttp3.Route;
 import static com.example.my.mamer.config.Config.DISMISS_DIALOG;
 import static com.example.my.mamer.config.Config.HTTP_OK;
 import static com.example.my.mamer.config.Config.HTTP_USER_ERROR;
+import static com.example.my.mamer.config.Config.HTTP_USER_FORMAT_ERROR;
 import static com.example.my.mamer.config.Config.HTTP_USER_GET_INFORMATION;
 import static com.example.my.mamer.config.Config.HTTP_USER_NULL;
 import static com.example.my.mamer.config.Config.MEDIA_TYPE_IMAGE;
@@ -83,6 +84,9 @@ public class UserEditorInformationActivity extends AppCompatActivity {
                     ((LoadingDraw)msg.obj).dismiss();
                     break;
                 case HTTP_USER_NULL:
+                    Toast.makeText(UserEditorInformationActivity.this,(String)msg.obj,Toast.LENGTH_SHORT).show();
+                    break;
+                case HTTP_USER_FORMAT_ERROR:
                     Toast.makeText(UserEditorInformationActivity.this,(String)msg.obj,Toast.LENGTH_SHORT).show();
                     break;
                 case HTTP_OK:
@@ -243,14 +247,22 @@ public class UserEditorInformationActivity extends AppCompatActivity {
                                 msg4.obj=loadingDraw;
                                 msgHandler.sendMessage(msg4);
 
-                                String jrespStr=jresp.getString("errors");
-                                JSONObject  errorStr=jresp.getJSONObject(jrespStr);
-                                if (errorStr.has("name")){
-                                    Message msg5=new Message();
-                                    msg5.what=response.code();
-                                    msg5.obj=errorStr.getString("name");
-                                    msgHandler.sendMessage(msg5);
+                                if (jresp.has("errors")){
+                                    JSONObject  errorStr=jresp.getJSONObject("errors");
+                                    if (errorStr.has("name")){
+                                        Message msg5=new Message();
+                                        msg5.what=response.code();
+                                        msg5.obj=errorStr.getString("name");
+                                        msgHandler.sendMessage(msg5);
+                                    }else if (errorStr.has("image")){
+                                        Message msg5=new Message();
+                                        msg5.what=response.code();
+                                        msg5.obj="图片上传失败,图片不可过大或过小";
+                                        msgHandler.sendMessage(msg5);
+                                    }
                                 }
+
+
                                 break;
 //                            401,令牌失效，重新请求
                             case HTTP_USER_ERROR:
@@ -329,14 +341,17 @@ public class UserEditorInformationActivity extends AppCompatActivity {
                                 msg4.obj=loadingDraw;
                                 msgHandler.sendMessage(msg4);
 
-                                String jrespStr=jresp.getString("errors");
-                                JSONObject  errorStr=jresp.getJSONObject(jrespStr);
-                                if (errorStr.has("name")){
-                                    Message msg5=new Message();
-                                    msg5.what=response.code();
-                                    msg5.obj=errorStr.getString("name");
-                                    msgHandler.sendMessage(msg5);
+                                if (jresp.has("errors")){
+                                    JSONObject  errorStr=jresp.getJSONObject("errors");
+                                    if (errorStr.has("name")){
+                                        Message msg5=new Message();
+                                        msg5.what=response.code();
+                                        msg5.obj=errorStr.getString("name");
+                                        msgHandler.sendMessage(msg5);
+                                    }
                                 }
+
+
                                 break;
 //                            401,令牌失效，重新请求
                             case HTTP_USER_ERROR:
@@ -427,89 +442,117 @@ public class UserEditorInformationActivity extends AppCompatActivity {
     private void imgUpLoad(final String localPath) throws JSONException {
         loadingDraw.show();
 
-        MultipartBody.Builder builder=new MultipartBody.Builder().setType(MultipartBody.FORM);
-        File file=new File(localPath);
-        builder.addFormDataPart("image",file.getName(),RequestBody.create(MEDIA_TYPE_IMAGE,file))
-               .addFormDataPart("type","avatar");
-        MultipartBody requestBody=builder.build();
-        HttpUtil.sendOkHttpRequestAvatars(USER_AVATAR_IMG, requestBody, new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                Message msg1=new Message();
-                msg1.what=DISMISS_DIALOG;
-                msg1.obj=loadingDraw;
-                msgHandler.sendMessage(msg1);
+        if (localPath==null){
+            Message msg1=new Message();
+            msg1.what=DISMISS_DIALOG;
+            msg1.obj=loadingDraw;
+            msgHandler.sendMessage(msg1);
 
-                Message msg2=new Message();
-                msg2.what=MESSAGE_ERROR;
-                msg2.obj="上传失败";
-                msgHandler.sendMessage(msg2);
-            }
+            Message msg10=new Message();
+            msg10.what=MESSAGE_ERROR;
+            msg10.obj="上传失败";
+            msgHandler.sendMessage(msg10);
+        }else {
 
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                try {
-                    JSONObject jresp=new JSONObject(response.body().string());
-                    switch (response.code()){
-//                        201
-                        case HTTP_OK:
-                            Message msg3=new Message();
-                            msg3.what=DISMISS_DIALOG;
-                            msg3.obj=loadingDraw;
-                            msgHandler.sendMessage(msg3);
 
-                            User.setUserImgId(jresp.getString("id"));
-                            User.setUserId(jresp.getString("user_id"));
-                            User.setUserImgAvatar(jresp.getString("path"));
-                            Log.e("Tag","修改后，，"+String.valueOf(User.getUserImgAvatar()));
-                            displayImage(localPath);
-                            break;
-//                            422
-                        case HTTP_USER_NULL:
-                            Message msg4=new Message();
-                            msg4.what=DISMISS_DIALOG;
-                            msg4.obj=loadingDraw;
-                            msgHandler.sendMessage(msg4);
+            MultipartBody.Builder builder = new MultipartBody.Builder().setType(MultipartBody.FORM);
+            File file = new File(localPath);
+            builder.addFormDataPart("image", file.getName(), RequestBody.create(MEDIA_TYPE_IMAGE, file))
+                    .addFormDataPart("type", "avatar");
+            MultipartBody requestBody = builder.build();
+            HttpUtil.sendOkHttpRequestAvatars(USER_AVATAR_IMG, requestBody, new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    Message msg1 = new Message();
+                    msg1.what = DISMISS_DIALOG;
+                    msg1.obj = loadingDraw;
+                    msgHandler.sendMessage(msg1);
 
-                            String jrespStr=jresp.getString("errors");
-                            JSONObject  errorStr=jresp.getJSONObject(jrespStr);
-                            if (errorStr.has("type")){
-                                Message msg5=new Message();
-                                msg5.what=response.code();
-                                msg5.obj=errorStr.getString("type");
-                                msgHandler.sendMessage(msg5);
-                            }else if (errorStr.has("image")){
-                                Message msg6=new Message();
-                                msg6.what=response.code();
-                                msg6.obj=errorStr.getString("image");
-                                msgHandler.sendMessage(msg6);
-                        }
-
-                            break;
-//                    401
-                        case HTTP_USER_ERROR:
-                            Message msg7=new Message();
-                            msg7.what=DISMISS_DIALOG;
-                            msg7.obj=loadingDraw;
-                            msgHandler.sendMessage(msg7);
-
-                            Authenticator authenticator=new Authenticator() {
-                                @Override
-                                public Request authenticate(Route route, Response response) throws IOException {
-//    刷新token
-                                    return response.request().newBuilder().addHeader("Authorization", User.getUserPassKey_type()+User.getUserPassKey()).build();
-                                }
-                            };
-                            default:
-                                break;
-                    }
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                    Message msg2 = new Message();
+                    msg2.what = MESSAGE_ERROR;
+                    msg2.obj = "上传失败";
+                    msgHandler.sendMessage(msg2);
                 }
 
-            }
-        });
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    try {
+                        JSONObject jresp = new JSONObject(response.body().string());
+                        switch (response.code()) {
+//                        201
+                            case HTTP_OK:
+                                Message msg3 = new Message();
+                                msg3.what = DISMISS_DIALOG;
+                                msg3.obj = loadingDraw;
+                                msgHandler.sendMessage(msg3);
+
+                                User.setUserImgId(jresp.getString("id"));
+                                User.setUserId(jresp.getString("user_id"));
+                                User.setUserImgAvatar(jresp.getString("path"));
+                                Log.e("Tag", "修改后，，" + String.valueOf(User.getUserImgAvatar()));
+                                displayImage(localPath);
+                                break;
+//                            422
+                            case HTTP_USER_NULL:
+                                Message msg4 = new Message();
+                                msg4.what = DISMISS_DIALOG;
+                                msg4.obj = loadingDraw;
+                                msgHandler.sendMessage(msg4);
+
+                                if (jresp.has("errors")) {
+                                    JSONObject errorStr = jresp.getJSONObject("errors");
+                                    if (errorStr.has("type")) {
+                                        Message msg5 = new Message();
+                                        msg5.what = response.code();
+                                        msg5.obj = errorStr.getString("type");
+                                        msgHandler.sendMessage(msg5);
+                                    } else if (errorStr.has("image")) {
+                                        Message msg6 = new Message();
+                                        msg6.what = response.code();
+                                        msg6.obj = "图片上传失败，图片可能过大或过小";
+                                        msgHandler.sendMessage(msg6);
+                                    }
+                                }
+
+
+                                break;
+//                            403
+                            case HTTP_USER_FORMAT_ERROR:
+                                Message msg7 = new Message();
+                                msg7.what = DISMISS_DIALOG;
+                                msg7.obj = loadingDraw;
+                                msgHandler.sendMessage(msg7);
+
+                                Message msg8 = new Message();
+                                msg8.what = response.code();
+                                msg8.obj = "格式不支持";
+                                msgHandler.sendMessage(msg8);
+                                break;
+//                    401
+                            case HTTP_USER_ERROR:
+                                Message msg9 = new Message();
+                                msg9.what = DISMISS_DIALOG;
+                                msg9.obj = loadingDraw;
+                                msgHandler.sendMessage(msg9);
+
+                                Authenticator authenticator = new Authenticator() {
+                                    @Override
+                                    public Request authenticate(Route route, Response response) throws IOException {
+//    刷新token
+                                        return response.request().newBuilder().addHeader("Authorization", User.getUserPassKey_type() + User.getUserPassKey()).build();
+                                    }
+                                };
+                            default:
+                                break;
+                        }
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            });
+        }
     }
 //    处理图片
     private void handleImageOnKitKat(Intent data) throws JSONException {

@@ -16,16 +16,14 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <activity android:name=".MainActivity" />
-        <activity android:name=".RegisterPhoneNumActivity"></activity>
+        <activity android:name=".RegisterPhoneNumActivity">
+
+        </activity>
         <activity android:name=".RegisterPicCode" />
         <activity android:name=".RegisterActivity" />
         <activity android:name=".TestActivity" />
         <activity android:name=".LoginActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity android:name=".UserHomePageActivity" />
         <activity android:name=".UserEditorInformationActivity" />
@@ -41,7 +39,11 @@
         </provider>
 
         <activity android:name=".BottomNavigationBarActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
     </application>
 

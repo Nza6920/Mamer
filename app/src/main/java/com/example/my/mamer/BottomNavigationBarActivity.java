@@ -4,8 +4,10 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
+import android.view.View;
 
 import com.ashokvarma.bottomnavigation.BottomNavigationBar;
 import com.ashokvarma.bottomnavigation.BottomNavigationItem;
@@ -16,20 +18,30 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
 
     private FragmentManager mFragmentManager;
     private BottomNavigationBar bottomNavigationBar;
-
+//首页话题和我的
     private TopicsFragment topicsFragment;
     private UserFragment userFragment;
+
+//侧滑菜单
+    private DrawerLayout drawerLayout;
+//    我的 ，侧滑菜单
+    private UserMenuRightFragment userMenuRightFragment;
 
 //    默认话题为首页
     private int lastSelectionedPosition=0;
     private FragmentTransaction transaction;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bottom_navigation_bar);
-
+        mFragmentManager=getSupportFragmentManager();
         bottomNavigationBar=findViewById(R.id.bottom_navigation_bar);
+        userMenuRightFragment= (UserMenuRightFragment) mFragmentManager.findFragmentById(R.id.user_menu_right);
+
         init();
+        initView();
     }
 //初始底部导航栏
     private void init(){
@@ -170,5 +182,32 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
     @Override
     public void onTabReselected(int position) {
 
+    }
+
+
+    private  void  initView(){
+        drawerLayout=findViewById(R.id.drawer_layout);
+        drawerLayout.setDrawerListener(new DrawerLayout.DrawerListener() {
+            @Override
+            public void onDrawerSlide(View view, float v) {
+
+            }
+
+            @Override
+            public void onDrawerOpened( View view) {
+
+            }
+
+            @Override
+            public void onDrawerClosed(View view) {
+                drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED,Gravity.END);
+            }
+
+            @Override
+            public void onDrawerStateChanged(int i) {
+
+            }
+        });
+        userMenuRightFragment.setDrawerLayout(drawerLayout);
     }
 }

@@ -206,7 +206,7 @@ public class LoginActivity extends AppCompatActivity {
                             Log.d("Tag",userPassKey);
                             User.setUserPassKey(userPassKey);
                             User.setUserPassKey_type(userPassKey_type);
-                            Intent intent=new Intent(LoginActivity.this,BottomNavigationBarActivity.class);
+                            Intent intent=new Intent(LoginActivity.this,UserHomePageActivity.class);
                             startActivity(intent);
                             finish();
                             break;
@@ -217,19 +217,22 @@ public class LoginActivity extends AppCompatActivity {
                             msg4.obj=loadingDraw;
                             msgHandler.sendMessage(msg4);
 
-                            String jrespStr=jresp.getString("errors");
-                            JSONObject  errorStr=jresp.getJSONObject(jrespStr);
-                            if (errorStr.has("username")){
-                                Message msg5=new Message();
-                                msg5.what=response.code();
-                                msg5.obj=errorStr.getString("username");
-                                msgHandler.sendMessage(msg5);
-                            }else {
-                                Message msg5=new Message();
-                                msg5.what=response.code();
-                                msg5.obj=errorStr.getString("password");
-                                msgHandler.sendMessage(msg5);
+                            if (jresp.has("errors")){
+                                JSONObject  errorStr=jresp.getJSONObject("errors");
+                                if (errorStr.has("username")){
+                                    Message msg5=new Message();
+                                    msg5.what=response.code();
+                                    msg5.obj=errorStr.getString("username");
+                                    msgHandler.sendMessage(msg5);
+                                }else {
+                                    Message msg5=new Message();
+                                    msg5.what=response.code();
+                                    msg5.obj=errorStr.getString("password");
+                                    msgHandler.sendMessage(msg5);
+                                }
                             }
+
+
 
                             break;
 //                            401

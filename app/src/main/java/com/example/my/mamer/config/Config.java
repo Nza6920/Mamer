@@ -16,6 +16,7 @@ public class Config {
     public final static int HTTP_USER_GET_INFORMATION=200;
     public final static int HTTP_USER_ERROR=401;
     public final static int HTTP_USER_NULL=422;
+    public final static int HTTP_USER_FORMAT_ERROR=403;
     public final static int HTTP_OVERNUM=500;
     public final static int HTTP_OVERTIME=429;
 //    循环消息常量
