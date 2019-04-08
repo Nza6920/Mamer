@@ -12,6 +12,10 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+        <include layout="@layout/topic_top_bar"/>
+        <include layout="@layout/user_top_bar"/>
+
+
         <FrameLayout
             android:id="@+id/fragment_content"
             android:layout_width="match_parent"

@@ -55,6 +55,6 @@
             android:background="#fff"
             android:gravity="center"/>
     </LinearLayout>
-    
+
 
 </LinearLayout>

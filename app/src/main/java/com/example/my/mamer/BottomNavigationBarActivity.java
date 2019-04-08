@@ -1,13 +1,16 @@
 package com.example.my.mamer;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.Button;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.ashokvarma.bottomnavigation.BottomNavigationBar;
 import com.ashokvarma.bottomnavigation.BottomNavigationItem;
@@ -23,14 +26,23 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
     private UserFragment userFragment;
 
 //侧滑菜单
-    private DrawerLayout drawerLayout;
+//    private DrawerLayout drawerLayout;
 //    我的 ，侧滑菜单
-    private UserMenuRightFragment userMenuRightFragment;
+//    private UserMenuRightFragment userMenuRightFragment;
+
 
 //    默认话题为首页
     private int lastSelectionedPosition=0;
     private FragmentTransaction transaction;
-
+//话题topic bar，分类，标题，新建话题
+    private RelativeLayout topiclayout;
+    private Button btnTopicClassify;
+    private TextView tvTopicName;
+    private Button btnTopicNewTopic;
+//    我的user bar,用户名，跳转个人资料
+    private RelativeLayout userlayout;
+    private TextView tvUserName;
+    private Button btnUserHomePage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,10 +50,17 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
         setContentView(R.layout.activity_bottom_navigation_bar);
         mFragmentManager=getSupportFragmentManager();
         bottomNavigationBar=findViewById(R.id.bottom_navigation_bar);
-        userMenuRightFragment= (UserMenuRightFragment) mFragmentManager.findFragmentById(R.id.user_menu_right);
+        topiclayout=findViewById(R.id.topic_top_bar);
+        btnTopicClassify=findViewById(R.id.topic_top_bar_classify);
+        tvTopicName=findViewById(R.id.topic_top_bar_name);
+        btnTopicNewTopic=findViewById(R.id.topic_top_bar_new);
+        userlayout=findViewById(R.id.user_top_bar);
+        tvUserName=findViewById(R.id.user_top_bar_name);
+        btnUserHomePage=findViewById(R.id.user_top_bar_right);
+//        userMenuRightFragment= (UserMenuRightFragment) mFragmentManager.findFragmentById(R.id.user_menu_right);
 
         init();
-        initView();
+//        initView();
     }
 //初始底部导航栏
     private void init(){
@@ -68,9 +87,36 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
                 .initialise();
 //        设置默认开启项
         setDefaultFragment();
+
+//        点击事件topic,user
+        btnTopicClassify.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+        btnTopicNewTopic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent=new Intent(BottomNavigationBarActivity.this,TopicsNewTopicActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+        btnUserHomePage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent=new Intent(BottomNavigationBarActivity.this,UserHomePageActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
     }
 //    设置默认开启的fragment
     private void setDefaultFragment(){
+//        隐藏user top bar
+        userlayout.setVisibility(View.GONE);
+
         mFragmentManager=getSupportFragmentManager();
         FragmentTransaction transaction=mFragmentManager.beginTransaction();
         topicsFragment=new TopicsFragment();
@@ -88,6 +134,8 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
         hideFragment(transaction);
         switch (position){
             case 0:
+                userlayout.setVisibility(View.GONE);
+                topiclayout.setVisibility(View.VISIBLE);
 //                没有topics就创建topics
                 if (topicsFragment==null){
                     topicsFragment=new TopicsFragment();
@@ -101,10 +149,15 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
                         transaction.hide(userFragment);
                     }
 //                    显示topicsFragment
+
                     transaction.show(topicsFragment);
+
                 }
                 break;
             case 1:
+                topiclayout.setVisibility(View.GONE);
+                userlayout.setVisibility(View.VISIBLE);
+
 //                没有userFragment就创建
                 if (userFragment==null) {
                     userFragment = new UserFragment();
@@ -119,6 +172,7 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
                     }
 //                    显示userFragment
                     transaction.show(userFragment);
+
                 }
                 break;
         }
@@ -185,29 +239,29 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
     }
 
 
-    private  void  initView(){
-        drawerLayout=findViewById(R.id.drawer_layout);
-        drawerLayout.setDrawerListener(new DrawerLayout.DrawerListener() {
-            @Override
-            public void onDrawerSlide(View view, float v) {
-
-            }
-
-            @Override
-            public void onDrawerOpened( View view) {
-
-            }
-
-            @Override
-            public void onDrawerClosed(View view) {
-                drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED,Gravity.END);
-            }
-
-            @Override
-            public void onDrawerStateChanged(int i) {
-
-            }
-        });
-        userMenuRightFragment.setDrawerLayout(drawerLayout);
-    }
+//    private  void  initView(){
+//        drawerLayout=findViewById(R.id.drawer_layout);
+//        drawerLayout.setDrawerListener(new DrawerLayout.DrawerListener() {
+//            @Override
+//            public void onDrawerSlide(View view, float v) {
+//
+//            }
+//
+//            @Override
+//            public void onDrawerOpened( View view) {
+//
+//            }
+//
+//            @Override
+//            public void onDrawerClosed(View view) {
+//                drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED,Gravity.END);
+//            }
+//
+//            @Override
+//            public void onDrawerStateChanged(int i) {
+//
+//            }
+//        });
+//        userMenuRightFragment.setDrawerLayout(drawerLayout);
+//    }
 }
