@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,31 +7,31 @@
     android:orientation="vertical"
     tools:context=".TopicsNewTopicActivity">
 
-    <include layout="@layout/title"/>
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scrollbars="none"
-        android:overScrollMode="never">
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginLeft="10dp"
-            android:orientation="vertical">
-                <EditText
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="请填写标题"
-                    android:textSize="17sp"
-                    android:gravity="center"/>
-        </LinearLayout>
+    <include layout="@layout/title" />
     <LinearLayout
+        android:id="@+id/new_topic_title"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_below="@+id/title_bar"
+        android:orientation="vertical">
+        <EditText
+            android:id="@+id/new_topic_title_edit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="请填写标题"
+            android:textSize="17sp"
+            android:gravity="center"/>
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/new_topic_classify"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginRight="10dp"
-        android:layout_marginLeft="10dp">
+        android:layout_marginLeft="10dp"
+        android:layout_below="@+id/new_topic_title">
         <TextView
             android:id="@+id/new_topic_share"
             android:layout_weight="1"
@@ -48,7 +48,7 @@
             android:gravity="center"
             android:background="@drawable/register_phone_num"/>
         <TextView
-            android:id="@+id/new_topic_question-answering"
+            android:id="@+id/new_topic_question_answering"
             android:layout_weight="1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -64,38 +64,82 @@
             android:gravity="center"
             android:background="@drawable/register_phone_num"/>
     </LinearLayout>
-
     <LinearLayout
+        android:id="@+id/new_topic_classify_show"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginRight="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_below="@+id/new_topic_title"
+        android:visibility="gone">
+        <TextView
+            android:id="@+id/new_topic_selected"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"
+            android:gravity="center"/>
+        <TextView
+            android:id="@+id/new_topic_selected_info"
+            android:layout_weight="3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"
+            android:gravity="center"
+            android:background="@drawable/register_phone_num"/>
+       </LinearLayout>
+
+    <com.example.my.mamer.view.RichTextEditor
+        android:id="@+id/new_topic_rich_text_editor"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="5dp"
-        android:background="@drawable/register_phone_num_tab"
-        android:orientation="vertical">
-        <EditText
+        android:layout_below="@+id/new_topic_classify"
+        android:background="@drawable/register_phone_num_tab" >
+        <LinearLayout
+            android:id="@+id/new_topic_bottom_bar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="60dp"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="10dp">
+            <TextView
+                android:id="@+id/new_topic_pic"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:text="图片"
+                android:textSize="15sp"
+                android:textColor="#000"
+                android:gravity="center" />
+            <TextView
+                android:id="@+id/new_topic_preview"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:text="预览"
+                android:textSize="15sp"
+                android:textColor="#000"
+                android:gravity="center"
+                android:background="@drawable/register_phone_num"/>
+        </LinearLayout>
+    </com.example.my.mamer.view.RichTextEditor>
+    <RelativeLayout
+            android:id="@+id/new_topic_web_view_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/new_topic_classify"
             android:text="111"
             android:textSize="15sp"
-            android:gravity="start" />
-
-        <RelativeLayout
+        android:visibility="gone">
+        <WebView
+            android:id="@+id/new_topic_web_view"
             android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
-            android:orientation="horizontal"
-            android:gravity="bottom">
+            android:layout_height="match_parent"
+            android:layout_margin="15dp"
+            android:orientation="horizontal"/>
+    </RelativeLayout>
 
-            <ImageView
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_alignParentBottom="true"
-                android:background="@mipmap/ic_new_topic_image" />
-        </RelativeLayout>
-    </LinearLayout>
-</ScrollView>
-
-</LinearLayout>
+</RelativeLayout>
