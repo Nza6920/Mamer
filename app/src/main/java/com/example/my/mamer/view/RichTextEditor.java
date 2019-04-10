@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -50,8 +51,6 @@ public class RichTextEditor extends ScrollView {
 //    首个EditText
     private EditText firstEdit;
 
-
-
     public RichTextEditor(Context context) {
         this(context,null);
     }
@@ -62,6 +61,7 @@ public class RichTextEditor extends ScrollView {
 
     public RichTextEditor(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        Log.e("tAg", String.valueOf(context));
         inflater=LayoutInflater.from(context);
 
 //        初始化allLayout
@@ -81,10 +81,8 @@ public class RichTextEditor extends ScrollView {
                     EditText editText= (EditText) view;
                     onBackspacePress(editText);
                 }
-                return false;
-            }
+                return false; }
         };
-
 //        图片删除处理
         picDelListener=new OnClickListener() {
             @Override
@@ -123,7 +121,6 @@ public class RichTextEditor extends ScrollView {
 
             @Override
             public void endTransition(LayoutTransition layoutTransition, ViewGroup viewGroup, View view, int i) {
-
                 if (!layoutTransition.isRunning() && i==LayoutTransition.CHANGE_DISAPPEARING){
 //                    动画结束，合并EditText
 //                    mergeEditText();
@@ -203,17 +200,21 @@ public class RichTextEditor extends ScrollView {
         editText.setHint(hint);
         editText.setOnFocusChangeListener(focusChangeListener);
         editText.setLineSpacing(BaseUtils.getInstance().dip2px(6),1);
-//        修改光标颜色，反射
+//        动态修改光标颜色，反射
+        Field fCursorDrawableRes= null;
         try {
-            Field field=TextView.class.getDeclaredField("mCursorDrawableRes");
-            field.setAccessible(true);
-            field.set(editText,R.drawable.shape_edit_text_cursor);
-        }catch (Exception e){
+            fCursorDrawableRes = TextView.class.getDeclaredField("mCursorDrawableRes");
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        }
+        fCursorDrawableRes.setAccessible(true);
+        try {
+            fCursorDrawableRes.set(editText,R.drawable.shape_edit_text_cursor);
+        } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
         return  editText;
     }
-
 //    生成图片view
     private RelativeLayout createImageLayout(){
         RelativeLayout layout= (RelativeLayout) inflater.inflate(R.layout.rich_edit_imageview,null);
@@ -225,7 +226,7 @@ public class RichTextEditor extends ScrollView {
         firstEdit.setHint("");
         return layout;
     }
-//    根据绝对路径添加View
+////    根据绝对路径添加View
     public void insertImage(String imagePath,int width){
         Bitmap bitmap=getScaledBitmap(imagePath,width);
         insertImage(bitmap,imagePath);
@@ -251,10 +252,11 @@ public class RichTextEditor extends ScrollView {
 //            否则插入EditText用来存储被图片分割的文字
             if (!(lastEditIndex<viewTagIndex-1)&&(TextUtils.isEmpty(editStr2))){
                 addEditTextAtIndex(lastEditIndex+1,imagePath);
-                lastFocusEdit.setSelection(lastFocusEdit.getText().length());
             }
-            hideKeyBoard();
+            addImageViewAtIndex(lastEditIndex+1,imagePath);
+            lastFocusEdit.setSelection(lastFocusEdit.getText().length());
         }
+        hideKeyBoard();
     }
 
 //        隐藏小键盘
@@ -275,8 +277,6 @@ public class RichTextEditor extends ScrollView {
     public void addImageViewAtIndex(final int index,String imagePath){
         final RelativeLayout imageLayout=createImageLayout();
         DataImageView imageView=imageLayout.findViewById(R.id.edit_image_view);
-
-
 //       从网络中加载图片,Glide4.0以后的写法
         RequestOptions options=new RequestOptions()
 //                加载失败的图片
@@ -289,7 +289,6 @@ public class RichTextEditor extends ScrollView {
                     .load(imagePath)
                     .apply(options)
                     .into(imageView);
-
 //        保存数据
         imageView.setAbsolutePath(imagePath);
         allLayout.addView(imageLayout,index);
@@ -322,6 +321,22 @@ public class RichTextEditor extends ScrollView {
         }
         return dataList;
     }
+//    返回用户输入内容
+//    public List<EditData> editDataStr(){
+//        List<EditData> dataStr=new ArrayList<>();
+//        int num=allLayout.getChildCount();
+//        for (int index=0;index<num;index++){
+//            View itemView=allLayout.getChildAt(index);
+//            EditData itemDataStr=new EditData();
+//            if (itemView instanceof EditText){
+//                EditText item= (EditText) itemView;
+//                itemDataStr.inputStr=item.getText().toString();
+//            }
+//            dataStr.add(itemDataStr);
+//        }
+//        return dataStr;
+//    }
+
     public  class EditData{
         public String inputStr;
         public String imagePath;

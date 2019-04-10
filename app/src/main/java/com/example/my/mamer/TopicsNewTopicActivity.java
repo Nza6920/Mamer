@@ -1,8 +1,10 @@
 package com.example.my.mamer;
 
-import android.os.Bundle;
+import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -45,6 +47,7 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
     private int categoryId=0;
 //    富文本编辑控件
     private RichTextEditor richTextEditor;
+    private String strContent;
 //    添加图片，预览，预览布局
     private TextView tvPic;
     private TextView tvPreview;
@@ -65,11 +68,6 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
             }
         }
     };
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_topics_new_topic);
-    }
 
     @Override
     protected void setContentView() {
@@ -82,9 +80,15 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
         tvTitleName=findViewById(R.id.title_tv_name);
         btnCommit=findViewById(R.id.title_btn_next);
 
+
+        Drawable tvClosePic=ContextCompat.getDrawable(this,R.mipmap.ic_title_close);
+        tvClose.setBackground(tvClosePic);
         tvClose.setOnClickListener(this);
         tvTitleName.setText("新建话题");
+        tvTitleName.setTextSize(20);
+        btnCommit.setText("完成");
         btnCommit.setOnClickListener(this);
+
     }
 
     @Override
@@ -109,9 +113,13 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
         etTopicTitle.addTextChangedListener(etWatcher);
 //        分类
         tvShare.setOnClickListener(this);
+        tvShare.setText("分享");
         tvTech.setOnClickListener(this);
+        tvTech.setText("教程");
         tvQueAnswer.setOnClickListener(this);
+        tvQueAnswer.setText("问答");
         tvNotice.setOnClickListener(this);
+        tvNotice.setText("公告");
         tvShowSelected.setOnClickListener(this);
 //        图片，预览
         tvPic.setOnClickListener(this);
@@ -163,7 +171,7 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
                     tvPic.setEnabled(false);
                     tvPreview.setText("编辑");
                     layoutWebView.setVisibility(View.VISIBLE);
-                    webContent="<html><header>"+Config.InitData.LINK_CSS+"</header><body>"+getEditData()+"</body></html>";
+                    webContent="<html><header>"+Config.HtmlToString.TO_CSS+"</header><body>"+getEditData()+"</body></html>";
                     webView.loadDataWithBaseURL(null,webContent,"text/html","utf-8",null);
                 }else {
                     tvPic.setEnabled(true);
@@ -171,25 +179,29 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
                     layoutWebView.setVisibility(View.GONE);
                 }
                 break;
+            case R.id.new_topic_pic:
+                insertImage();
+                break;
+            case R.id.title_btn_next:
+                if (isCommit()){
+
+                }
+                break;
+            case R.id.title_tv_close:
+                Intent intent=new Intent(TopicsNewTopicActivity.this,BottomNavigationBarActivity.class);
+                startActivity(intent);
+                finish();
+                break;
                 default:
                     break;
-
-
         }
     }
 //      标题输入监听
     TextWatcher etWatcher= new TextWatcher() {
         @Override
-        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-        }
-
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
         @Override
-        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-
-        }
-
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
         @Override
         public void afterTextChanged(Editable editable) {
             getTopicTitleEditStr();
@@ -200,14 +212,12 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
                 msg1.obj="标题应在2至50个字符内";
                 msgHandler.sendMessage(msg1);
             }
-
         }
     };
-
+//话题分类id get set
     public int getCategoryId() {
         return categoryId;
     }
-
     public void setCategoryId(int categoryId) {
         this.categoryId = categoryId;
     }
@@ -215,7 +225,6 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
     private void getTopicTitleEditStr(){
         strTopicTitle=etTopicTitle.getText().toString().trim();
     }
-
 //    计算位数
     private static int calculatePlaces(String str) {
         int m = 0;
@@ -233,7 +242,7 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
     }
 //    插入图片
     private void insertImage(){
-        richTextEditor.insertImage(null,Config.InitData.URL_PIC);
+        richTextEditor.insertImage(null,"https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1519468205527&di=5c7f3a21b5b2b09a1a0dc5e0eaef5c27&imgtype=0&src=http%3A%2F%2Fimg1.3lian.com%2F2015%2Fa1%2F70%2Fd%2F81.jpg");
     }
 //    生成控件中的数据
     private String getEditData(){
@@ -254,5 +263,48 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
         }
         return content.toString();
     }
+//    字数限制
+    private void getInputEditStr() {
+        List<RichTextEditor.EditData> editDataList = richTextEditor.buildEditData();
+        if (editDataList.size() > 0) {
+            for (RichTextEditor.EditData itemData : editDataList) {
+                if (itemData.inputStr != null) {
+//                    将EditText中的换行符，空格符转换成html
+                   strContent = itemData.inputStr.replace("\n", "").replace("", "");
+                }
+            }
+        }
+    }
+//    提交条件，通行证,topictitle,choiceClassify,content
+    private boolean isCommit(){
+        getTopicTitleEditStr();
+        getInputEditStr();
+        int inputTitleStrCount=calculatePlaces(strTopicTitle);
+        int cId=getCategoryId();
+        int inputStrCount=calculatePlaces(strContent);
+        if (inputTitleStrCount>50||inputTitleStrCount<2){
+            Message msg1=new Message();
+            msg1.what=USER_SET_INFORMATION;
+            msg1.obj="标题应在2至50个字符内";
+            msgHandler.sendMessage(msg1);
+            return false;
+        }else if (cId==0){
+            Message msg1=new Message();
+            msg1.what=USER_SET_INFORMATION;
+            msg1.obj="请选择话题分类";
+            msgHandler.sendMessage(msg1);
+            return false;
+        }else if (inputStrCount<3){
+            Message msg1=new Message();
+            msg1.what=USER_SET_INFORMATION;
+            msg1.obj="请输入至少三个字符";
+            msgHandler.sendMessage(msg1);
+            return false;
+        }else {
+            return true;
+        }
+    }
+//    提交
+
 }
 

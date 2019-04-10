@@ -9,7 +9,7 @@ public class BaseUtils {
     private Context context;
 
     private BaseUtils(){
-        context=MyApplication.getContext();
+        this.context=MyApplication.getContext();
     }
 
     public static synchronized BaseUtils getInstance(){

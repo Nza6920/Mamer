@@ -6,6 +6,7 @@ import android.view.KeyEvent;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputConnectionWrapper;
+import android.widget.EditText;
 
 public class DeletableEditText extends android.support.v7.widget.AppCompatEditText {
     public DeletableEditText(Context context) {
