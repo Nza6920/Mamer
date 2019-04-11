@@ -124,7 +124,7 @@ public class PhotoPopupWindow extends PopupWindow{
         }
     }
 //   为图片创建不同的名称用于保存，避免覆盖
-        public static String createFileName(){
+    public static String createFileName(){
         String fileName=null;
 //        系统当前时间
             Date date=new Date(System.currentTimeMillis());

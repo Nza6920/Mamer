@@ -1,26 +1,32 @@
 package com.example.my.mamer;
 
+import android.content.ContentUris;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.DocumentsContract;
+import android.provider.MediaStore;
 import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
-import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.my.mamer.config.Config;
 import com.example.my.mamer.view.RichTextEditor;
+
+import org.json.JSONException;
 
 import java.util.List;
 
+import static com.example.my.mamer.config.Config.RESULT_LODA_IMAGE;
 import static com.example.my.mamer.config.Config.USER_SET_INFORMATION;
 
 public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.OnClickListener {
@@ -48,13 +54,9 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
 //    富文本编辑控件
     private RichTextEditor richTextEditor;
     private String strContent;
-//    添加图片，预览，预览布局
+//    添加图片
     private TextView tvPic;
-    private TextView tvPreview;
-    private RelativeLayout layoutWebView;
-//    用于预览数据
-    private WebView webView;
-    private String webContent;
+    public static int richTextWidth;
 
     private final Handler msgHandler=new Handler(){
         @Override
@@ -80,7 +82,6 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
         tvTitleName=findViewById(R.id.title_tv_name);
         btnCommit=findViewById(R.id.title_btn_next);
 
-
         Drawable tvClosePic=ContextCompat.getDrawable(this,R.mipmap.ic_title_close);
         tvClose.setBackground(tvClosePic);
         tvClose.setOnClickListener(this);
@@ -105,9 +106,6 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
         tvShowSelectedInfo=findViewById(R.id.new_topic_selected_info);
         richTextEditor=findViewById(R.id.new_topic_rich_text_editor);
         tvPic=findViewById(R.id.new_topic_pic);
-        tvPreview=findViewById(R.id.new_topic_preview);
-        layoutWebView=findViewById(R.id.new_topic_web_view_layout);
-        webView=findViewById(R.id.new_topic_web_view);
 
 //        标题
         etTopicTitle.addTextChangedListener(etWatcher);
@@ -121,16 +119,21 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
         tvNotice.setOnClickListener(this);
         tvNotice.setText("公告");
         tvShowSelected.setOnClickListener(this);
-//        图片，预览
+//        图片
         tvPic.setOnClickListener(this);
-        tvPreview.setOnClickListener(this);
+//        view.post方式获得该控件的宽度
+        richTextEditor.post(new Runnable() {
+            @Override
+            public void run() {
+                richTextWidth=richTextEditor.getWidth();
+            }
+        });
     }
 
 //    点击事件监听
     @Override
     public void onClick(View view) {
         int v=view.getId();
-
         switch (v){
 //            分类选择后展示
             case  R.id.new_topic_share:
@@ -166,21 +169,11 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
                 layoutTopicClassify.setVisibility(View.VISIBLE);
                 setCategoryId(0);
                 break;
-            case R.id.new_topic_preview:
-                if ("预览".equals(tvPreview.getText())){
-                    tvPic.setEnabled(false);
-                    tvPreview.setText("编辑");
-                    layoutWebView.setVisibility(View.VISIBLE);
-                    webContent="<html><header>"+Config.HtmlToString.TO_CSS+"</header><body>"+getEditData()+"</body></html>";
-                    webView.loadDataWithBaseURL(null,webContent,"text/html","utf-8",null);
-                }else {
-                    tvPic.setEnabled(true);
-                    tvPreview.setText("预览");
-                    layoutWebView.setVisibility(View.GONE);
-                }
-                break;
+
             case R.id.new_topic_pic:
-                insertImage();
+                Intent intent=new Intent("android.intent.action.GET_CONTENT");
+                intent.setType("image/*");
+                startActivityForResult(intent,RESULT_LODA_IMAGE);
                 break;
             case R.id.title_btn_next:
                 if (isCommit()){
@@ -188,8 +181,8 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
                 }
                 break;
             case R.id.title_tv_close:
-                Intent intent=new Intent(TopicsNewTopicActivity.this,BottomNavigationBarActivity.class);
-                startActivity(intent);
+                Intent i=new Intent(TopicsNewTopicActivity.this,BottomNavigationBarActivity.class);
+                startActivity(i);
                 finish();
                 break;
                 default:
@@ -241,8 +234,61 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
         return m;
     }
 //    插入图片
-    private void insertImage(){
-        richTextEditor.insertImage(null,"https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1519468205527&di=5c7f3a21b5b2b09a1a0dc5e0eaef5c27&imgtype=0&src=http%3A%2F%2Fimg1.3lian.com%2F2015%2Fa1%2F70%2Fd%2F81.jpg");
+    private void insertImage(String imagePath){
+        richTextEditor.insertImage(imagePath);
+    }
+//     回调图片
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode,Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode==RESULT_OK){
+//            从相册获取
+            if (requestCode==RESULT_LODA_IMAGE&& null!=data){
+//判断手机系统版本号
+                try {
+                    handleImageOnKitKat(data);
+                    Log.e("imagePath", String.valueOf(data));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+    }
+//    处理图片
+    private void handleImageOnKitKat(Intent data) throws JSONException {
+        String imagePath=null;
+        Uri uri=data.getData();
+        if (DocumentsContract.isDocumentUri(this,uri)){
+            String docId=DocumentsContract.getDocumentId(uri);
+            if ("com.android.providers.media.documents".equals(uri.getAuthority())){
+//                解析出数字格式id
+                String id=docId.split(":")[1];
+                String selection=MediaStore.Images.Media._ID+"="+id;
+                imagePath=getImagePath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,selection);
+            }else if ("com.android.providers.downloads.documents".equals(uri.getAuthority())){
+                Uri contentUri=ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"),Long.valueOf(docId));
+                imagePath=getImagePath(contentUri,null);
+            }
+        }else if ("content".equalsIgnoreCase(uri.getScheme())){
+            imagePath=getImagePath(uri,null);
+        }else if ("file".equalsIgnoreCase(uri.getScheme())){
+            imagePath=uri.getPath();
+        }
+//        Log.e("imagePath",imagePath);
+        insertImage(imagePath);
+    }
+//    图片路径
+    private String getImagePath(Uri uri,String selection){
+        String path=null;
+        Cursor cursor=getContentResolver().query(uri,null,selection,null,null);
+        if (cursor!=null){
+            if (cursor.moveToFirst()){
+                path=cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
+            }
+            cursor.close();
+        }
+        return path;
     }
 //    生成控件中的数据
     private String getEditData(){
@@ -253,7 +299,7 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
             for (RichTextEditor.EditData itemData:editDataList){
                 if (itemData.inputStr!=null){
 //                    将EditText中的换行符，空格符转换成html
-                    String inputStr=itemData.inputStr.replace("\n","</p><p>").replace("","&nbsp");
+                    String inputStr=itemData.inputStr.replace("\n","<p></p>").replace("","&nbsp");
                     content.append("<p>").append(inputStr).append("</p>");
                 }else if (itemData.imagePath!=null){
                     content.append("<p style=\"text-align:center\"><img width=\"100%\" src=\"").append(itemData.imagePath).append("\"/></p>");
@@ -269,7 +315,7 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
         if (editDataList.size() > 0) {
             for (RichTextEditor.EditData itemData : editDataList) {
                 if (itemData.inputStr != null) {
-//                    将EditText中的换行符，空格符转换成html
+//                    将EditText中的换行符，空格符转换成空
                    strContent = itemData.inputStr.replace("\n", "").replace("", "");
                 }
             }
@@ -305,6 +351,7 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
         }
     }
 //    提交
+
 
 }
 

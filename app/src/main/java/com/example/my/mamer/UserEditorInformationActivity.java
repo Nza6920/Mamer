@@ -118,8 +118,6 @@ public class UserEditorInformationActivity extends AppCompatActivity {
         etUserEmail=findViewById(R.id.user_information_email);
         etUserIntroduction=findViewById(R.id.user_information_introduction);
 
-//        Drawable tvClosePic=ContextCompat.getDrawable(this,R.mipmap.ic_title_back);
-//        tvBack.setBackground(tvClosePic);
         btnFinish.setText("完成");
 
         if (User.getUserImgBitmap()!=null){
@@ -151,16 +149,6 @@ public class UserEditorInformationActivity extends AppCompatActivity {
         etUserEmail.setText(User.getUserEmail());
         etUserIntroduction.setText(User.getUserIntroduction());
 
-//        点击事件
-//        返回
-//        tvBack.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Intent intent=new Intent(UserEditorInformationActivity.this,UserHomePageActivity.class);
-//                startActivity(intent);
-//                finish();
-//            }
-//        });
 //        提交
         btnFinish.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -4,7 +4,10 @@ import android.animation.LayoutTransition;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.text.TextUtils;
+import android.graphics.drawable.Drawable;
+import android.os.Handler;
+import android.os.Message;
+import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -18,8 +21,7 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
+import com.example.my.mamer.MyApplication;
 import com.example.my.mamer.R;
 import com.example.my.mamer.util.BaseUtils;
 
@@ -42,7 +44,7 @@ public class RichTextEditor extends ScrollView {
     private OnClickListener picDelListener;
 //    editText焦点监听
     private OnFocusChangeListener focusChangeListener;
-//    最新被聚焦的editText
+//    最近被聚焦的editText
     private EditText lastFocusEdit;
 //    在图片添加或删除时，触发transition动画
     private LayoutTransition mTransitioner;
@@ -50,6 +52,16 @@ public class RichTextEditor extends ScrollView {
     private int disappearingImageIndex=0;
 //    首个EditText
     private EditText firstEdit;
+
+    private final Handler msgHandler=new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what){
+                default:
+                    break;
+            }
+        }
+    };
 
     public RichTextEditor(Context context) {
         this(context,null);
@@ -178,7 +190,7 @@ public class RichTextEditor extends ScrollView {
         imgCount--;
 //        当没有图片的时候，显示
         if (imgCount==0){
-            firstEdit.setHint("tomorrow will be better");
+            firstEdit.setHint("若要添加图片，请在添加图片后点击上传图片，以免图片丢失哦");
         }
     }
 
@@ -226,35 +238,46 @@ public class RichTextEditor extends ScrollView {
         firstEdit.setHint("");
         return layout;
     }
-////    根据绝对路径添加View
-    public void insertImage(String imagePath,int width){
-        Bitmap bitmap=getScaledBitmap(imagePath,width);
-        insertImage(bitmap,imagePath);
-    }
-//    插入一张图片
-    public void insertImage(Bitmap bitmap,String imagePath){
-        String lastEditStr=lastFocusEdit.getText().toString();
-        int cursorIndex=lastFocusEdit.getSelectionStart();
-        String editStr1=lastEditStr.substring(0,cursorIndex);
-        int lastEditIndex=allLayout.indexOfChild(lastFocusEdit);
 
+//    插入一张图片
+    public void insertImage(String imagePath){
+        Bitmap bitmap=BitmapFactory.decodeFile(imagePath);
+        Log.i("imagePath", "insert"+String.valueOf(bitmap));
+//        所有文字
+        String lastEditStr=lastFocusEdit.getText().toString();
+//        获取此时光标的位置
+        int cursorIndex=lastFocusEdit.getSelectionStart();
+//        获取所有文字中第一个文字到光标所在位置的文字
+        String editStr1=lastEditStr.substring(0,cursorIndex);
+//        得到最后一个文字在父容器中的下标位置
+        int lastEditIndex=allLayout.indexOfChild(lastFocusEdit);
+//            如果editText为空，或者光标已经定在了editText的最前面则直接添加imageView插入图片，并且EditText下移
         if (lastEditStr.length()==0|| editStr1.length()==0){
-//            如果editText为空，或者光标已经定在了editText的最前面，则直接插入图片，并且EditText下移
-            addImageViewAtIndex(lastEditIndex,imagePath);
-        }else {
-//            如果EditText非空，且光标不在最顶端，则需要添加imageView和EditText
+            Log.i("imagePath","cursorIndex"+ String.valueOf(cursorIndex));
+            Log.i("imagePath","lastEditIndex"+String.valueOf(lastEditIndex));
+//            创建一个imageView
+            addImageViewAtIndex(lastEditIndex,bitmap);
+        }else if (lastEditStr.length()==cursorIndex){
+//            光标在文字末端
+            Log.i("imagePath","文字末端cursorIndex"+ String.valueOf(cursorIndex));
+            Log.i("imagePath","文字末端lastEditIndex"+String.valueOf(lastEditIndex));
+            addImageViewAtIndex(lastEditIndex+1,bitmap);
+            addEditTextAtIndex(lastEditIndex+2,"");
+        }
+        else {
+//            如果EditText非空，且光标不在最顶端和末端，则需要添加EditText
+//            将光标前面的文字存到lastFocusEdit里面
             lastFocusEdit.setText(editStr1);
+//            将光标后到最后的文字存到editStr2里面
             String editStr2=lastEditStr.substring(cursorIndex);
-            if (editStr2.length()==0){
-                editStr2="";
-            }
-//            如果获取焦点的editText不是ViewGroup中的最后一个元素且光标位于EditTEXT的最后
-//            否则插入EditText用来存储被图片分割的文字
-            if (!(lastEditIndex<viewTagIndex-1)&&(TextUtils.isEmpty(editStr2))){
-                addEditTextAtIndex(lastEditIndex+1,imagePath);
-            }
-            addImageViewAtIndex(lastEditIndex+1,imagePath);
-            lastFocusEdit.setSelection(lastFocusEdit.getText().length());
+//            创建一个imageView
+            addImageViewAtIndex(lastEditIndex+1,bitmap);
+            Log.i("imagePath","cursorIndex"+ String.valueOf(cursorIndex));
+            Log.i("imagePath","lastEditIndex"+String.valueOf(lastEditIndex));
+//            将文字重新插入在图片的位置后面
+            addEditTextAtIndex(lastEditIndex+2,editStr2);
+//            lastEditStr=editStr2+lastEditStr;
+//            lastFocusEdit.setSelection(lastFocusEdit.getText().length());
         }
         hideKeyBoard();
     }
@@ -265,43 +288,46 @@ public class RichTextEditor extends ScrollView {
         inputMethodManager.hideSoftInputFromWindow(lastFocusEdit.getWindowToken(),0);
     }
 //    在特定位置插入EditText，index位置，editStr EditText显示的文字
-    public void  addEditTextAtIndex(final int index,CharSequence editStr){
+    public void  addEditTextAtIndex(final int index,CharSequence charSequence){
         EditText editText2=createEditText("",EDIT_PADDING);
-        editText2.setText(editStr);
+        editText2.setText(charSequence);
         editText2.requestFocus();
         editText2.setOnFocusChangeListener(focusChangeListener);
 
         allLayout.addView(editText2,index);
     }
 //    在特定位置添加imageView
-    public void addImageViewAtIndex(final int index,String imagePath){
+    public RelativeLayout addImageViewAtIndex(final int index,final Bitmap bitmap){
         final RelativeLayout imageLayout=createImageLayout();
-        DataImageView imageView=imageLayout.findViewById(R.id.edit_image_view);
-//       从网络中加载图片,Glide4.0以后的写法
-        RequestOptions options=new RequestOptions()
-//                加载失败的图片
-                .error(R.mipmap.ic_title_close)
-//                等待加载时的图片,默认占位图
-                .placeholder(R.mipmap.ic_dialog_loading)
-//                图片缩放，<=imageView
-                .fitCenter();
-            Glide.with(getContext())
-                    .load(imagePath)
-                    .apply(options)
-                    .into(imageView);
-//        保存数据
-        imageView.setAbsolutePath(imagePath);
+        final DataImageView dataImageView=imageLayout.findViewById(R.id.edit_image_view);
+        final Drawable picLoss=ContextCompat.getDrawable(MyApplication.getContext(),R.mipmap.ic_image_loss);
+        if (bitmap==null){
+            final Runnable setAvatarRunable = new Runnable() {
+                @Override
+                public void run() {
+                    dataImageView.setBackground(picLoss);
+                }
+            };
+            new Thread() {
+                public void run() {
+                    msgHandler.post(setAvatarRunable);
+                }
+            }.start();
+        }else {
+            final Runnable setAvatarRunable = new Runnable() {
+                @Override
+                public void run() {
+                    dataImageView.setImageBitmap(bitmap);
+                }
+            };
+            new Thread() {
+                public void run() {
+                    msgHandler.post(setAvatarRunable);
+                }
+            }.start();
+        }
         allLayout.addView(imageLayout,index);
-    }
-//    根据view的宽度动态缩放bitmap尺寸,width view的宽度
-    public Bitmap getScaledBitmap(String filePath,int width){
-        BitmapFactory.Options options=new BitmapFactory.Options();
-        options.inJustDecodeBounds=true;
-        BitmapFactory.decodeFile(filePath,options);
-        int sampleSize=options.outWidth>width?options.outWidth/width+1:1;
-        options.inJustDecodeBounds=false;
-        options.inSampleSize=sampleSize;
-        return BitmapFactory.decodeFile(filePath,options);
+        return imageLayout;
     }
 //    对外提供的接口，生成编译数据上传
     public List<EditData> buildEditData(){

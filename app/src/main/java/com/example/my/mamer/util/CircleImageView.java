@@ -107,7 +107,7 @@ public class CircleImageView extends android.support.v7.widget.AppCompatImageVie
         float scale=1.0f;
 //        将图片宽度高度的最小者作为图片的边长，用来和view来计算伸缩比列
         int bitmapSize=Math.min(bitmap.getHeight(),bitmap.getWidth());
-//计算缩放比例，view的大小和图片的大小比例
+//         计算缩放比例，view的大小和图片的大小比例
         scale=mWidth*1.0f/bitmapSize;
 //        利用图像变化处理器，设置伸缩比例，长宽以相同比例伸缩
         mMatrix.setScale(scale,scale);
