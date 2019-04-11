@@ -2,6 +2,8 @@ package com.example.my.mamer.config;
 
 import android.graphics.Bitmap;
 
+import java.util.ArrayList;
+
 public class User {
     private static String userId;
     private static String userName;
@@ -20,6 +22,10 @@ public class User {
     private static Boolean boundPhone;
     private static String userBornDate;
     private static Boolean email_verified;
+//    暂存当前用户发帖图片image
+    public static ArrayList<String> imagePaths=new ArrayList<>();
+//暂存上传后返回的图片path
+    public static ArrayList<String> iamgeContentPaths=new ArrayList<>();
 
     public User() {
     }
@@ -126,5 +132,21 @@ public class User {
 
     public static void setEmail_verified(Boolean email_verified) {
         User.email_verified = email_verified;
+    }
+
+    public static ArrayList<String> getImagePaths() {
+        return imagePaths;
+    }
+
+    public static void setImagePaths(ArrayList<String> imagePaths) {
+        User.imagePaths = imagePaths;
+    }
+
+    public static ArrayList<String> getIamgeContentPaths() {
+        return iamgeContentPaths;
+    }
+
+    public static void setIamgeContentPaths(ArrayList<String> iamgeContentPaths) {
+        User.iamgeContentPaths = iamgeContentPaths;
     }
 }

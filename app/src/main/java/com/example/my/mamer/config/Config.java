@@ -35,14 +35,4 @@ public class Config {
     public static final String CONTENT_TYPEs="application/x-www-form-urlencoded;charset=utf-8";
     public static final MediaType MEDIA_TYPE_IMAGE=MediaType.parse("image/*");
 
-    public class HtmlToString{
-        public static final String TO_CSS="<style type=\"text/css\">"+
-                "body{margin:0px;padding:0px;}"+
-                "p{font-family:PingFang-SC-Regular;}"+
-                "font-size:16px;"+
-                "color:#333333;"+
-                "letter-spacing:0.2px;"+
-                "line-height:28px;"+
-                "</style>";
-    }
 }

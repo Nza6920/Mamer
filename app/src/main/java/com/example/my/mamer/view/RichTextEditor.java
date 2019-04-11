@@ -23,6 +23,7 @@ import android.widget.TextView;
 
 import com.example.my.mamer.MyApplication;
 import com.example.my.mamer.R;
+import com.example.my.mamer.config.User;
 import com.example.my.mamer.util.BaseUtils;
 
 import java.lang.reflect.Field;
@@ -73,7 +74,6 @@ public class RichTextEditor extends ScrollView {
 
     public RichTextEditor(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        Log.e("tAg", String.valueOf(context));
         inflater=LayoutInflater.from(context);
 
 //        初始化allLayout
@@ -115,7 +115,7 @@ public class RichTextEditor extends ScrollView {
         };
 
         LinearLayout.LayoutParams firstEditParam=new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.MATCH_PARENT);
-        firstEdit=createEditText("tomorrow will be better",dip2px(context,(float)EDIT_PADDING));
+        firstEdit=createEditText("若要添加图片，请在添加图片后点击上传图片，以免图片丢失哦,若删除图片;请在删除图片后点击上传图片，以免图片占位噢",dip2px(context,(float)EDIT_PADDING));
         allLayout.addView(firstEdit,firstEditParam);
         lastFocusEdit=firstEdit;
 
@@ -185,12 +185,13 @@ public class RichTextEditor extends ScrollView {
 //        删除文件夹里面的图片
         List<EditData> dataList=buildEditData();
         EditData editData=dataList.get(disappearingImageIndex);
+        User.imagePaths.remove(disappearingImageIndex);
         allLayout.removeView(view);
         viewTagIndex--;
         imgCount--;
 //        当没有图片的时候，显示
         if (imgCount==0){
-            firstEdit.setHint("若要添加图片，请在添加图片后点击上传图片，以免图片丢失哦");
+            firstEdit.setHint("若要添加图片，请在添加图片后点击上传图片，以免图片丢失哦;请在删除图片后点击上传图片，以免图片占位噢");
         }
     }
 
@@ -238,7 +239,6 @@ public class RichTextEditor extends ScrollView {
         firstEdit.setHint("");
         return layout;
     }
-
 //    插入一张图片
     public void insertImage(String imagePath){
         Bitmap bitmap=BitmapFactory.decodeFile(imagePath);
@@ -279,9 +279,9 @@ public class RichTextEditor extends ScrollView {
 //            lastEditStr=editStr2+lastEditStr;
 //            lastFocusEdit.setSelection(lastFocusEdit.getText().length());
         }
+        User.imagePaths.add(imagePath);
         hideKeyBoard();
     }
-
 //        隐藏小键盘
     public void hideKeyBoard(){
         InputMethodManager inputMethodManager= (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -347,21 +347,6 @@ public class RichTextEditor extends ScrollView {
         }
         return dataList;
     }
-//    返回用户输入内容
-//    public List<EditData> editDataStr(){
-//        List<EditData> dataStr=new ArrayList<>();
-//        int num=allLayout.getChildCount();
-//        for (int index=0;index<num;index++){
-//            View itemView=allLayout.getChildAt(index);
-//            EditData itemDataStr=new EditData();
-//            if (itemView instanceof EditText){
-//                EditText item= (EditText) itemView;
-//                itemDataStr.inputStr=item.getText().toString();
-//            }
-//            dataStr.add(itemDataStr);
-//        }
-//        return dataStr;
-//    }
 
     public  class EditData{
         public String inputStr;

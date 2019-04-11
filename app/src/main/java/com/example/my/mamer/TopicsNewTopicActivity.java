@@ -20,13 +20,37 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.my.mamer.config.User;
+import com.example.my.mamer.util.HttpUtil;
+import com.example.my.mamer.util.LoadingDraw;
 import com.example.my.mamer.view.RichTextEditor;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
+import okhttp3.Authenticator;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.MultipartBody;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+import okhttp3.Route;
+
+import static com.example.my.mamer.config.Config.DISMISS_DIALOG;
+import static com.example.my.mamer.config.Config.HTTP_OK;
+import static com.example.my.mamer.config.Config.HTTP_USER_ERROR;
+import static com.example.my.mamer.config.Config.HTTP_USER_FORMAT_ERROR;
+import static com.example.my.mamer.config.Config.HTTP_USER_NULL;
+import static com.example.my.mamer.config.Config.MEDIA_TYPE_IMAGE;
+import static com.example.my.mamer.config.Config.MESSAGE_ERROR;
 import static com.example.my.mamer.config.Config.RESULT_LODA_IMAGE;
+import static com.example.my.mamer.config.Config.USER_AVATAR_IMG;
 import static com.example.my.mamer.config.Config.USER_SET_INFORMATION;
 
 public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.OnClickListener {
@@ -54,9 +78,13 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
 //    富文本编辑控件
     private RichTextEditor richTextEditor;
     private String strContent;
-//    添加图片
+//    添加,上传图片图片
     private TextView tvPic;
+    private TextView tvCommitPic;
     public static int richTextWidth;
+
+    private LoadingDraw loadingDraw;
+
 
     private final Handler msgHandler=new Handler(){
         @Override
@@ -64,6 +92,18 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
             switch (msg.what){
                 case USER_SET_INFORMATION:
                     Toast.makeText(TopicsNewTopicActivity.this,(String)msg.obj,Toast.LENGTH_SHORT).show();
+                    break;
+                case HTTP_OK:
+                    Toast.makeText(TopicsNewTopicActivity.this,(String)msg.obj,Toast.LENGTH_SHORT).show();
+                    break;
+                case HTTP_USER_NULL:
+                    Toast.makeText(TopicsNewTopicActivity.this,(String)msg.obj,Toast.LENGTH_SHORT).show();
+                    break;
+                case HTTP_USER_FORMAT_ERROR:
+                    Toast.makeText(TopicsNewTopicActivity.this,(String)msg.obj,Toast.LENGTH_SHORT).show();
+                    break;
+                case DISMISS_DIALOG:
+                    ((LoadingDraw)msg.obj).dismiss();
                     break;
                 default:
                     break;
@@ -74,6 +114,9 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
     @Override
     protected void setContentView() {
         setContentView(R.layout.activity_topics_new_topic);
+        loadingDraw=new LoadingDraw(this);
+        User.imagePaths.clear();
+        User.iamgeContentPaths.clear();
     }
 
     @Override
@@ -106,6 +149,7 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
         tvShowSelectedInfo=findViewById(R.id.new_topic_selected_info);
         richTextEditor=findViewById(R.id.new_topic_rich_text_editor);
         tvPic=findViewById(R.id.new_topic_pic);
+        tvCommitPic=findViewById(R.id.new_topic_post_pic);
 
 //        标题
         etTopicTitle.addTextChangedListener(etWatcher);
@@ -121,6 +165,7 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
         tvShowSelected.setOnClickListener(this);
 //        图片
         tvPic.setOnClickListener(this);
+        tvCommitPic.setOnClickListener(this);
 //        view.post方式获得该控件的宽度
         richTextEditor.post(new Runnable() {
             @Override
@@ -175,9 +220,26 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
                 intent.setType("image/*");
                 startActivityForResult(intent,RESULT_LODA_IMAGE);
                 break;
+            case R.id.new_topic_post_pic:
+//              获取所有需要提交的图片imagePath
+                ArrayList<String> imagesPaths= User.getImagePaths();
+                if (imagesPaths.size()==0){
+                    Message msg1=new Message();
+                    msg1.what=USER_SET_INFORMATION;
+                    msg1.obj="请选择图片";
+                    msgHandler.sendMessage(msg1);
+                }else {
+                    for (int i=imagesPaths.size()-1;i>=0;i--){
+                        int imageInfo=i+1;
+                        String imagePathInfo="第"+imageInfo+"张图片";
+//                    提交
+                        postNewTopicPics(imagesPaths.get(i),imagePathInfo);
+                    }
+                }
+                break;
             case R.id.title_btn_next:
                 if (isCommit()){
-
+                    User.imagePaths.clear();
                 }
                 break;
             case R.id.title_tv_close:
@@ -235,7 +297,7 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
     }
 //    插入图片
     private void insertImage(String imagePath){
-        richTextEditor.insertImage(imagePath);
+          richTextEditor.insertImage(imagePath);
     }
 //     回调图片
     @Override
@@ -350,8 +412,95 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
             return true;
         }
     }
-//    提交
+//    提交图片
+    private void postNewTopicPics(String imagesPaths, final String imagePathInfo){
+        loadingDraw.show();
 
+        MultipartBody.Builder builder = new MultipartBody.Builder().setType(MultipartBody.FORM);
+        File file = new File(imagesPaths);
+        builder.addFormDataPart("image", file.getName(), RequestBody.create(MEDIA_TYPE_IMAGE, file))
+                .addFormDataPart("type", "topic");
+        MultipartBody requestBody = builder.build();
+        HttpUtil.sendOkHttpRequestAvatars(USER_AVATAR_IMG, requestBody, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Message msg1 = new Message();
+                msg1.what = DISMISS_DIALOG;
+                msg1.obj = loadingDraw;
+                msgHandler.sendMessage(msg1);
+
+                Message msg2 = new Message();
+                msg2.what = MESSAGE_ERROR;
+                msg2.obj = "上传失败";
+                msgHandler.sendMessage(msg2);
+            }
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                try {
+                    JSONObject jresp = new JSONObject(response.body().string());
+                    switch (response.code()) {
+//                        201
+                        case HTTP_OK:
+                            Message msg3 = new Message();
+                            msg3.what = DISMISS_DIALOG;
+                            msg3.obj = loadingDraw;
+                            msgHandler.sendMessage(msg3);
+
+                            User.iamgeContentPaths.add(jresp.getString("path"));
+                            Message msg2 = new Message();
+                            msg2.what = response.code();
+                            msg2.obj =imagePathInfo+ "上传成功";
+                            msgHandler.sendMessage(msg2);
+                            break;
+//                            422
+                        case HTTP_USER_NULL:
+                            Message msg4 = new Message();
+                            msg4.what = DISMISS_DIALOG;
+                            msg4.obj = loadingDraw;
+                            msgHandler.sendMessage(msg4);
+
+                             Message msg6 = new Message();
+                             msg6.what = response.code();
+                             msg6.obj = imagePathInfo+"上传失败，图片可能过大或过小";
+                             msgHandler.sendMessage(msg6);
+                            break;
+//                            403
+                        case HTTP_USER_FORMAT_ERROR:
+                            Message msg7 = new Message();
+                            msg7.what = DISMISS_DIALOG;
+                            msg7.obj = loadingDraw;
+                            msgHandler.sendMessage(msg7);
+
+                            Message msg8 = new Message();
+                            msg8.what = response.code();
+                            msg8.obj = imagePathInfo+"格式不支持";
+                            msgHandler.sendMessage(msg8);
+                            break;
+//                    401
+                        case HTTP_USER_ERROR:
+                            Message msg9 = new Message();
+                            msg9.what = DISMISS_DIALOG;
+                            msg9.obj = loadingDraw;
+                            msgHandler.sendMessage(msg9);
+
+                            Authenticator authenticator = new Authenticator() {
+                                @Override
+                                public Request authenticate(Route route, Response response) throws IOException {
+//    刷新token
+                                    return response.request().newBuilder().addHeader("Authorization", User.getUserPassKey_type() + User.getUserPassKey()).build();
+                                }
+                            };
+                        default:
+                            break;
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
+    }
 
 }
 

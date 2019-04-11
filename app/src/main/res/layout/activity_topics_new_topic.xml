@@ -117,7 +117,7 @@
             android:textColor="#000"
             android:gravity="center" />
         <TextView
-            android:id="@+id/new_topic_preview"
+            android:id="@+id/new_topic_post_pic"
             android:layout_weight="1"
             android:layout_width="0dp"
             android:layout_height="match_parent"
