@@ -530,6 +530,7 @@ public class UserEditorInformationActivity extends AppCompatActivity {
                                         return response.request().newBuilder().addHeader("Authorization", User.getUserPassKey_type() + User.getUserPassKey()).build();
                                     }
                                 };
+                                break;
                             default:
                                 break;
                         }

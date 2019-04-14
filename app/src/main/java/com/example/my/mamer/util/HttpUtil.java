@@ -46,5 +46,12 @@ public class HttpUtil {
         Request request=new Request.Builder().addHeader("Authorization", User.getUserPassKey_type()+User.getUserPassKey()).url(address).post(requestBody).build();
         client.newCall(request).enqueue(callback);
     }
+//    上传新建话题
+    public static void sendOkHttpRequestNewTopic(String address,final RequestBody requestBody,final okhttp3.Callback callback){
+        OkHttpClient client=new OkHttpClient();
+
+        Request request=new Request.Builder().addHeader("Authorization", User.getUserPassKey_type()+User.getUserPassKey()).url(address).post(requestBody).build();
+        client.newCall(request).enqueue(callback);
+    }
 
 }

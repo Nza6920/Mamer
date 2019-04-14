@@ -4,19 +4,18 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.text.Editable;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.style.AbsoluteSizeSpan;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -25,7 +24,6 @@ import android.widget.Toast;
 
 import com.example.my.mamer.util.HttpUtil;
 import com.example.my.mamer.util.LoadingDraw;
-
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -326,21 +324,7 @@ public class RegisterActivity extends AppCompatActivity {
         return m;
     }
 
-    //    密码输入合法判断
-//    private Boolean isPasCN(String str) {
-//        if ( null==str||"".equals(str)) {
-//            return false;
-//        }else{
-//            Pattern pattern=Pattern.compile(regExPasCN);
-//            Matcher matcher = pattern.matcher(str);
-//            if (!matcher.matches()){
-//                return true;
-//            } else {
-//                return false;
-//            }
-//        }
-//
-//    }
+
 
 //再次输入密码合法判断
     private Boolean isPasSame(){

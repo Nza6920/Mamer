@@ -3,6 +3,7 @@ package com.example.my.mamer.config;
 import android.graphics.Bitmap;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class User {
     private static String userId;
@@ -23,10 +24,9 @@ public class User {
     private static String userBornDate;
     private static Boolean email_verified;
 //    暂存当前用户发帖图片image
-    public static ArrayList<String> imagePaths=new ArrayList<>();
+public static HashMap<Integer,String> imagePaths=new HashMap<>();
 //暂存上传后返回的图片path
-    public static ArrayList<String> iamgeContentPaths=new ArrayList<>();
-
+    public static ArrayList<String> imageContentPaths=new ArrayList<>();
     public User() {
     }
 
@@ -134,19 +134,20 @@ public class User {
         User.email_verified = email_verified;
     }
 
-    public static ArrayList<String> getImagePaths() {
+    public static HashMap<Integer, String> getImagePaths() {
         return imagePaths;
     }
 
-    public static void setImagePaths(ArrayList<String> imagePaths) {
+    public static void setImagePaths(HashMap<Integer, String> imagePaths) {
         User.imagePaths = imagePaths;
     }
 
-    public static ArrayList<String> getIamgeContentPaths() {
-        return iamgeContentPaths;
+    public static ArrayList<String> getImageContentPaths() {
+        return imageContentPaths;
+    }
+    public static void setImageContentPaths(ArrayList<String> imageContentPaths) {
+        User.imageContentPaths = imageContentPaths;
     }
 
-    public static void setIamgeContentPaths(ArrayList<String> iamgeContentPaths) {
-        User.iamgeContentPaths = iamgeContentPaths;
-    }
+
 }

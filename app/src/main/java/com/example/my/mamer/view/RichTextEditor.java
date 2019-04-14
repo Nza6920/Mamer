@@ -25,6 +25,7 @@ import com.example.my.mamer.MyApplication;
 import com.example.my.mamer.R;
 import com.example.my.mamer.config.User;
 import com.example.my.mamer.util.BaseUtils;
+import com.example.my.mamer.util.IdUtils;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -34,6 +35,7 @@ public class RichTextEditor extends ScrollView {
     private static final int EDIT_PADDING=0;
 //    tag
     private int viewTagIndex=0;
+    private int imageViewTagIndex=0;
 //    图片个数
     private int imgCount=0;
 //    所有子view的容器
@@ -53,7 +55,8 @@ public class RichTextEditor extends ScrollView {
     private int disappearingImageIndex=0;
 //    首个EditText
     private EditText firstEdit;
-
+//
+    int imageP=0;
     private final Handler msgHandler=new Handler(){
         @Override
         public void handleMessage(Message msg) {
@@ -182,11 +185,8 @@ public class RichTextEditor extends ScrollView {
 //    处理删除图片点击事件，View整个image对应的relativeLayout View
     private void onImageCloseClick(View view){
         disappearingImageIndex=allLayout.indexOfChild(view);
-//        删除文件夹里面的图片
-        List<EditData> dataList=buildEditData();
-        EditData editData=dataList.get(disappearingImageIndex);
-        User.imagePaths.remove(disappearingImageIndex);
         allLayout.removeView(view);
+        User.imagePaths.remove(view.getId());
         viewTagIndex--;
         imgCount--;
 //        当没有图片的时候，显示
@@ -242,7 +242,6 @@ public class RichTextEditor extends ScrollView {
 //    插入一张图片
     public void insertImage(String imagePath){
         Bitmap bitmap=BitmapFactory.decodeFile(imagePath);
-        Log.i("imagePath", "insert"+String.valueOf(bitmap));
 //        所有文字
         String lastEditStr=lastFocusEdit.getText().toString();
 //        获取此时光标的位置
@@ -256,12 +255,12 @@ public class RichTextEditor extends ScrollView {
             Log.i("imagePath","cursorIndex"+ String.valueOf(cursorIndex));
             Log.i("imagePath","lastEditIndex"+String.valueOf(lastEditIndex));
 //            创建一个imageView
-            addImageViewAtIndex(lastEditIndex,bitmap);
+            addImageViewAtIndex(lastEditIndex,bitmap,imagePath);
         }else if (lastEditStr.length()==cursorIndex){
 //            光标在文字末端
             Log.i("imagePath","文字末端cursorIndex"+ String.valueOf(cursorIndex));
             Log.i("imagePath","文字末端lastEditIndex"+String.valueOf(lastEditIndex));
-            addImageViewAtIndex(lastEditIndex+1,bitmap);
+            addImageViewAtIndex(lastEditIndex+1,bitmap,imagePath);
             addEditTextAtIndex(lastEditIndex+2,"");
         }
         else {
@@ -271,15 +270,12 @@ public class RichTextEditor extends ScrollView {
 //            将光标后到最后的文字存到editStr2里面
             String editStr2=lastEditStr.substring(cursorIndex);
 //            创建一个imageView
-            addImageViewAtIndex(lastEditIndex+1,bitmap);
+            addImageViewAtIndex(lastEditIndex+1,bitmap,imagePath);
             Log.i("imagePath","cursorIndex"+ String.valueOf(cursorIndex));
             Log.i("imagePath","lastEditIndex"+String.valueOf(lastEditIndex));
 //            将文字重新插入在图片的位置后面
             addEditTextAtIndex(lastEditIndex+2,editStr2);
-//            lastEditStr=editStr2+lastEditStr;
-//            lastFocusEdit.setSelection(lastFocusEdit.getText().length());
         }
-        User.imagePaths.add(imagePath);
         hideKeyBoard();
     }
 //        隐藏小键盘
@@ -297,7 +293,7 @@ public class RichTextEditor extends ScrollView {
         allLayout.addView(editText2,index);
     }
 //    在特定位置添加imageView
-    public RelativeLayout addImageViewAtIndex(final int index,final Bitmap bitmap){
+    public RelativeLayout addImageViewAtIndex(final int index,final Bitmap bitmap,String imagePath){
         final RelativeLayout imageLayout=createImageLayout();
         final DataImageView dataImageView=imageLayout.findViewById(R.id.edit_image_view);
         final Drawable picLoss=ContextCompat.getDrawable(MyApplication.getContext(),R.mipmap.ic_image_loss);
@@ -326,7 +322,12 @@ public class RichTextEditor extends ScrollView {
                 }
             }.start();
         }
+//        设置imageLayoutId
+        imageLayout.setId(IdUtils.generateViewId());
+//        将Id和imagePath匹配
+        User.imagePaths.put(imageLayout.getId(),imagePath);
         allLayout.addView(imageLayout,index);
+
         return imageLayout;
     }
 //    对外提供的接口，生成编译数据上传
@@ -340,8 +341,14 @@ public class RichTextEditor extends ScrollView {
                 EditText item= (EditText) itemView;
                 itemData.inputStr=item.getText().toString();
             }else if (itemView instanceof RelativeLayout){
-                DataImageView item=itemView.findViewById(R.id.edit_image_view);
-                itemData.imagePath=item.getAbsolutePath();
+                if (User.imageContentPaths.size()>imageP){
+                    Log.e("UserImage", String.valueOf(User.imageContentPaths.size()));
+                    Log.e("UserImage", String.valueOf(imageP));
+                    Log.e("UserImage",User.imageContentPaths.get(imageP));
+                    itemData.imagePath=User.imageContentPaths.get(imageP);
+                    Log.e("UserImage",itemData.imagePath);
+                    imageP++;
+                }
             }
             dataList.add(itemData);
         }

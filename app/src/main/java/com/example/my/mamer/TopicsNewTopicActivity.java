@@ -30,7 +30,8 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import okhttp3.Authenticator;
@@ -47,8 +48,10 @@ import static com.example.my.mamer.config.Config.HTTP_OK;
 import static com.example.my.mamer.config.Config.HTTP_USER_ERROR;
 import static com.example.my.mamer.config.Config.HTTP_USER_FORMAT_ERROR;
 import static com.example.my.mamer.config.Config.HTTP_USER_NULL;
+import static com.example.my.mamer.config.Config.JSON;
 import static com.example.my.mamer.config.Config.MEDIA_TYPE_IMAGE;
 import static com.example.my.mamer.config.Config.MESSAGE_ERROR;
+import static com.example.my.mamer.config.Config.NEW_TOPIC_INFO;
 import static com.example.my.mamer.config.Config.RESULT_LODA_IMAGE;
 import static com.example.my.mamer.config.Config.USER_AVATAR_IMG;
 import static com.example.my.mamer.config.Config.USER_SET_INFORMATION;
@@ -84,6 +87,7 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
     public static int richTextWidth;
 
     private LoadingDraw loadingDraw;
+    private int imageInfo=1;
 
 
     private final Handler msgHandler=new Handler(){
@@ -116,7 +120,7 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
         setContentView(R.layout.activity_topics_new_topic);
         loadingDraw=new LoadingDraw(this);
         User.imagePaths.clear();
-        User.iamgeContentPaths.clear();
+        User.imageContentPaths.clear();
     }
 
     @Override
@@ -221,25 +225,33 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
                 startActivityForResult(intent,RESULT_LODA_IMAGE);
                 break;
             case R.id.new_topic_post_pic:
-//              获取所有需要提交的图片imagePath
-                ArrayList<String> imagesPaths= User.getImagePaths();
+                break;
+            case R.id.title_btn_next:
+//                先提交图片，获取所有需要提交的图片imagePath
+                HashMap<Integer,String> imagesPaths= User.getImagePaths();
                 if (imagesPaths.size()==0){
                     Message msg1=new Message();
                     msg1.what=USER_SET_INFORMATION;
                     msg1.obj="请选择图片";
                     msgHandler.sendMessage(msg1);
                 }else {
-                    for (int i=imagesPaths.size()-1;i>=0;i--){
-                        int imageInfo=i+1;
-                        String imagePathInfo="第"+imageInfo+"张图片";
+//遍历hash
+                        Iterator iterator=imagesPaths.keySet().iterator();
+                        while (iterator.hasNext()){
+                            Integer IdKey= (Integer) iterator.next();
+                            String imagePath=imagesPaths.get(IdKey);
 //                    提交
-                        postNewTopicPics(imagesPaths.get(i),imagePathInfo);
+                            String imagePathInfo="第"+imageInfo+"张图片";
+                            postNewTopicPics(imagePath,imagePathInfo);
+                            imageInfo++;
                     }
-                }
-                break;
-            case R.id.title_btn_next:
-                if (isCommit()){
-                    User.imagePaths.clear();
+                    if (isCommit()){
+                        try {
+                            postNewTopicInfo();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
                 }
                 break;
             case R.id.title_tv_close:
@@ -283,14 +295,16 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
 //    计算位数
     private static int calculatePlaces(String str) {
         int m = 0;
-        char arr[] = str.toCharArray();
-        for (int i = 0; i < arr.length; i++) {
-            char c = arr[i];
+        if (str!=null){
+            char arr[] = str.toCharArray();
+            for (int i = 0; i < arr.length; i++) {
+                char c = arr[i];
 //            中文字符
-            if ((c >= 0x0391 && c <= 0xFFE5)) {
-                m = m + 2;
-            } else if ((c >= 0x0000 && c <= 0x00FF)) {
-                m = m + 1;
+                if ((c >= 0x0391 && c <= 0xFFE5)) {
+                    m = m + 2;
+                } else if ((c >= 0x0000 && c <= 0x00FF)) {
+                    m = m + 1;
+                }
             }
         }
         return m;
@@ -361,7 +375,7 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
             for (RichTextEditor.EditData itemData:editDataList){
                 if (itemData.inputStr!=null){
 //                    将EditText中的换行符，空格符转换成html
-                    String inputStr=itemData.inputStr.replace("\n","<p></p>").replace("","&nbsp");
+                    String inputStr=itemData.inputStr.replace("\n","<p></p>").replace("","&nbsp;");
                     content.append("<p>").append(inputStr).append("</p>");
                 }else if (itemData.imagePath!=null){
                     content.append("<p style=\"text-align:center\"><img width=\"100%\" src=\"").append(itemData.imagePath).append("\"/></p>");
@@ -386,10 +400,10 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
 //    提交条件，通行证,topictitle,choiceClassify,content
     private boolean isCommit(){
         getTopicTitleEditStr();
-        getInputEditStr();
+//        getInputEditStr();
         int inputTitleStrCount=calculatePlaces(strTopicTitle);
         int cId=getCategoryId();
-        int inputStrCount=calculatePlaces(strContent);
+//        int inputStrCount=calculatePlaces(strContent);
         if (inputTitleStrCount>50||inputTitleStrCount<2){
             Message msg1=new Message();
             msg1.what=USER_SET_INFORMATION;
@@ -402,19 +416,22 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
             msg1.obj="请选择话题分类";
             msgHandler.sendMessage(msg1);
             return false;
-        }else if (inputStrCount<3){
-            Message msg1=new Message();
-            msg1.what=USER_SET_INFORMATION;
-            msg1.obj="请输入至少三个字符";
-            msgHandler.sendMessage(msg1);
-            return false;
-        }else {
+        }
+//        else if (inputStrCount<3){
+//            Message msg1=new Message();
+//            msg1.what=USER_SET_INFORMATION;
+//            msg1.obj="请输入至少三个字符";
+//            msgHandler.sendMessage(msg1);
+//            return false;
+//        }
+        else {
             return true;
         }
     }
 //    提交图片
     private void postNewTopicPics(String imagesPaths, final String imagePathInfo){
         loadingDraw.show();
+
 
         MultipartBody.Builder builder = new MultipartBody.Builder().setType(MultipartBody.FORM);
         File file = new File(imagesPaths);
@@ -446,7 +463,7 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
                             msg3.obj = loadingDraw;
                             msgHandler.sendMessage(msg3);
 
-                            User.iamgeContentPaths.add(jresp.getString("path"));
+                            User.imageContentPaths.add(jresp.getString("path"));
                             Message msg2 = new Message();
                             msg2.what = response.code();
                             msg2.obj =imagePathInfo+ "上传成功";
@@ -501,6 +518,78 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
             }
         });
     }
+//提交文本
+    private void postNewTopicInfo() throws JSONException {
+        loadingDraw.show();
 
+        String newTopicInfo=getEditData();
+        getTopicTitleEditStr();
+        JSONObject jsonParam=new JSONObject();
+        jsonParam.put("title",strTopicTitle);
+        jsonParam.put("body",newTopicInfo);
+        jsonParam.put("category_id",getCategoryId());
+        String jsonStr=jsonParam.toString();
+
+        RequestBody requestBody=RequestBody.create(JSON,jsonStr);
+        HttpUtil.sendOkHttpRequestNewTopic(NEW_TOPIC_INFO, requestBody, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Message msg1=new Message();
+                msg1.what=DISMISS_DIALOG;
+                msg1.obj=loadingDraw;
+                msgHandler.sendMessage(msg1);
+
+                Message msg2=new Message();
+                msg2.what=MESSAGE_ERROR;
+                msg2.obj="服务器异常,请检查网络";
+                msgHandler.sendMessage(msg2);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                JSONObject jresp= null;
+                try {
+                    jresp = new JSONObject(response.body().string());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                switch (response.code()){
+                    case HTTP_OK:
+                        Message msg3=new Message();
+                        msg3.what=DISMISS_DIALOG;
+                        msg3.obj=loadingDraw;
+                        msgHandler.sendMessage(msg3);
+
+                        Message msg4=new Message();
+                        msg4.what=response.code();
+                        msg4.obj="发帖成功";
+                        msgHandler.sendMessage(msg4);
+                        User.imagePaths.clear();
+                        User.imageContentPaths.clear();
+                        Intent intent=new Intent(TopicsNewTopicActivity.this,BottomNavigationBarActivity.class);
+                        startActivity(intent);
+                        finish();
+                        break;
+//                    401
+                    case HTTP_USER_ERROR:
+                        Message msg9 = new Message();
+                        msg9.what = DISMISS_DIALOG;
+                        msg9.obj = loadingDraw;
+                        msgHandler.sendMessage(msg9);
+
+                        Authenticator authenticator = new Authenticator() {
+                            @Override
+                            public Request authenticate(Route route, Response response) throws IOException {
+//    刷新token
+                                return response.request().newBuilder().addHeader("Authorization", User.getUserPassKey_type() + User.getUserPassKey()).build();
+                            }
+                        };
+                        break;
+                        default:
+                            break;
+                }
+            }
+        });
+    }
 }
 

@@ -10,6 +10,7 @@ public class Config {
     public static final String LOGIN="https://mamer.club/api/authorizations";
     public static final String USER_INFORMATION="https://mamer.club/api/user";
     public static final String USER_AVATAR_IMG="https://mamer.club/api/images";
+    public static final String NEW_TOPIC_INFO="https://mamer.club/api/topics";
 
     //    http返回码
     public final static int HTTP_OK=201;
