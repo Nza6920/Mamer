@@ -1,5 +1,6 @@
 package com.example.my.mamer;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -11,6 +12,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.my.mamer.config.User;
+
 import static com.example.my.mamer.config.Config.HTTP_OK;
 import static com.example.my.mamer.config.Config.HTTP_USER_NULL;
 
@@ -18,6 +21,8 @@ public class UserFragment extends Fragment {
 
 //    mamer能量值
     private TextView tvUserMamerEnergy;
+    private LinearLayout userMamerEnergyLayout;
+    private LinearLayout userUnloginLayout;
 //    用户个人话题
     private TextView tvUserTopics;
 //    用户关注
@@ -59,6 +64,8 @@ public class UserFragment extends Fragment {
         View view=inflater.inflate(R.layout.fragment_user,container,false);
 //        初始化控件
         tvUserMamerEnergy=view.findViewById(R.id.user_mamer_energy);
+        userMamerEnergyLayout=view.findViewById(R.id.user_mamer_energy_layout);
+        userUnloginLayout=view.findViewById(R.id.user_un_login_layout);
         tvUserTopics=view.findViewById(R.id.user_my_topic);
         tvUserattention=view.findViewById(R.id.user_my_attention);
         tvUserCollect=view.findViewById(R.id.user_my_collect);
@@ -74,7 +81,16 @@ public class UserFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        if (User.getUserPassKey()==null){
+            userUnloginLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent=new Intent(getActivity(),RegisterPhoneNumActivity.class);
+                    startActivity(intent);
+                }
+            });
 
+        }
 
     }
 

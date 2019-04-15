@@ -113,7 +113,7 @@ public class RegisterPhoneNumActivity extends AppCompatActivity {
         tvClose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                finish();
             }
         });
 //        密码登陆

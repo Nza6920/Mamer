@@ -112,6 +112,13 @@ public class LoginActivity extends AppCompatActivity {
 
         btnLogin.getBackground().setAlpha(111);
 //        监听，点击事件
+//        返回按钮
+        tvClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
 //        密码
         etPas.addTextChangedListener(new TextWatcher() {
 
@@ -268,10 +275,5 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
     }
-//    返回主页面
-    private void previous(){
-        Intent intent=new Intent(LoginActivity.this,RegisterPhoneNumActivity.class);
-        startActivity(intent);
-        finish();
-    }
+
 }

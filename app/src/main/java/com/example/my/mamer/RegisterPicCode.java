@@ -125,7 +125,9 @@ public class RegisterPicCode extends AppCompatActivity {
         tvClose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                Intent intent=new Intent(RegisterPicCode.this,RegisterPhoneNumActivity.class);
+                startActivity(intent);
+                finish();
             }
         });
 //        输入

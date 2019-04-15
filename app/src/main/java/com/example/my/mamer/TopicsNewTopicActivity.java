@@ -88,6 +88,7 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
 
     private LoadingDraw loadingDraw;
     private int imageInfo=1;
+    private int inputStrCountTag;
 
 
     private final Handler msgHandler=new Handler(){
@@ -245,13 +246,6 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
                             postNewTopicPics(imagePath,imagePathInfo);
                             imageInfo++;
                     }
-                    if (isCommit()){
-                        try {
-                            postNewTopicInfo();
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
                 }
                 break;
             case R.id.title_tv_close:
@@ -301,7 +295,7 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
                 char c = arr[i];
 //            中文字符
                 if ((c >= 0x0391 && c <= 0xFFE5)) {
-                    m = m + 2;
+                    m = m + 1;
                 } else if ((c >= 0x0000 && c <= 0x00FF)) {
                     m = m + 1;
                 }
@@ -375,35 +369,30 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
             for (RichTextEditor.EditData itemData:editDataList){
                 if (itemData.inputStr!=null){
 //                    将EditText中的换行符，空格符转换成html
-                    String inputStr=itemData.inputStr.replace("\n","<p></p>").replace("","&nbsp;");
+                    String inputStr=itemData.inputStr.replace("\n","<p></p>").replace(" ","&nbsp;");
                     content.append("<p>").append(inputStr).append("</p>");
-                }else if (itemData.imagePath!=null){
+                }else if (User.imageContentPaths!=null){
                     content.append("<p style=\"text-align:center\"><img width=\"100%\" src=\"").append(itemData.imagePath).append("\"/></p>");
                 }
+                int inputStrCount=getInputEditStr(itemData.inputStr);
+                inputStrCount+=inputStrCount;
+                setInputStrCountTag(inputStrCount);
             }
             content.append("</div>");
+
         }
         return content.toString();
     }
 //    字数限制
-    private void getInputEditStr() {
-        List<RichTextEditor.EditData> editDataList = richTextEditor.buildEditData();
-        if (editDataList.size() > 0) {
-            for (RichTextEditor.EditData itemData : editDataList) {
-                if (itemData.inputStr != null) {
-//                    将EditText中的换行符，空格符转换成空
-                   strContent = itemData.inputStr.replace("\n", "").replace("", "");
-                }
-            }
-        }
+    private int getInputEditStr(String inputStr) {
+       int inputStrCount=calculatePlaces(inputStr);
+       return inputStrCount;
     }
 //    提交条件，通行证,topictitle,choiceClassify,content
     private boolean isCommit(){
         getTopicTitleEditStr();
-//        getInputEditStr();
         int inputTitleStrCount=calculatePlaces(strTopicTitle);
         int cId=getCategoryId();
-//        int inputStrCount=calculatePlaces(strContent);
         if (inputTitleStrCount>50||inputTitleStrCount<2){
             Message msg1=new Message();
             msg1.what=USER_SET_INFORMATION;
@@ -416,15 +405,7 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
             msg1.obj="请选择话题分类";
             msgHandler.sendMessage(msg1);
             return false;
-        }
-//        else if (inputStrCount<3){
-//            Message msg1=new Message();
-//            msg1.what=USER_SET_INFORMATION;
-//            msg1.obj="请输入至少三个字符";
-//            msgHandler.sendMessage(msg1);
-//            return false;
-//        }
-        else {
+        } else {
             return true;
         }
     }
@@ -468,6 +449,13 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
                             msg2.what = response.code();
                             msg2.obj =imagePathInfo+ "上传成功";
                             msgHandler.sendMessage(msg2);
+                            if (isCommit()){
+                                try {
+                                    postNewTopicInfo();
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
                             break;
 //                            422
                         case HTTP_USER_NULL:
@@ -520,76 +508,107 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
     }
 //提交文本
     private void postNewTopicInfo() throws JSONException {
-        loadingDraw.show();
 
-        String newTopicInfo=getEditData();
-        getTopicTitleEditStr();
-        JSONObject jsonParam=new JSONObject();
-        jsonParam.put("title",strTopicTitle);
-        jsonParam.put("body",newTopicInfo);
-        jsonParam.put("category_id",getCategoryId());
-        String jsonStr=jsonParam.toString();
+        String newTopicInfo = getEditData();
+        if (getInputStrCountTag() < 3) {
+            Message msg1 = new Message();
+            msg1.what = USER_SET_INFORMATION;
+            msg1.obj = "请输入至少三个字符";
+            msgHandler.sendMessage(msg1);
+        }
+            getTopicTitleEditStr();
+            final JSONObject jsonParam = new JSONObject();
+            jsonParam.put("title", strTopicTitle);
+            jsonParam.put("body", newTopicInfo);
+            jsonParam.put("category_id", getCategoryId());
+            String jsonStr = jsonParam.toString();
 
-        RequestBody requestBody=RequestBody.create(JSON,jsonStr);
-        HttpUtil.sendOkHttpRequestNewTopic(NEW_TOPIC_INFO, requestBody, new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                Message msg1=new Message();
-                msg1.what=DISMISS_DIALOG;
-                msg1.obj=loadingDraw;
-                msgHandler.sendMessage(msg1);
-
-                Message msg2=new Message();
-                msg2.what=MESSAGE_ERROR;
-                msg2.obj="服务器异常,请检查网络";
-                msgHandler.sendMessage(msg2);
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                JSONObject jresp= null;
-                try {
-                    jresp = new JSONObject(response.body().string());
-                } catch (JSONException e) {
-                    e.printStackTrace();
+            RequestBody requestBody = RequestBody.create(JSON, jsonStr);
+            HttpUtil.sendOkHttpRequestNewTopic(NEW_TOPIC_INFO, requestBody, new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    Message msg2 = new Message();
+                    msg2.what = MESSAGE_ERROR;
+                    msg2.obj = "服务器异常,请检查网络";
+                    msgHandler.sendMessage(msg2);
                 }
-                switch (response.code()){
-                    case HTTP_OK:
-                        Message msg3=new Message();
-                        msg3.what=DISMISS_DIALOG;
-                        msg3.obj=loadingDraw;
-                        msgHandler.sendMessage(msg3);
 
-                        Message msg4=new Message();
-                        msg4.what=response.code();
-                        msg4.obj="发帖成功";
-                        msgHandler.sendMessage(msg4);
-                        User.imagePaths.clear();
-                        User.imageContentPaths.clear();
-                        Intent intent=new Intent(TopicsNewTopicActivity.this,BottomNavigationBarActivity.class);
-                        startActivity(intent);
-                        finish();
-                        break;
-//                    401
-                    case HTTP_USER_ERROR:
-                        Message msg9 = new Message();
-                        msg9.what = DISMISS_DIALOG;
-                        msg9.obj = loadingDraw;
-                        msgHandler.sendMessage(msg9);
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    JSONObject jresp = null;
+                    try {
+                        jresp = new JSONObject(response.body().string());
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    switch (response.code()) {
+                        case HTTP_OK:
+                            Message msg4 = new Message();
+                            msg4.what = response.code();
+                            msg4.obj = "发帖成功";
+                            msgHandler.sendMessage(msg4);
+                            User.imagePaths.clear();
+                            User.imageContentPaths.clear();
+                            Intent intent = new Intent(TopicsNewTopicActivity.this, BottomNavigationBarActivity.class);
+                            startActivity(intent);
+                            finish();
+                            break;
+//                            422
+                        case HTTP_USER_NULL:
+                            if (jresp.has("errors")){
+                                try {
+                                    JSONObject errorStr=jresp.getJSONObject("errors");
+                                    if (errorStr.has("body")) {
+                                        Message msg3 = new Message();
+                                        msg3.what = response.code();
+                                        msg3.obj = "话题内容至少为3个字符";
+                                        msgHandler.sendMessage(msg3);
+                                    }else if (errorStr.has("title")){
+                                        Message msg3 = new Message();
+                                        msg3.what = response.code();
+                                        msg3.obj ="标题至少为2个字符";
+                                        msgHandler.sendMessage(msg3);
+                                    }else if (errorStr.has("category_code")){
+                                        Message msg3 = new Message();
+                                        msg3.what = response.code();
+                                        msg3.obj = "分类不能为空";
+                                        msgHandler.sendMessage(msg3);
+                                    }
 
-                        Authenticator authenticator = new Authenticator() {
-                            @Override
-                            public Request authenticate(Route route, Response response) throws IOException {
-//    刷新token
-                                return response.request().newBuilder().addHeader("Authorization", User.getUserPassKey_type() + User.getUserPassKey()).build();
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
                             }
-                        };
-                        break;
+                            break;
+//                    401
+                        case HTTP_USER_ERROR:
+                            Message msg9 = new Message();
+                            msg9.what = DISMISS_DIALOG;
+                            msg9.obj = loadingDraw;
+                            msgHandler.sendMessage(msg9);
+
+                            Authenticator authenticator = new Authenticator() {
+                                @Override
+                                public Request authenticate(Route route, Response response) throws IOException {
+                                    //    刷新token
+                                    return response.request().newBuilder().addHeader("Authorization", User.getUserPassKey_type() + User.getUserPassKey()).build();
+                                }
+                            };
+                            User.setUserPassKey(String.valueOf(authenticator));
+                            break;
                         default:
                             break;
+                    }
                 }
-            }
-        });
+            });
+    }
+
+    public int getInputStrCountTag() {
+        return inputStrCountTag;
+    }
+
+    public void setInputStrCountTag(int inputStrCountTag) {
+        this.inputStrCountTag = inputStrCountTag;
     }
 }
 

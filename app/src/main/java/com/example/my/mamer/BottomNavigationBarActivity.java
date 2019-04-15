@@ -3,6 +3,8 @@ package com.example.my.mamer;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -11,11 +13,21 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.ashokvarma.bottomnavigation.BottomNavigationBar;
 import com.ashokvarma.bottomnavigation.BottomNavigationItem;
 import com.ashokvarma.bottomnavigation.ShapeBadgeItem;
 import com.ashokvarma.bottomnavigation.TextBadgeItem;
+import com.example.my.mamer.config.User;
+import com.example.my.mamer.util.LoadingDraw;
+
+import static com.example.my.mamer.config.Config.DISMISS_DIALOG;
+import static com.example.my.mamer.config.Config.HTTP_OK;
+import static com.example.my.mamer.config.Config.HTTP_USER_FORMAT_ERROR;
+import static com.example.my.mamer.config.Config.HTTP_USER_NULL;
+import static com.example.my.mamer.config.Config.MESSAGE_ERROR;
+import static com.example.my.mamer.config.Config.USER_SET_INFORMATION;
 
 public class BottomNavigationBarActivity extends AppCompatActivity implements BottomNavigationBar.OnTabSelectedListener {
 
@@ -43,6 +55,34 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
     private RelativeLayout userlayout;
     private TextView tvUserName;
     private Button btnUserHomePage;
+
+    private final Handler msgHandler=new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what){
+                case USER_SET_INFORMATION:
+                    Toast.makeText(BottomNavigationBarActivity.this,(String)msg.obj,Toast.LENGTH_SHORT).show();
+                    break;
+                case HTTP_OK:
+                    Toast.makeText(BottomNavigationBarActivity.this,(String)msg.obj,Toast.LENGTH_SHORT).show();
+                    break;
+                case HTTP_USER_NULL:
+                    Toast.makeText(BottomNavigationBarActivity.this,(String)msg.obj,Toast.LENGTH_SHORT).show();
+                    break;
+                case HTTP_USER_FORMAT_ERROR:
+                    Toast.makeText(BottomNavigationBarActivity.this,(String)msg.obj,Toast.LENGTH_SHORT).show();
+                    break;
+                case DISMISS_DIALOG:
+                    ((LoadingDraw)msg.obj).dismiss();
+                    break;
+                case MESSAGE_ERROR:
+                    Toast.makeText(BottomNavigationBarActivity.this,(String)msg.obj,Toast.LENGTH_SHORT).show();
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,17 +138,31 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
         btnTopicNewTopic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (User.getUserPassKey()!=null){
                 Intent intent=new Intent(BottomNavigationBarActivity.this,TopicsNewTopicActivity.class);
                 startActivity(intent);
                 finish();
+                }else {
+                    Message msg1 = new Message();
+                    msg1.what = MESSAGE_ERROR;
+                    msg1.obj = "登陆后体验更多";
+                    msgHandler.sendMessage(msg1);
+                }
             }
         });
         btnUserHomePage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent=new Intent(BottomNavigationBarActivity.this,UserHomePageActivity.class);
-                startActivity(intent);
-                finish();
+                if (User.getUserPassKey()!=null){
+                    Intent intent=new Intent(BottomNavigationBarActivity.this,UserHomePageActivity.class);
+                    startActivity(intent);
+                    finish();
+                }else {
+                    Message msg1 = new Message();
+                    msg1.what = MESSAGE_ERROR;
+                    msg1.obj = "登陆后体验更多";
+                    msgHandler.sendMessage(msg1);
+                }
             }
         });
     }
