@@ -213,7 +213,7 @@ public class LoginActivity extends AppCompatActivity {
                             Log.d("Tag",userPassKey);
                             User.setUserPassKey(userPassKey);
                             User.setUserPassKey_type(userPassKey_type);
-                            Intent intent=new Intent(LoginActivity.this,BottomNavigationBarActivity.class);
+                            Intent intent=new Intent(LoginActivity.this,UserHomePageActivity.class);
                             startActivity(intent);
                             finish();
                             break;

@@ -35,7 +35,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="url" value="jar:file:/D:/android/android-studio/plugins/android/lib/android.jar!/images/material_design_icons/image/ic_crop_original_black_24dp.xml" />
+                                                <entry key="url" value="jar:file:/D:/android/android-studio/plugins/android/lib/android.jar!/images/material_design_icons/device/ic_access_time_black_24dp.xml" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -79,10 +79,8 @@
                                   </option>
                                   <option name="values">
                                     <map>
-                                      <entry key="assetType" value="TEXT" />
-                                      <entry key="backgroundColor" value="c7c7c7" />
-                                      <entry key="iconShape" value="HRECT" />
-                                      <entry key="outputName" value="ic_image_loss" />
+                                      <entry key="iconShape" value="NONE" />
+                                      <entry key="outputName" value="ic_topic_time" />
                                     </map>
                                   </option>
                                 </PersistentState>

@@ -90,14 +90,12 @@ public class UserFragment extends Fragment {
                 }
             });
 
+        }else {
+            userUnloginLayout.setVisibility(View.GONE);
+            userMamerEnergyLayout.setVisibility(View.VISIBLE);
         }
 
     }
-
-
-
-
-
     //    处理并显示数据
     private void showUserInfo(){
 

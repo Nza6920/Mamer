@@ -141,7 +141,6 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
                 if (User.getUserPassKey()!=null){
                 Intent intent=new Intent(BottomNavigationBarActivity.this,TopicsNewTopicActivity.class);
                 startActivity(intent);
-                finish();
                 }else {
                     Message msg1 = new Message();
                     msg1.what = MESSAGE_ERROR;
