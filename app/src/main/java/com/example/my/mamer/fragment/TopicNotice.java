@@ -8,9 +8,9 @@ import android.view.ViewGroup;
 
 import com.example.my.mamer.R;
 
-public class TopicLatestRelease extends Fragment {
+public class TopicNotice extends Fragment {
     @Override
-    public View onCreateView(LayoutInflater inflater,ViewGroup container,Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
         View view=inflater.inflate(R.layout.fragment_topic_cotent,container,false);
         return view;
     }

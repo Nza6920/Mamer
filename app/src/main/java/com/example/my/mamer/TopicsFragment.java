@@ -9,8 +9,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.my.mamer.adapter.TopicTabAdapter;
-import com.example.my.mamer.fragment.TopicLastReply;
-import com.example.my.mamer.fragment.TopicLatestRelease;
+import com.example.my.mamer.fragment.TopicNotice;
+import com.example.my.mamer.fragment.TopicQuestionAnswer;
+import com.example.my.mamer.fragment.TopicShare;
+import com.example.my.mamer.fragment.TopicTeach;
 
 import java.util.ArrayList;
 
@@ -19,8 +21,10 @@ public class TopicsFragment extends Fragment {
     private TabLayout titleInfoLayout;
     private ViewPager contentInfoView;
 //    fragment
-    private TopicLastReply topicLastReply;
-    private TopicLatestRelease topicLatestRelease;
+    private TopicNotice topicNotice;
+    private TopicQuestionAnswer topicQuestionAnswer;
+    private TopicShare topicShare;
+    private TopicTeach topicTeach;
 //    list
     private ArrayList<Fragment> listFragment;
     private ArrayList<String> listTitle;
@@ -33,8 +37,11 @@ public class TopicsFragment extends Fragment {
         titleInfoLayout=view.findViewById(R.id.topic_info_title);
         contentInfoView=view.findViewById(R.id.topic_info_content);
 //        初始化各fragment
-        topicLastReply=new TopicLastReply();
-        topicLatestRelease=new TopicLatestRelease();
+        topicNotice=new TopicNotice();
+        topicQuestionAnswer=new TopicQuestionAnswer();
+        topicShare=new TopicShare();
+        topicTeach=new TopicTeach();
+
 
         return view;
     }
@@ -44,18 +51,23 @@ public class TopicsFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 //        装入fragment
         listFragment=new ArrayList<>();
-        listFragment.add(topicLastReply);
-        listFragment.add(topicLatestRelease);
+        listFragment.add(topicNotice);
+        listFragment.add(topicQuestionAnswer);
+        listFragment.add(topicShare);
+        listFragment.add(topicTeach);
 //装入title名
         listTitle=new ArrayList<>();
-        listTitle.add("最后回复");
-        listTitle.add("最新发布");
+        listTitle.add("分享");
+        listTitle.add("教程");
+        listTitle.add("问答");
+        listTitle.add("公告");
 //        设置tabLayout模式
-        titleInfoLayout.setTabMode(TabLayout.MODE_FIXED);
-        titleInfoLayout.setTabGravity(TabLayout.GRAVITY_CENTER);
+//        titleInfoLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
 //        为TabLayout添加tab名称
         titleInfoLayout.addTab(titleInfoLayout.newTab().setText(listTitle.get(0)));
         titleInfoLayout.addTab(titleInfoLayout.newTab().setText(listTitle.get(1)));
+        titleInfoLayout.addTab(titleInfoLayout.newTab().setText(listTitle.get(2)));
+        titleInfoLayout.addTab(titleInfoLayout.newTab().setText(listTitle.get(3)));
         adapter=new TopicTabAdapter(getChildFragmentManager(),listFragment,listTitle);
 
 //        viewPager加载adapter
