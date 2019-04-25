@@ -11,7 +11,7 @@ public class TopicContent {
     private   int viewCount;
     private   String createTime;
     private   String updateTime;
-    private   int categoryId;
+    private   String categoryId;
 
 
     public TopicContent() {
@@ -89,11 +89,11 @@ public class TopicContent {
         this.updateTime = updateTime;
     }
 
-    public int getCategoryId() {
+    public String getCategoryId() {
         return categoryId;
     }
 
-    public void setCategoryId(int categoryId) {
+    public void setCategoryId(String categoryId) {
         this.categoryId = categoryId;
     }
 }

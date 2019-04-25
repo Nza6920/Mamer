@@ -48,7 +48,7 @@
         <activity android:name=".UserSelfTopicListActivity">
 
         </activity>
-        <activity android:name=".TopicInfoShowActivity"></activity>
+        <activity android:name=".TopicParticularsActivity"></activity>
     </application>
 
 </manifest>

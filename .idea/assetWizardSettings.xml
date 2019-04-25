@@ -35,7 +35,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="url" value="jar:file:/D:/android/android-studio/plugins/android/lib/android.jar!/images/material_design_icons/image/ic_crop_original_black_24dp.xml" />
+                                                <entry key="url" value="jar:file:/D:/android/android-studio/plugins/android/lib/android.jar!/images/material_design_icons/editor/ic_insert_comment_black_24dp.xml" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -80,7 +80,7 @@
                                   <option name="values">
                                     <map>
                                       <entry key="iconShape" value="NONE" />
-                                      <entry key="outputName" value="ic_image_error" />
+                                      <entry key="outputName" value="ic_topic_particulars_comment" />
                                     </map>
                                   </option>
                                 </PersistentState>

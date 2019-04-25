@@ -1,9 +1,12 @@
 package com.example.my.mamer;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -99,7 +102,7 @@ public class UserSelfTopicListActivity extends AppCompatActivity {
     //    数据加载接口
     public void onDataLoad() {
         Log.e("Tag","进入数据获取");
-        HttpUtil.sendOkHttpGetTopicList(1," ", 1, new Callback() {
+        HttpUtil.sendOkHttpGetUserTopicList(1, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
 
@@ -124,7 +127,10 @@ public class UserSelfTopicListActivity extends AppCompatActivity {
                                 for (int i=0;i<jsonSize;i++) {
                                     JSONObject jsonObject = jsonArray.getJSONObject(i);
                                     TopicContent topicContent = new TopicContent();
+                                    topicContent.setTopicId(jsonObject.getString("id"));
                                     topicContent.setTopicTitle(jsonObject.getString("title"));
+                                    topicContent.setTopicAuthorId(jsonObject.getString("user_id"));
+                                    topicContent.setCategoryId(jsonObject.getString("category_id"));
                                     topicContent.setReplyCount(jsonObject.getString("reply_count"));
                                     topicContent.setUpdateTime(jsonObject.getString("updated_at"));
                                     listData.add(topicContent);
@@ -147,12 +153,23 @@ public class UserSelfTopicListActivity extends AppCompatActivity {
         });
     }
 
-//    listView监听事件
+//    listView监听事件,
+// adapterView发生点击的adapterView，
+// view被点击的item的view通过它获得该项中的各个组件
+// position adapterView中的行位置，
+//    id adapter数据源的第几条记录
 private void initEvent(){
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+//                暂存数据
+                SharedPreferences.Editor editor=PreferenceManager.getDefaultSharedPreferences(UserSelfTopicListActivity.this).edit();
+                editor.putString("id",listData.get(position).getTopicId());
+                editor.putString("categoryId",listData.get(position).getCategoryId());
+                editor.apply();
 
+                Intent intent=new Intent(UserSelfTopicListActivity.this,TopicParticularsActivity.class);
+                startActivity(intent);
             }
         });
 }
