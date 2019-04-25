@@ -37,11 +37,10 @@ public class TopicsFragment extends Fragment {
         titleInfoLayout=view.findViewById(R.id.topic_info_title);
         contentInfoView=view.findViewById(R.id.topic_info_content);
 //        初始化各fragment
-        topicNotice=new TopicNotice();
-        topicQuestionAnswer=new TopicQuestionAnswer();
         topicShare=new TopicShare();
         topicTeach=new TopicTeach();
-
+        topicQuestionAnswer=new TopicQuestionAnswer();
+        topicNotice=new TopicNotice();
 
         return view;
     }
@@ -51,10 +50,12 @@ public class TopicsFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 //        装入fragment
         listFragment=new ArrayList<>();
-        listFragment.add(topicNotice);
-        listFragment.add(topicQuestionAnswer);
         listFragment.add(topicShare);
         listFragment.add(topicTeach);
+        listFragment.add(topicQuestionAnswer);
+        listFragment.add(topicNotice);
+
+
 //装入title名
         listTitle=new ArrayList<>();
         listTitle.add("分享");

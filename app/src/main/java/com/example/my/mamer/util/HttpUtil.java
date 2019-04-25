@@ -1,6 +1,6 @@
 package com.example.my.mamer.util;
 
-import com.example.my.mamer.config.User;
+import com.example.my.mamer.config.GlobalUserInfo;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -20,17 +20,17 @@ public class HttpUtil {
         Request request=new Request.Builder().url(address).post(requestBody).build();
         client.newCall(request).enqueue(callback);
     }
-
+//获取用户信息
     public static void sendOkHttpRequestGet(String address,okhttp3.Callback callback){
         OkHttpClient client=new OkHttpClient();
-        Request request=new Request.Builder().addHeader("Authorization", User.getUserPassKey_type()+User.getUserPassKey()).url(address).build();
+        Request request=new Request.Builder().addHeader("Authorization", GlobalUserInfo.userInfo.tokenType+GlobalUserInfo.userInfo.token ).url(address).build();
         client.newCall(request).enqueue(callback);
     }
-//获取用户信息
+//编辑用户信息
     public static void sendOkHttpRequestPatch(String address,final  RequestBody requestBody,final okhttp3.Callback callback){
         OkHttpClient client=new OkHttpClient();
 
-        Request request=new Request.Builder().patch(requestBody).addHeader("Authorization", User.getUserPassKey_type()+User.getUserPassKey()).addHeader("Content-Type",CONTENT_TYPEs).url(address).build();
+        Request request=new Request.Builder().patch(requestBody).addHeader("Authorization", GlobalUserInfo.userInfo.tokenType+GlobalUserInfo.userInfo.token ).addHeader("Content-Type",CONTENT_TYPEs).url(address).build();
         client.newCall(request).enqueue(callback);
     }
 //下载头像
@@ -43,15 +43,21 @@ public class HttpUtil {
     public static void sendOkHttpRequestAvatars(String address, final RequestBody requestBody,final okhttp3.Callback callback){
         OkHttpClient client=new OkHttpClient();
 
-        Request request=new Request.Builder().addHeader("Authorization", User.getUserPassKey_type()+User.getUserPassKey()).url(address).post(requestBody).build();
+        Request request=new Request.Builder().addHeader("Authorization", GlobalUserInfo.userInfo.tokenType+GlobalUserInfo.userInfo.token ).url(address).post(requestBody).build();
         client.newCall(request).enqueue(callback);
     }
 //    上传新建话题
     public static void sendOkHttpRequestNewTopic(String address,final RequestBody requestBody,final okhttp3.Callback callback){
         OkHttpClient client=new OkHttpClient();
 
-        Request request=new Request.Builder().addHeader("Authorization", User.getUserPassKey_type()+User.getUserPassKey()).url(address).post(requestBody).build();
+        Request request=new Request.Builder().addHeader("Authorization", GlobalUserInfo.userInfo.tokenType+GlobalUserInfo.userInfo.token ).url(address).post(requestBody).build();
         client.newCall(request).enqueue(callback);
     }
-
+//获取用户话题列表
+    public static void sendOkHttpGetTopicList(int categoryId,String order,int pageCount,okhttp3.Callback callback){
+        String TOPIC_LIST="https://mamer.club/api/topics?include=user&category_id="+categoryId+"&order="+order+"&page="+pageCount;
+        OkHttpClient client=new OkHttpClient();
+        Request request=new Request.Builder().addHeader("Authorization", GlobalUserInfo.userInfo.tokenType+GlobalUserInfo.userInfo.token ).url(TOPIC_LIST).build();
+        client.newCall(request).enqueue(callback);
+    }
 }

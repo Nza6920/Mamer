@@ -1,40 +1,27 @@
-package com.example.my.mamer.config;
-
-import android.graphics.Bitmap;
+package com.example.my.mamer.bean;
 
 public class TopicContent {
 //    话题Id,文章标题，作者id，作者头像，回复数，浏览数，创建时间，最新回复时间，话题分类
-    private int topicId;
-    private String topicTitle;
-    private String topicAuthorId;
-    private String topicAuthorName;
-    private Bitmap topicAuthorPic;
-    private int replyCount;
-    private int viewCount;
-    private String createTime;
-    private String updateTime;
-    private int categoryId;
+    private   String topicId;
+    private   String topicTitle;
+    private   String topicAuthorId;
+    private   String topicAuthorName;
+    private   String topicAuthorPic;
+    private   String replyCount;
+    private   int viewCount;
+    private   String createTime;
+    private   String updateTime;
+    private   int categoryId;
 
-    public TopicContent(int topicId, String topicTitle, String topicAuthorId,Bitmap topicAuthorPic, int replyCount, int viewCount, String createTime, String updateTime, int categoryId) {
-        this.topicId = topicId;
-        this.topicTitle = topicTitle;
-        this.topicAuthorId = topicAuthorId;
-        this.topicAuthorPic = topicAuthorPic;
-        this.replyCount = replyCount;
-        this.viewCount = viewCount;
-        this.createTime = createTime;
-        this.updateTime = updateTime;
-        this.categoryId = categoryId;
-    }
 
     public TopicContent() {
     }
 
-    public int getTopicId() {
+    public String getTopicId() {
         return topicId;
     }
 
-    public void setTopicId(int topicId) {
+    public void setTopicId(String topicId) {
         this.topicId = topicId;
     }
 
@@ -50,6 +37,10 @@ public class TopicContent {
         return topicAuthorId;
     }
 
+    public void setTopicAuthorId(String topicAuthorId) {
+        this.topicAuthorId = topicAuthorId;
+    }
+
     public String getTopicAuthorName() {
         return topicAuthorName;
     }
@@ -58,23 +49,19 @@ public class TopicContent {
         this.topicAuthorName = topicAuthorName;
     }
 
-    public void setTopicAuthorId(String topicAuthorId) {
-        this.topicAuthorId = topicAuthorId;
-    }
-
-    public Bitmap getTopicAuthorPic() {
+    public String getTopicAuthorPic() {
         return topicAuthorPic;
     }
 
-    public void setTopicAuthorPic(Bitmap topicAuthorPic) {
+    public void setTopicAuthorPic(String topicAuthorPic) {
         this.topicAuthorPic = topicAuthorPic;
     }
 
-    public int getReplyCount() {
+    public String getReplyCount() {
         return replyCount;
     }
 
-    public void setReplyCount(int replyCount) {
+    public void setReplyCount(String replyCount) {
         this.replyCount = replyCount;
     }
 

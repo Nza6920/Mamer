@@ -1,9 +1,30 @@
 package com.example.my.mamer.config;
 
+import com.example.my.mamer.bean.User;
+
 import okhttp3.MediaType;
 
 //配置类
 public class Config {
+
+    private class Globle {
+        User user;
+        String token;
+
+        Globle(User user, String token)
+        {
+            this.user = user;
+            this.token = token;
+        }
+    }
+    public static Globle globle = null;
+
+    public void login(User user, String token)
+    {
+        if (Config.globle == null) {
+            Config.globle = new Config.Globle(user, token);
+        }
+    }
     public static final String PHONE_NUMBER="https://mamer.club/api/captchas";
     public static final String PIC_CODE="https://mamer.club/api/verificationCodes";
     public static final String REGISTER="https://mamer.club/api/users";
@@ -35,5 +56,7 @@ public class Config {
     public static final MediaType JSON=MediaType.parse("application/json;charset=utf-8");
     public static final String CONTENT_TYPEs="application/x-www-form-urlencoded;charset=utf-8";
     public static final MediaType MEDIA_TYPE_IMAGE=MediaType.parse("image/*");
+
+
 
 }

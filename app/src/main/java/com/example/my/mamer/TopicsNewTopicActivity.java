@@ -20,7 +20,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.my.mamer.config.User;
+import com.example.my.mamer.config.GlobalUserInfo;
 import com.example.my.mamer.util.HttpUtil;
 import com.example.my.mamer.util.LoadingDraw;
 import com.example.my.mamer.view.RichTextEditor;
@@ -110,6 +110,9 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
                 case DISMISS_DIALOG:
                     ((LoadingDraw)msg.obj).dismiss();
                     break;
+                case MESSAGE_ERROR:
+                    Toast.makeText(TopicsNewTopicActivity.this, (String) msg.obj,Toast.LENGTH_LONG).show();
+                    break;
                 default:
                     break;
             }
@@ -120,8 +123,8 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
     protected void setContentView() {
         setContentView(R.layout.activity_topics_new_topic);
         loadingDraw=new LoadingDraw(this);
-        User.imagePaths.clear();
-        User.imageContentPaths.clear();
+        GlobalUserInfo.userInfo.user.imagePaths.clear();
+        GlobalUserInfo.userInfo.user.imageContentPaths.clear();
     }
 
     @Override
@@ -229,23 +232,16 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
                 break;
             case R.id.title_btn_next:
 //                先提交图片，获取所有需要提交的图片imagePath
-                HashMap<Integer,String> imagesPaths= User.getImagePaths();
-                if (imagesPaths.size()==0){
-                    Message msg1=new Message();
-                    msg1.what=USER_SET_INFORMATION;
-                    msg1.obj="请选择图片";
-                    msgHandler.sendMessage(msg1);
-                }else {
+                HashMap<Integer,String> imagesPaths=  GlobalUserInfo.userInfo.user.getImagePaths();
 //遍历hash
-                        Iterator iterator=imagesPaths.keySet().iterator();
-                        while (iterator.hasNext()){
-                            Integer IdKey= (Integer) iterator.next();
-                            String imagePath=imagesPaths.get(IdKey);
+                Iterator iterator=imagesPaths.keySet().iterator();
+                while (iterator.hasNext()){
+                    Integer IdKey= (Integer) iterator.next();
+                    String imagePath=imagesPaths.get(IdKey);
 //                    提交
-                            String imagePathInfo="第"+imageInfo+"张图片";
-                            postNewTopicPics(imagePath,imagePathInfo);
-                            imageInfo++;
-                    }
+                    String imagePathInfo="第"+imageInfo+"张图片";
+                    postNewTopicPics(imagePath,imagePathInfo);
+                    imageInfo++;
                 }
                 break;
             case R.id.title_tv_close:
@@ -371,7 +367,7 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
 //                    将EditText中的换行符，空格符转换成html
                     String inputStr=itemData.inputStr.replace("\n","<p></p>").replace(" ","&nbsp;");
                     content.append("<p>").append(inputStr).append("</p>");
-                }else if (User.imageContentPaths!=null){
+                }else if ( GlobalUserInfo.userInfo.user.imageContentPaths!=null){
                     content.append("<p style=\"text-align:center\"><img width=\"100%\" src=\"").append(itemData.imagePath).append("\"/></p>");
                 }
                 int inputStrCount=getInputEditStr(itemData.inputStr);
@@ -444,7 +440,7 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
                             msg3.obj = loadingDraw;
                             msgHandler.sendMessage(msg3);
 
-                            User.imageContentPaths.add(jresp.getString("path"));
+                            GlobalUserInfo.userInfo.user.imageContentPaths.add(jresp.getString("path"));
                             Message msg2 = new Message();
                             msg2.what = response.code();
                             msg2.obj =imagePathInfo+ "上传成功";
@@ -492,7 +488,7 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
                                 @Override
                                 public Request authenticate(Route route, Response response) throws IOException {
 //    刷新token
-                                    return response.request().newBuilder().addHeader("Authorization", User.getUserPassKey_type() + User.getUserPassKey()).build();
+                                    return response.request().newBuilder().addHeader("Authorization",  GlobalUserInfo.userInfo.tokenType +  GlobalUserInfo.userInfo.token).build();
                                 }
                             };
                         default:
@@ -547,8 +543,8 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
                             msg4.what = response.code();
                             msg4.obj = "发帖成功";
                             msgHandler.sendMessage(msg4);
-                            User.imagePaths.clear();
-                            User.imageContentPaths.clear();
+                            GlobalUserInfo.userInfo.user.imagePaths.clear();
+                            GlobalUserInfo.userInfo.user.imageContentPaths.clear();
                             Intent intent = new Intent(TopicsNewTopicActivity.this, BottomNavigationBarActivity.class);
                             startActivity(intent);
                             finish();
@@ -591,10 +587,10 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
                                 @Override
                                 public Request authenticate(Route route, Response response) throws IOException {
                                     //    刷新token
-                                    return response.request().newBuilder().addHeader("Authorization", User.getUserPassKey_type() + User.getUserPassKey()).build();
+                                    return response.request().newBuilder().addHeader("Authorization",  GlobalUserInfo.userInfo.tokenType +  GlobalUserInfo.userInfo.token).build();
                                 }
                             };
-                            User.setUserPassKey(String.valueOf(authenticator));
+                            GlobalUserInfo.userInfo.user.setUserPassKey(String.valueOf(authenticator));
                             break;
                         default:
                             break;

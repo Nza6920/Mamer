@@ -23,7 +23,8 @@ import android.widget.TextView;
 
 import com.example.my.mamer.MyApplication;
 import com.example.my.mamer.R;
-import com.example.my.mamer.config.User;
+import com.example.my.mamer.bean.User;
+import com.example.my.mamer.config.GlobalUserInfo;
 import com.example.my.mamer.util.BaseUtils;
 import com.example.my.mamer.util.IdUtils;
 
@@ -186,7 +187,7 @@ public class RichTextEditor extends ScrollView {
     private void onImageCloseClick(View view){
         disappearingImageIndex=allLayout.indexOfChild(view);
         allLayout.removeView(view);
-        User.imagePaths.remove(view.getId());
+        GlobalUserInfo.userInfo.user.imagePaths.remove(view.getId());
         viewTagIndex--;
         imgCount--;
 //        当没有图片的时候，显示
@@ -325,7 +326,7 @@ public class RichTextEditor extends ScrollView {
 //        设置imageLayoutId
         imageLayout.setId(IdUtils.generateViewId());
 //        将Id和imagePath匹配
-        User.imagePaths.put(imageLayout.getId(),imagePath);
+        GlobalUserInfo.userInfo.user.imagePaths.put(imageLayout.getId(),imagePath);
         allLayout.addView(imageLayout,index);
 
         return imageLayout;
@@ -341,12 +342,8 @@ public class RichTextEditor extends ScrollView {
                 EditText item= (EditText) itemView;
                 itemData.inputStr=item.getText().toString();
             }else if (itemView instanceof RelativeLayout){
-                if (User.imageContentPaths.size()>imageP){
-                    Log.e("UserImage", String.valueOf(User.imageContentPaths.size()));
-                    Log.e("UserImage", String.valueOf(imageP));
-                    Log.e("UserImage",User.imageContentPaths.get(imageP));
-                    itemData.imagePath=User.imageContentPaths.get(imageP);
-                    Log.e("UserImage",itemData.imagePath);
+                if ( GlobalUserInfo.userInfo.user.imageContentPaths.size()>imageP){
+                    itemData.imagePath= GlobalUserInfo.userInfo.user.imageContentPaths.get(imageP);
                     imageP++;
                 }
             }

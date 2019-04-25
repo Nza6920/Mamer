@@ -12,7 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.my.mamer.config.User;
+import com.example.my.mamer.config.GlobalUserInfo;
 
 import static com.example.my.mamer.config.Config.HTTP_OK;
 import static com.example.my.mamer.config.Config.HTTP_USER_NULL;
@@ -81,7 +81,7 @@ public class UserFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        if (User.getUserPassKey()==null){
+        if (GlobalUserInfo.userInfo.token ==null){
             userUnloginLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

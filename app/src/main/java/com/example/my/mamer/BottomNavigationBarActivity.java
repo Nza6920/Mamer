@@ -19,7 +19,7 @@ import com.ashokvarma.bottomnavigation.BottomNavigationBar;
 import com.ashokvarma.bottomnavigation.BottomNavigationItem;
 import com.ashokvarma.bottomnavigation.ShapeBadgeItem;
 import com.ashokvarma.bottomnavigation.TextBadgeItem;
-import com.example.my.mamer.config.User;
+import com.example.my.mamer.config.GlobalUserInfo;
 import com.example.my.mamer.util.LoadingDraw;
 
 import static com.example.my.mamer.config.Config.DISMISS_DIALOG;
@@ -138,7 +138,7 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
         btnTopicNewTopic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (User.getUserPassKey()!=null){
+                if (GlobalUserInfo.userInfo.token !=null){
                 Intent intent=new Intent(BottomNavigationBarActivity.this,TopicsNewTopicActivity.class);
                 startActivity(intent);
                 }else {
@@ -152,7 +152,7 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
         btnUserHomePage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (User.getUserPassKey()!=null){
+                if (GlobalUserInfo.userInfo.token!=null){
                     Intent intent=new Intent(BottomNavigationBarActivity.this,UserHomePageActivity.class);
                     startActivity(intent);
                     finish();

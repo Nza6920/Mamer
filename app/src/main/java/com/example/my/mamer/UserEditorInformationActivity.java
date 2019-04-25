@@ -3,8 +3,6 @@ package com.example.my.mamer;
 import android.content.ContentUris;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -12,16 +10,17 @@ import android.os.Message;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.my.mamer.config.User;
-import com.example.my.mamer.util.CircleImageView;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
+import com.example.my.mamer.config.GlobalUserInfo;
 import com.example.my.mamer.util.HttpUtil;
 import com.example.my.mamer.util.LoadingDraw;
 import com.example.my.mamer.util.PhotoPopupWindow;
@@ -58,7 +57,7 @@ import static com.example.my.mamer.config.Config.USER_INFORMATION;
 public class UserEditorInformationActivity extends AppCompatActivity {
     private static final MediaType XWWW=MediaType.parse("application/x-www-form-urlencoded");
 //    头像
-    private CircleImageView imgUserInformationAvatar;
+    private ImageView imgUserInformationAvatar;
     private PhotoPopupWindow photoPopupWindow;
     private String userAvatar;
 //    头像按钮
@@ -67,6 +66,7 @@ public class UserEditorInformationActivity extends AppCompatActivity {
     private EditText etUserName;
     private String userName;
     private TextView etUserEmail;
+    private TextView tvUserEmailInfo;
     private EditText etUserIntroduction;
     private String userInformation;
 //    返回按钮
@@ -116,39 +116,40 @@ public class UserEditorInformationActivity extends AppCompatActivity {
         tvUserEditor=findViewById(R.id.user_information_editor);
         etUserName=findViewById(R.id.user_information_name);
         etUserEmail=findViewById(R.id.user_information_email);
+        tvUserEmailInfo=findViewById(R.id.user_information_email_info);
         etUserIntroduction=findViewById(R.id.user_information_introduction);
 
         btnFinish.setText("完成");
 
-        if (User.getUserImgBitmap()!=null){
-            Message msg3=new Message();
-            msg3.what=DISMISS_DIALOG;
-            msg3.obj=loadingDraw;
-            msgHandler.sendMessage(msg3);
+//填充数据
+        final Runnable setAvatarRunable=new Runnable() {
+            @Override
+            public void run() {
+                RequestOptions options=new RequestOptions()
+                        .error(R.mipmap.ic_image_error)
+                        .placeholder(R.mipmap.ic_image_error);
+                Glide.with(getApplication())
+                        .asBitmap()
+                        .load(GlobalUserInfo.userInfo.user.getUserImg())
+                        .apply(options)
+                        .into(imgUserInformationAvatar);
+            }
+        };
+        new Thread(){
+            public void run(){
+                msgHandler.post(setAvatarRunable);
+            }
+        }.start();
 
-            new Thread(){
-                public void run(){
-                    msgHandler.post(setAvatarBitmapRunable);
-                }
-            }.start();
-        }else {
-            Message msg3=new Message();
-            msg3.what=DISMISS_DIALOG;
-            msg3.obj=loadingDraw;
-            msgHandler.sendMessage(msg3);
-
-            new Thread(){
-                public void run(){
-                    msgHandler.post(setImgRunable);
-                }
-            }.start();
+        etUserName.setText(GlobalUserInfo.userInfo.user.getUserName());
+        etUserEmail.setText(GlobalUserInfo.userInfo.user.getUserEmail());
+        etUserIntroduction.setText(GlobalUserInfo.userInfo.user.getUserIntroduction());
+        if (GlobalUserInfo.userInfo.user.getEmail_verified()){
+            tvUserEmailInfo.setText("当前邮箱已通过邮箱验证，不可更改");
         }
-
-
-        etUserName.setText(User.getUserName());
-        etUserEmail.setText(User.getUserEmail());
-        etUserIntroduction.setText(User.getUserIntroduction());
-
+        else {
+            tvUserEmailInfo.setText("当前邮箱未进行邮箱验证，请登陆官网进行邮箱验证");
+        }
 //        提交
         btnFinish.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -165,10 +166,10 @@ public class UserEditorInformationActivity extends AppCompatActivity {
         tvUserEditor.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 photoPopupWindow=new PhotoPopupWindow(UserEditorInformationActivity.this);
             }
         });
+
 
 
     }
@@ -180,10 +181,10 @@ public class UserEditorInformationActivity extends AppCompatActivity {
 //    PATC提交信息
     private void patchInformation() throws JSONException {
         getEditString();
-        if (User.getUserImgId()!=null){
+        if (GlobalUserInfo.userInfo.user.getUserImgId()!=null){
 //            修改头像
             RequestBody requestBody=new FormBody.Builder()
-                    .add("avatar_image_id",User.getUserImgId())
+                    .add("avatar_image_id",GlobalUserInfo.userInfo.user.getUserImgId())
                     .add("name",userName)
                     .add("introduction",userInformation)
                     .build();
@@ -216,13 +217,12 @@ public class UserEditorInformationActivity extends AppCompatActivity {
                                 msg3.obj=loadingDraw;
                                 msgHandler.sendMessage(msg3);
 
-                                User.setUserId(jresp.getString("id"));
-                                User.setUserName(jresp.getString("name"));
-                                User.setUserImgAvatar(jresp.getString("avatar"));
-                                User.setUserIntroduction(jresp.getString("introduction"));
-                                User.setEmail_verified(jresp.getBoolean("email_verified"));
-                                User.setUserBornDate(jresp.getString("bound_phone"));
-                                Log.e("Tag","修改后"+String.valueOf(User.getUserImgAvatar()));
+                                GlobalUserInfo.userInfo.user.setUserId(jresp.getString("id"));
+                                GlobalUserInfo.userInfo.user.setUserName(jresp.getString("name"));
+                                GlobalUserInfo.userInfo.user.setUserImg(jresp.getString("avatar"));
+                                GlobalUserInfo.userInfo.user.setUserIntroduction(jresp.getString("introduction"));
+                                GlobalUserInfo.userInfo.user.setEmail_verified(jresp.getBoolean("email_verified"));
+                                GlobalUserInfo.userInfo.user.setUserBornDate(jresp.getString("bound_phone"));
 
                                 Intent intent=new Intent(UserEditorInformationActivity.this,UserHomePageActivity.class);
                                 startActivity(intent);
@@ -240,7 +240,7 @@ public class UserEditorInformationActivity extends AppCompatActivity {
                                     if (errorStr.has("name")){
                                         Message msg5=new Message();
                                         msg5.what=response.code();
-                                        msg5.obj=errorStr.getString("name");
+                                        msg5.obj="该用户名已被占用";
                                         msgHandler.sendMessage(msg5);
                                     }else if (errorStr.has("image")){
                                         Message msg5=new Message();
@@ -263,7 +263,7 @@ public class UserEditorInformationActivity extends AppCompatActivity {
                                     @Override
                                     public Request authenticate(Route route, Response response) throws IOException {
 //    刷新token
-                                        return response.request().newBuilder().addHeader("Authorization", User.getUserPassKey_type()+User.getUserPassKey()).build();
+                                        return response.request().newBuilder().addHeader("Authorization", GlobalUserInfo.userInfo.tokenType+GlobalUserInfo.userInfo.token).build();
                                     }
                                 };
 
@@ -310,13 +310,12 @@ public class UserEditorInformationActivity extends AppCompatActivity {
                                 msg3.obj=loadingDraw;
                                 msgHandler.sendMessage(msg3);
 
-                                User.setUserId(jresp.getString("id"));
-                                User.setUserName(jresp.getString("name"));
-                                User.setUserImgAvatar(jresp.getString("avatar"));
-                                User.setUserIntroduction(jresp.getString("introduction"));
-                                User.setEmail_verified(jresp.getBoolean("email_verified"));
-                                User.setUserBornDate(jresp.getString("bound_phone"));
-                                Log.e("Tag","修改后"+String.valueOf(User.getUserImgAvatar()));
+                                GlobalUserInfo.userInfo.user.setUserId(jresp.getString("id"));
+                                GlobalUserInfo.userInfo.user.setUserName(jresp.getString("name"));
+                                GlobalUserInfo.userInfo.user.setUserImg(jresp.getString("avatar"));
+                                GlobalUserInfo.userInfo.user.setUserIntroduction(jresp.getString("introduction"));
+                                GlobalUserInfo.userInfo.user.setEmail_verified(jresp.getBoolean("email_verified"));
+                                GlobalUserInfo.userInfo.user.setUserBornDate(jresp.getString("bound_phone"));
 
                                 Intent intent=new Intent(UserEditorInformationActivity.this,UserHomePageActivity.class);
                                 startActivity(intent);
@@ -352,7 +351,7 @@ public class UserEditorInformationActivity extends AppCompatActivity {
                                     @Override
                                     public Request authenticate(Route route, Response response) throws IOException {
 //    刷新token
-                                        return response.request().newBuilder().addHeader("Authorization", User.getUserPassKey_type()+User.getUserPassKey()).build();
+                                        return response.request().newBuilder().addHeader("Authorization", GlobalUserInfo.userInfo.tokenType+GlobalUserInfo.userInfo.token).build();
                                     }
                                 };
 
@@ -374,34 +373,6 @@ public class UserEditorInformationActivity extends AppCompatActivity {
 
 
     }
-    //加载头像
-    private Bitmap loadPicCodeImg(String bicCodes){
-
-        Bitmap bitmap=null;
-        try {
-            byte[] bitmapArray=Base64.decode(bicCodes.split(",")[1],Base64.DEFAULT);
-            bitmap=BitmapFactory.decodeByteArray(bitmapArray,0,bitmapArray.length);
-            imgUserInformationAvatar.setBitmap(bitmap);
-            imgUserInformationAvatar.setmWidth(bitmap.getWidth());
-            imgUserInformationAvatar.setmHeight(bitmap.getHeight());
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        return bitmap;
-    }
-    Runnable setImgRunable=new Runnable() {
-        @Override
-        public void run() {
-            imgUserInformationAvatar.setImageBitmap(loadPicCodeImg(User.getUserImg()));
-        }
-    };
-    Runnable setAvatarBitmapRunable=new Runnable() {
-        @Override
-        public void run() {
-            imgUserInformationAvatar.setImageBitmap(User.getUserImgBitmap());
-            Log.e("Tag", String.valueOf(User.getUserImgBitmap()));
-        }
-    };
 
 //回调图片
     @Override
@@ -438,7 +409,7 @@ public class UserEditorInformationActivity extends AppCompatActivity {
 
             Message msg10=new Message();
             msg10.what=MESSAGE_ERROR;
-            msg10.obj="上传失败";
+            msg10.obj="读取图片失败";
             msgHandler.sendMessage(msg10);
         }else {
 
@@ -458,7 +429,7 @@ public class UserEditorInformationActivity extends AppCompatActivity {
 
                     Message msg2 = new Message();
                     msg2.what = MESSAGE_ERROR;
-                    msg2.obj = "上传失败";
+                    msg2.obj = "上传图片失败";
                     msgHandler.sendMessage(msg2);
                 }
 
@@ -474,11 +445,28 @@ public class UserEditorInformationActivity extends AppCompatActivity {
                                 msg3.obj = loadingDraw;
                                 msgHandler.sendMessage(msg3);
 
-                                User.setUserImgId(jresp.getString("id"));
-                                User.setUserId(jresp.getString("user_id"));
-                                User.setUserImgAvatar(jresp.getString("path"));
-                                Log.e("Tag", "修改后，，" + String.valueOf(User.getUserImgAvatar()));
-                                displayImage(localPath);
+                                GlobalUserInfo.userInfo.user.setUserImgId(jresp.getString("id"));
+                                GlobalUserInfo.userInfo.user.setUserId(jresp.getString("user_id"));
+                                GlobalUserInfo.userInfo.user.setUserImg(jresp.getString("path"));
+                                Log.e("Tag", "修改后，，" + String.valueOf(GlobalUserInfo.userInfo.user.getUserImg()));
+                                final Runnable setAvatarRunable=new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        RequestOptions options=new RequestOptions()
+                                                .error(R.mipmap.ic_image_error)
+                                                .placeholder(R.mipmap.ic_image_error);
+                                        Glide.with(getApplication())
+                                                .asBitmap()
+                                                .load(GlobalUserInfo.userInfo.user.getUserImg())
+                                                .apply(options)
+                                                .into(imgUserInformationAvatar);
+                                    }
+                                };
+                                new Thread(){
+                                    public void run(){
+                                        msgHandler.post(setAvatarRunable);
+                                    }
+                                }.start();
                                 break;
 //                            422
                             case HTTP_USER_NULL:
@@ -527,7 +515,7 @@ public class UserEditorInformationActivity extends AppCompatActivity {
                                     @Override
                                     public Request authenticate(Route route, Response response) throws IOException {
 //    刷新token
-                                        return response.request().newBuilder().addHeader("Authorization", User.getUserPassKey_type() + User.getUserPassKey()).build();
+                                        return response.request().newBuilder().addHeader("Authorization", GlobalUserInfo.userInfo.tokenType + GlobalUserInfo.userInfo.token).build();
                                     }
                                 };
                                 break;
@@ -579,27 +567,27 @@ public class UserEditorInformationActivity extends AppCompatActivity {
         return path;
     }
 //    显示头像
-    private void displayImage(String imagePath){
-        if (imagePath!=null){
-           final Bitmap bitmap=BitmapFactory.decodeFile(imagePath);
-            imgUserInformationAvatar.setBitmap(bitmap);
-            imgUserInformationAvatar.setmWidth(bitmap.getWidth());
-            imgUserInformationAvatar.setmHeight(bitmap.getHeight());
-            User.setUserImgBitmap(bitmap);
-
-            final Runnable setAvatarRunable = new Runnable() {
-                    @Override
-                    public void run() {
-                        imgUserInformationAvatar.setImageBitmap(bitmap);
-                    }
-                };
-                new Thread() {
-                    public void run() {
-                        msgHandler.post(setAvatarRunable);
-                    }
-                }.start();
-        }else {
-            Toast.makeText(this,"显示失败",Toast.LENGTH_SHORT).show();
-        }
-    }
+//    private void displayImage(String imagePath){
+//        if (imagePath!=null){
+//           final Bitmap bitmap=BitmapFactory.decodeFile(imagePath);
+//            imgUserInformationAvatar.setBitmap(bitmap);
+//            imgUserInformationAvatar.setmWidth(bitmap.getWidth());
+//            imgUserInformationAvatar.setmHeight(bitmap.getHeight());
+//            GlobalUserInfo.userInfo.user.setUserImgBitmap(bitmap);
+//
+//            final Runnable setAvatarRunable = new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        imgUserInformationAvatar.setImageBitmap(bitmap);
+//                    }
+//                };
+//                new Thread() {
+//                    public void run() {
+//                        msgHandler.post(setAvatarRunable);
+//                    }
+//                }.start();
+//        }else {
+//            Toast.makeText(this,"显示失败",Toast.LENGTH_SHORT).show();
+//        }
+//    }
 }

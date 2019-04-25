@@ -12,7 +12,7 @@
         android:layout_gravity="center"
         android:layout_marginTop="10dp"
         android:orientation="vertical">
-        <com.example.my.mamer.util.CircleImageView
+        <ImageView
             android:id="@+id/user_menu_avatar"
                 android:layout_width="80dp"
                 android:layout_height="80dp"

@@ -13,14 +13,14 @@ import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.style.AbsoluteSizeSpan;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.my.mamer.config.User;
+import com.example.my.mamer.bean.User;
+import com.example.my.mamer.config.GlobalUserInfo;
 import com.example.my.mamer.util.HttpUtil;
 import com.example.my.mamer.util.LoadingDraw;
 import com.example.my.mamer.util.NCopyPaste;
@@ -30,19 +30,25 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 
+import okhttp3.Authenticator;
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import okhttp3.Route;
 
 import static com.example.my.mamer.config.Config.DISMISS_DIALOG;
 import static com.example.my.mamer.config.Config.HTTP_OK;
 import static com.example.my.mamer.config.Config.HTTP_OVERTIME;
 import static com.example.my.mamer.config.Config.HTTP_USER_ERROR;
+import static com.example.my.mamer.config.Config.HTTP_USER_GET_INFORMATION;
 import static com.example.my.mamer.config.Config.HTTP_USER_NULL;
 import static com.example.my.mamer.config.Config.JSON;
 import static com.example.my.mamer.config.Config.LOGIN;
 import static com.example.my.mamer.config.Config.MESSAGE_ERROR;
+import static com.example.my.mamer.config.Config.USER_INFORMATION;
+import static com.example.my.mamer.config.Config.USER_SET_INFORMATION;
 
 public class LoginActivity extends AppCompatActivity {
     private LoadingDraw loadingDraw;
@@ -177,6 +183,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 //    post
     private void postInformation() throws JSONException {
+        loadingDraw.show();
         JSONObject jsonParam=new JSONObject();
         jsonParam.put("username",uName);
         jsonParam.put("password",pas);
@@ -207,15 +214,9 @@ public class LoginActivity extends AppCompatActivity {
                             msg3.what=DISMISS_DIALOG;
                             msg3.obj=loadingDraw;
                             msgHandler.sendMessage(msg3);
+//登陆成功
+                            loginSuccess(jresp);
 
-                            String userPassKey=jresp.getString("access_token");
-                            String userPassKey_type=jresp.getString("token_type");
-                            Log.d("Tag",userPassKey);
-                            User.setUserPassKey(userPassKey);
-                            User.setUserPassKey_type(userPassKey_type);
-                            Intent intent=new Intent(LoginActivity.this,UserHomePageActivity.class);
-                            startActivity(intent);
-                            finish();
                             break;
 //                            422
                         case HTTP_USER_NULL:
@@ -268,6 +269,87 @@ public class LoginActivity extends AppCompatActivity {
                             break;
                         default:
                             break;
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+    private void loginSuccess(JSONObject jresp) throws JSONException {
+        loadingDraw.show();
+        User user=new User();
+        GlobalUserInfo.userInfo.user=user;
+        GlobalUserInfo.userInfo.token=jresp.getString("access_token");
+        GlobalUserInfo.userInfo.tokenType=jresp.getString("token_type");
+
+        HttpUtil.sendOkHttpRequestGet(USER_INFORMATION, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Message msg1=new Message();
+                msg1.what=DISMISS_DIALOG;
+                msg1.obj=loadingDraw;
+                msgHandler.sendMessage(msg1);
+
+                Message msg2=new Message();
+                msg2.what=MESSAGE_ERROR;
+                msg2.obj="服务器异常,请检查网络";
+                msgHandler.sendMessage(msg2);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                try {
+                    JSONObject jresp=new JSONObject(response.body().string());
+                    switch (response.code()){
+                        case HTTP_USER_GET_INFORMATION:
+                            Message msg3=new Message();
+                            msg3.what=DISMISS_DIALOG;
+                            msg3.obj=loadingDraw;
+                            msgHandler.sendMessage(msg3);
+
+                            GlobalUserInfo.userInfo.user.setUserId(jresp.getString("id"));
+                            GlobalUserInfo.userInfo.user.setUserName(jresp.getString("name"));
+                            GlobalUserInfo.userInfo.user.setUserEmail(jresp.getString("email"));
+                            GlobalUserInfo.userInfo.user.setUserImg(jresp.getString("avatar"));
+                            GlobalUserInfo.userInfo.user.setUserIntroduction(jresp.getString("introduction"));
+//                            是否绑定
+                            GlobalUserInfo.userInfo.user.setBoundPhone(jresp.getBoolean("bound_phone"));
+//                            是否验证邮箱
+                            GlobalUserInfo.userInfo.user.setEmail_verified(jresp.getBoolean("email_verified"));
+//                            注册
+                            GlobalUserInfo.userInfo.user.setUserBornDate(jresp.getString("created_at"));
+
+                            new Thread(){
+                                public void run(){
+                                    Message msg5=new Message();
+                                    msg5.what=USER_SET_INFORMATION;
+                                    msgHandler.sendMessage(msg5);
+                                }
+                            }.start();
+
+                            Intent intent=new Intent(LoginActivity.this,UserHomePageActivity.class);
+                            startActivity(intent);
+                            finish();
+                            break;
+//                            令牌失效，重新请求
+                        case HTTP_USER_ERROR:
+                            Message msg4=new Message();
+                            msg4.what=DISMISS_DIALOG;
+                            msg4.obj=loadingDraw;
+                            msgHandler.sendMessage(msg4);
+
+                            Authenticator authenticator=new Authenticator() {
+                                @Override
+                                public Request authenticate(Route route, Response response) throws IOException {
+//    刷新token
+                                    return response.request().newBuilder().addHeader("Authorization", GlobalUserInfo.userInfo.tokenType+GlobalUserInfo.userInfo.token).build();
+                                }
+                            };
+                            break;
+                        default:
+                            break;
+
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();

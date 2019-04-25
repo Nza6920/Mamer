@@ -8,16 +8,15 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.example.my.mamer.util.CircleImageView;
 
 public class UserMenuRightFragment extends Fragment {
     private DrawerLayout drawerLayout;
 //    title
     private TextView tvClose;
 //    用户头像
-    private CircleImageView imgUserAvatar;
+    private ImageView imgUserAvatar;
 //    用户名
     private TextView tvUserName;
 //    用户资料按钮

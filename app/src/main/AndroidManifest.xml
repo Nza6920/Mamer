@@ -44,7 +44,11 @@
         </activity>
         <activity
             android:name=".TopicsNewTopicActivity"
-            android:screenOrientation="portrait"/>
-       </application>
+            android:screenOrientation="portrait" />
+        <activity android:name=".UserSelfTopicListActivity">
+
+        </activity>
+        <activity android:name=".TopicInfoShowActivity"></activity>
+    </application>
 
 </manifest>

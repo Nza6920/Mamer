@@ -324,8 +324,6 @@ public class RegisterActivity extends AppCompatActivity {
         return m;
     }
 
-
-
 //再次输入密码合法判断
     private Boolean isPasSame(){
         getEditString();

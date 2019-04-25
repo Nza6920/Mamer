@@ -4,19 +4,32 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.my.mamer.R;
-import com.example.my.mamer.config.TopicContent;
+import com.example.my.mamer.bean.TopicContent;
 
-import java.util.List;
+import java.util.ArrayList;
 
-public class TopicContentAdapter extends ArrayAdapter<TopicContent> {
-    private final int resourceId;
-    private LinearLayout topicContentLayout;
+import static com.example.my.mamer.MyApplication.getContext;
+
+public class TopicContentAdapter extends BaseAdapter {
+
+    private ArrayList<TopicContent> data;
+    private LayoutInflater layoutInflater;
+    private Context context;
+
+    public TopicContentAdapter(Context context, ArrayList<TopicContent> data) {
+        this.context=context;
+        this.data=data;
+        this.layoutInflater=LayoutInflater.from(context);
+    }
+//    组建对应listView中的控件
+    public final class listItem{
     private ImageView authorImage;
     private TextView topicContentTitle;
     private TextView topicAuthorNamePic;
@@ -24,33 +37,55 @@ public class TopicContentAdapter extends ArrayAdapter<TopicContent> {
     private TextView topicTimePic;
     private TextView topicTime;
     private TextView topicDiscussCount;
+}
 
-    public TopicContentAdapter(Context context, int textViewResourceId, List<TopicContent> objects) {
-        super(context, textViewResourceId, objects);
-        resourceId = textViewResourceId;
+    @Override
+    public int getCount() {
+        return data.size();
     }
-
+//获得某一位置的数据
+    @Override
+    public Object getItem(int position) {
+        return data.get(position);
+    }
+//获得唯一标识
+    @Override
+    public long getItemId(int i) {
+        return i;
+    }
 
     @Override
     public View getView(int position,View convertView,  ViewGroup parent) {
-//        获取当前项的TopicContent实例
-        TopicContent topicContent= (TopicContent) getItem(position);
-//        实例化一个对象
-        View view=LayoutInflater.from(getContext()).inflate(resourceId,parent,false);
-        topicContentLayout=view.findViewById(R.id.topic_part_content);
-        authorImage=view.findViewById(R.id.topic_content_author_pic);
-        topicContentTitle=view.findViewById(R.id.topic_content_title);
-        topicAuthorNamePic=view.findViewById(R.id.topic_content_author_name_pic);
-        topicAuthorName=view.findViewById(R.id.topic_content_author_name);
-        topicTimePic=view.findViewById(R.id.topic_content_time_pic);
-        topicTime=view.findViewById(R.id.topic_content_time);
-        topicDiscussCount=view.findViewById(R.id.topic_discuss_count);
-//        设置
-        authorImage.setImageBitmap(topicContent.getTopicAuthorPic());
-        topicContentTitle.setText(topicContent.getTopicTitle());
-        topicAuthorName.setText(topicContent.getTopicAuthorName());
-        topicTime.setText(topicContent.getCreateTime());
-        topicDiscussCount.setText(topicContent.getReplyCount());
-        return view;
+
+        listItem listViewItem=null;
+        if (convertView==null){
+            listViewItem=new listItem();
+//            获得组件并实例化
+            convertView=layoutInflater.inflate(R.layout.fragment_topic_cotent_item,null);
+            listViewItem.authorImage=convertView.findViewById(R.id.topic_content_author_pic);
+            listViewItem.topicContentTitle=convertView.findViewById(R.id.topic_content_title);
+            listViewItem.topicAuthorNamePic=convertView.findViewById(R.id.topic_content_author_name_pic);
+            listViewItem.topicAuthorName=convertView.findViewById(R.id.topic_content_author_name);
+            listViewItem.topicTimePic=convertView.findViewById(R.id.topic_content_time_pic);
+            listViewItem.topicTime=convertView.findViewById(R.id.topic_content_time);
+            listViewItem.topicDiscussCount=convertView.findViewById(R.id.topic_discuss_count);
+            convertView.setTag(listViewItem);
+        }else {
+            listViewItem= (listItem) convertView.getTag();
+        }
+//        绑定数据
+            RequestOptions options=new RequestOptions()
+                    .error(R.mipmap.ic_image_error)
+                    .placeholder(R.mipmap.ic_image_error);
+            Glide.with(getContext())
+                    .asBitmap()
+                    .load(data.get(position).getTopicAuthorPic())
+                    .apply(options)
+                    .into(listViewItem.authorImage);
+        listViewItem. topicContentTitle.setText(( data.get(position)).getTopicTitle());
+        listViewItem.topicAuthorName.setText(( data.get(position)).getTopicAuthorName());
+        listViewItem.topicTime.setText(( data.get(position)).getCreateTime());
+        listViewItem.topicDiscussCount.setText((data.get(position)).getReplyCount());
+        return convertView;
     }
 }
