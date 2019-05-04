@@ -41,10 +41,12 @@ public class Config {
     public final static int HTTP_USER_FORMAT_ERROR=403;
     public final static int HTTP_OVERNUM=500;
     public final static int HTTP_OVERTIME=429;
+    public final static int HTTP_NOT_FOUND=404;
 //    循环消息常量
     public final static int DISMISS_DIALOG=7;
     public final static int MESSAGE_ERROR=9;
     public final static int USER_SET_INFORMATION=5;
+    public final static int UNLOGIN=10;
 
 //    拍摄
     public final static int RESULT_CAMERA_IMAGE=6;

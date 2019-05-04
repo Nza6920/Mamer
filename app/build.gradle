@@ -36,4 +36,5 @@ dependencies {
     implementation 'pub.devrel:easypermissions:1.2.0'
     implementation files('libs/fastjson-1.2.56.jar')
     implementation 'com.ashokvarma.android:bottom-navigation-bar:2.1.0'
+    implementation 'org.jsoup:jsoup:1.11.3'
 }

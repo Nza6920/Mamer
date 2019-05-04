@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import com.example.my.mamer.adapter.UserSelfTopicAdapter;
 import com.example.my.mamer.bean.TopicContent;
+import com.example.my.mamer.config.GlobalUserInfo;
 import com.example.my.mamer.util.HttpUtil;
 import com.example.my.mamer.util.LoadingDraw;
 
@@ -33,6 +34,7 @@ import okhttp3.Callback;
 import okhttp3.Response;
 
 import static com.example.my.mamer.config.Config.DISMISS_DIALOG;
+import static com.example.my.mamer.config.Config.HTTP_NOT_FOUND;
 import static com.example.my.mamer.config.Config.HTTP_USER_GET_INFORMATION;
 import static com.example.my.mamer.config.Config.MESSAGE_ERROR;
 import static com.example.my.mamer.config.Config.USER_SET_INFORMATION;
@@ -95,14 +97,23 @@ public class UserSelfTopicListActivity extends AppCompatActivity {
         Drawable tvBackPic=ContextCompat.getDrawable(this,R.mipmap.ic_title_back);
         tvBack.setBackground(tvBackPic);
 
+        tvBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent=new Intent(UserSelfTopicListActivity.this,BottomNavigationBarActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
         tvTitle.setText("我的话题");
         tvTitle.setTextSize(25);
         Log.e("Tag","UI完成");
+
     }
     //    数据加载接口
     public void onDataLoad() {
         Log.e("Tag","进入数据获取");
-        HttpUtil.sendOkHttpGetUserTopicList(1, new Callback() {
+        HttpUtil.sendOkHttpGetUserTopicList(GlobalUserInfo.userInfo.user.getUserId(),1, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
 
@@ -120,29 +131,43 @@ public class UserSelfTopicListActivity extends AppCompatActivity {
                     jresp = new JSONObject(response.body().string());
                     switch (response.code()) {
                         case HTTP_USER_GET_INFORMATION:
-
                             if (jresp.has("data")) {
                                 jsonArray=jresp.getJSONArray("data");
-                                int jsonSize=jsonArray.length();
-                                for (int i=0;i<jsonSize;i++) {
-                                    JSONObject jsonObject = jsonArray.getJSONObject(i);
-                                    TopicContent topicContent = new TopicContent();
-                                    topicContent.setTopicId(jsonObject.getString("id"));
-                                    topicContent.setTopicTitle(jsonObject.getString("title"));
-                                    topicContent.setTopicAuthorId(jsonObject.getString("user_id"));
-                                    topicContent.setCategoryId(jsonObject.getString("category_id"));
-                                    topicContent.setReplyCount(jsonObject.getString("reply_count"));
-                                    topicContent.setUpdateTime(jsonObject.getString("updated_at"));
-                                    listData.add(topicContent);
+                                if (jsonArray==null){
+
+                                    Message msg1 = new Message();
+                                    msg1.what = MESSAGE_ERROR;
+                                    msg1.obj="您还没有发表过文章呢";
+                                    msgHandler.sendMessage(msg1);
+                                }else {
+                                    int jsonSize=jsonArray.length();
+                                    for (int i=0;i<jsonSize;i++) {
+                                        JSONObject jsonObject = jsonArray.getJSONObject(i);
+                                        TopicContent topicContent = new TopicContent();
+                                        topicContent.setTopicId(jsonObject.getString("id"));
+                                        topicContent.setTopicTitle(jsonObject.getString("title"));
+                                        topicContent.setTopicAuthorId(jsonObject.getString("user_id"));
+                                        topicContent.setCategoryId(jsonObject.getString("category_id"));
+                                        topicContent.setReplyCount(jsonObject.getString("reply_count"));
+                                        topicContent.setUpdateTime(jsonObject.getString("updated_at"));
+                                        listData.add(topicContent);
+                                    }
+
+                                    Message msg3 = new Message();
+                                    msg3.what = USER_SET_INFORMATION;
+                                    msgHandler.sendMessage(msg3);
+
+    //       notifyDataSetChanged方法通过一个外部的方法控制如果适配器的内容改变时需要强制调用getView来刷新每个Item的内容
                                 }
-
-                                Message msg3 = new Message();
-                                msg3.what = USER_SET_INFORMATION;
-                                msgHandler.sendMessage(msg3);
-
-//       notifyDataSetChanged方法通过一个外部的方法控制如果适配器的内容改变时需要强制调用getView来刷新每个Item的内容
                             }
                             break;
+                        case HTTP_NOT_FOUND:
+                            Message msg3 = new Message();
+                            msg3.what = MESSAGE_ERROR;
+                            msg3.obj="对不起，我好像出现了一点问题";
+                            msgHandler.sendMessage(msg3);
+                            break;
+
                         default:
                             break;
                     }
@@ -165,7 +190,9 @@ private void initEvent(){
 //                暂存数据
                 SharedPreferences.Editor editor=PreferenceManager.getDefaultSharedPreferences(UserSelfTopicListActivity.this).edit();
                 editor.putString("id",listData.get(position).getTopicId());
+                editor.putString("userId",listData.get(position).getTopicAuthorId());
                 editor.putString("categoryId",listData.get(position).getCategoryId());
+                editor.putString("tagId","2");
                 editor.apply();
 
                 Intent intent=new Intent(UserSelfTopicListActivity.this,TopicParticularsActivity.class);

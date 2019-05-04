@@ -1,7 +1,10 @@
 package com.example.my.mamer.fragment;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +13,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.example.my.mamer.R;
+import com.example.my.mamer.TopicParticularsActivity;
 import com.example.my.mamer.adapter.TopicContentAdapter;
 import com.example.my.mamer.bean.TopicContent;
 import com.example.my.mamer.util.HttpUtil;
@@ -107,11 +111,13 @@ public class TopicTeach extends BaseLazyLoadFragment {
                                     TopicContent topicContent=new TopicContent();
                                     topicContent.setTopicId(jsonObject.getString("id"));
                                     topicContent.setTopicTitle(jsonObject.getString("title"));
+                                    topicContent.setCategoryId(jsonObject.getString("category_id"));
                                     topicContent.setCreateTime(jsonObject.getString("created_at"));
                                     topicContent.setReplyCount(jsonObject.getString("reply_count"));
                                     if(jsonObject.has("user")){
                                         JSONObject userInfo=jsonObject.getJSONObject("user");
                                         topicContent.setTopicAuthorName(userInfo.getString("name"));
+                                        topicContent.setTopicAuthorId(userInfo.getString("id"));
                                         topicContent.setTopicAuthorPic(userInfo.getString("avatar"));
                                     }
                                     listData.add(topicContent);
@@ -137,8 +143,17 @@ public class TopicTeach extends BaseLazyLoadFragment {
     public void initEvent() {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
 //                跳转到话题详情
+                SharedPreferences.Editor editor=PreferenceManager.getDefaultSharedPreferences(getContext()).edit();
+                editor.putString("id",listData.get(position).getTopicId());
+                editor.putString("userId",listData.get(position).getTopicAuthorId());
+                editor.putString("categoryId",listData.get(position).getCategoryId());
+                editor.putString("tagId","1");
+                editor.apply();
+
+                Intent intent=new Intent(getContext(),TopicParticularsActivity.class);
+                startActivity(intent);
             }
         });
     }

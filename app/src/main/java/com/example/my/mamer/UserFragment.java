@@ -16,6 +16,7 @@ import com.example.my.mamer.config.GlobalUserInfo;
 
 import static com.example.my.mamer.config.Config.HTTP_OK;
 import static com.example.my.mamer.config.Config.HTTP_USER_NULL;
+import static com.example.my.mamer.config.Config.UNLOGIN;
 
 public class UserFragment extends Fragment {
 
@@ -24,6 +25,7 @@ public class UserFragment extends Fragment {
     private LinearLayout userMamerEnergyLayout;
     private LinearLayout userUnloginLayout;
 //    用户个人话题
+    private LinearLayout layoutTopics;
     private TextView tvUserTopics;
 //    用户关注
     private TextView tvUserattention;
@@ -49,9 +51,10 @@ public class UserFragment extends Fragment {
                     break;
                 case HTTP_OK:
                     Toast.makeText(getActivity(),(String)msg.obj,Toast.LENGTH_SHORT).show();
-
                     break;
-
+                case UNLOGIN:
+                    Toast.makeText(getActivity(),"登陆以体验更多",Toast.LENGTH_SHORT).show();
+                    break;
 
                 default:
                     break;
@@ -66,7 +69,8 @@ public class UserFragment extends Fragment {
         tvUserMamerEnergy=view.findViewById(R.id.user_mamer_energy);
         userMamerEnergyLayout=view.findViewById(R.id.user_mamer_energy_layout);
         userUnloginLayout=view.findViewById(R.id.user_un_login_layout);
-        tvUserTopics=view.findViewById(R.id.user_my_topic);
+        tvUserTopics=view.findViewById(R.id.user_my_topic_count);
+        layoutTopics=view.findViewById(R.id.user_my_topic);
         tvUserattention=view.findViewById(R.id.user_my_attention);
         tvUserCollect=view.findViewById(R.id.user_my_collect);
         recommendUsersLayout=view.findViewById(R.id.user_recommend_users_layout);
@@ -81,6 +85,7 @@ public class UserFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+//        判断是否登录
         if (GlobalUserInfo.userInfo.token ==null){
             userUnloginLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -94,6 +99,22 @@ public class UserFragment extends Fragment {
             userUnloginLayout.setVisibility(View.GONE);
             userMamerEnergyLayout.setVisibility(View.VISIBLE);
         }
+//        点击事件
+        layoutTopics.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (GlobalUserInfo.userInfo.token==null){
+                    Message msg1=new Message();
+                    msg1.what=UNLOGIN;
+                    msgHandler.sendMessage(msg1);
+                }else {
+                    Intent intent=new Intent(getActivity(),UserSelfTopicListActivity.class);
+                    startActivity(intent);
+                }
+            }
+        });
+//        获取数据
+
 
     }
     //    处理并显示数据

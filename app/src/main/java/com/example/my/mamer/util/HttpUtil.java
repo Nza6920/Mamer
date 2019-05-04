@@ -61,17 +61,17 @@ public class HttpUtil {
         client.newCall(request).enqueue(callback);
     }
 //    获取某一用户话题列表
-    public static void sendOkHttpGetUserTopicList(int pageCount,okhttp3.Callback callback){
-        String USER_TOPIC_LIST="https://mamer.club/api/users/:id/topics?include=&page="+pageCount;
+    public static void sendOkHttpGetUserTopicList(String userId,int pageCount,okhttp3.Callback callback){
+        String USER_TOPIC_LIST="https://mamer.club/api/users/"+userId+"/topics?page="+pageCount;
         OkHttpClient client=new OkHttpClient();
-        Request request=new Request.Builder().addHeader("Authorization", GlobalUserInfo.userInfo.tokenType+GlobalUserInfo.userInfo.token ).url(USER_TOPIC_LIST).build();
+        Request request=new Request.Builder().url(USER_TOPIC_LIST).build();
         client.newCall(request).enqueue(callback);
     }
 //    获取某一话题详情
-    public static void sendOkHttpGetTopicParticulars(okhttp3.Callback callback){
-        String TOPIC_PARTICULARS="https://mamer.club/api/topics/:id?include=user";
+    public static void sendOkHttpGetTopicParticulars(String essayId,okhttp3.Callback callback){
+        String TOPIC_PARTICULARS="https://mamer.club/api/topics/"+essayId+"?include=user";
         OkHttpClient client=new OkHttpClient();
-        Request request=new Request.Builder().addHeader("Authorization", GlobalUserInfo.userInfo.tokenType+GlobalUserInfo.userInfo.token ).url(TOPIC_PARTICULARS).build();
+        Request request=new Request.Builder().url(TOPIC_PARTICULARS).build();
         client.newCall(request).enqueue(callback);
     }
 }
