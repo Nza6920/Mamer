@@ -8,6 +8,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 
 import static com.example.my.mamer.config.Config.CONTENT_TYPEs;
+import static com.example.my.mamer.config.Config.USER_RECOMMEND;
 
 public class HttpUtil {
 
@@ -72,6 +73,12 @@ public class HttpUtil {
         String TOPIC_PARTICULARS="https://mamer.club/api/topics/"+essayId+"?include=user";
         OkHttpClient client=new OkHttpClient();
         Request request=new Request.Builder().url(TOPIC_PARTICULARS).build();
+        client.newCall(request).enqueue(callback);
+    }
+//    获取活跃用户
+    public static void sendOkHttpGetUserRecommend(okhttp3.Callback callback){
+        OkHttpClient client=new OkHttpClient();
+        Request request=new Request.Builder().url(USER_RECOMMEND).build();
         client.newCall(request).enqueue(callback);
     }
 }

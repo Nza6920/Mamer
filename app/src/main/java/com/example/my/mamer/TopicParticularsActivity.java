@@ -9,6 +9,7 @@ import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -84,6 +85,7 @@ public class TopicParticularsActivity extends AppCompatActivity {
                     Toast.makeText(TopicParticularsActivity.this,(String)msg.obj,Toast.LENGTH_SHORT).show();
                     break;
                 case  USER_SET_INFORMATION:
+                    Log.e("Tag","话题详情--设置数据");
                     RequestOptions options=new RequestOptions()
                             .error(R.mipmap.ic_image_error)
                             .placeholder(R.mipmap.ic_image_error);
@@ -92,9 +94,13 @@ public class TopicParticularsActivity extends AppCompatActivity {
                             .load(listData.get(0).getTopicAuthorPic())
                             .apply(options)
                             .into(tvAuthorPic);
+                    Log.e("Tag","话题详情--设置头像");
                     tvAuthorName.setText(listData.get(0).getTopicAuthorName());
+                    Log.e("Tag","话题详情--姓名");
                     tvEssayTitle.setText(listData.get(0).getTopicTitle());
+                    Log.e("Tag","话题详情--标题");
                     tvCreatedTime.setText(listData.get(0).getCreateTime());
+                    Log.e("Tag","话题详情--创建时间");
                     break;
                 case UNLOGIN:
                     Toast.makeText(TopicParticularsActivity.this,"登录以体验更多",Toast.LENGTH_SHORT).show();
@@ -180,11 +186,11 @@ public class TopicParticularsActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 //                从主页访问，返回首页
-                if (prefs.getString("tagId",null)=="1"){
+                if (prefs.getString("tagId",null).equals("1")){
                     Intent intent=new Intent(TopicParticularsActivity.this,BottomNavigationBarActivity.class);
                     startActivity(intent);
                     finish();
-                }else if (prefs.getString("tagId",null)=="2"){
+                }else if (prefs.getString("tagId",null).equals("2")){
 //                从个人访问，返回个人话题列表
                     Intent intent=new Intent(TopicParticularsActivity.this,UserSelfTopicListActivity.class);
                     startActivity(intent);
@@ -245,21 +251,24 @@ public class TopicParticularsActivity extends AppCompatActivity {
                             msg3.obj=loadingDraw;
                             msgHandler.sendMessage(msg3);
 
+                            Log.e("Tag","话题详情--获取具体数据");
                             TopicContent topicContent=new TopicContent();
                             topicContent.setTopicTitle(jresp.getString("title"));
                             topicContent.setTopicConten(jresp.getString("body"));
                             topicContent.setReplyCount(jresp.getString("reply_count"));
                             topicContent.setCreateTime(jresp.getString("created_at"));
                             if (jresp.has("user")){
-                                JSONObject user=jresp.getJSONObject(jresp.getString("user"));
+                                Log.e("Tag","话题详情--获取作者数据");
+                                JSONObject user=jresp.getJSONObject("user");
                                 topicContent.setTopicAuthorName(user.getString("name"));
                                 topicContent.setTopicAuthorPic(user.getString("avatar"));
                                 topicContent.setTopicAuthorId(user.getString("id"));
                             }
+                            Log.e("Tag","话题详情--暂存数据");
                             listData.add(topicContent);
 //处理内容
                             jsoupUtil(topicContent.getTopicConten());
-
+                            Log.e("Tag","话题详情--更新数据");
                             Message msg4 = new Message();
                             msg4.what = USER_SET_INFORMATION;
                             msgHandler.sendMessage(msg4);
@@ -269,8 +278,7 @@ public class TopicParticularsActivity extends AppCompatActivity {
                                 break;
                     }
                 } catch (JSONException e) {
-
-
+                    e.printStackTrace();
                 }
             }
         });
