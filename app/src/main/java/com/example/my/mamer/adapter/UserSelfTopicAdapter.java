@@ -18,7 +18,6 @@ public class UserSelfTopicAdapter extends BaseAdapter {
     private ArrayList<TopicContent> data;
 //    布局解析器
     private LayoutInflater layoutInflater;
-    private Context context;
 
     public UserSelfTopicAdapter( Context context,ArrayList<TopicContent> data) {
         Log.e("Tag","进入接收数据");
