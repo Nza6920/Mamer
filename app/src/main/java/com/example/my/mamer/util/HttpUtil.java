@@ -76,6 +76,28 @@ public class HttpUtil {
         Request request=new Request.Builder().url(TOPIC_PARTICULARS).build();
         client.newCall(request).enqueue(callback);
     }
+//    删除话题
+    public static void sendOkHttpDelTopic(String essayId,okhttp3.Callback callback){
+        String DEL_TOPIC="https://mamer.club/api/topics/"+essayId;
+        OkHttpClient client=new OkHttpClient();
+        Request request=new Request.Builder().delete().addHeader("Authorization", GlobalUserInfo.userInfo.tokenType+GlobalUserInfo.userInfo.token).addHeader("Content-Type",CONTENT_TYPEs).url(DEL_TOPIC).build();
+        client.newCall(request).enqueue(callback);
+    }
+//    用户发布评论
+    public static  void sendOkHttpPostReply(String essayId,RequestBody requestBody,okhttp3.Callback callback){
+        String Post_Reply="https://mamer.club/api/topics/"+essayId+"/replies";
+
+        OkHttpClient client=new OkHttpClient();
+        Request request=new Request.Builder().post(requestBody).addHeader("Authorization",GlobalUserInfo.userInfo.tokenType+GlobalUserInfo.userInfo.token).url(Post_Reply).build();
+        client.newCall(request).enqueue(callback);
+    }
+//    获取话题回复列表
+    public static void sendOkHttpGetTopicReplyList(String essayId,okhttp3.Callback callback){
+        String GET_TOPIC_REPLY_LIST="https://mamer.club/api/topics/"+essayId+"/replies?include=user&page=1";
+        OkHttpClient client=new OkHttpClient();
+        Request request=new Request.Builder().url(GET_TOPIC_REPLY_LIST).build();
+        client.newCall(request).enqueue(callback);
+    }
 //    获取活跃用户
     public static void sendOkHttpGetUserRecommend(okhttp3.Callback callback){
         OkHttpClient client=new OkHttpClient();
@@ -86,6 +108,12 @@ public class HttpUtil {
     public static void sendOkHttpGetRecommendResource(okhttp3.Callback callback){
         OkHttpClient client=new OkHttpClient();
         Request request=new Request.Builder().url(RECOMMEND_RESOURCE).build();
+        client.newCall(request).enqueue(callback);
+    }
+//    刷新token
+    public static void sendOkHttpRefreshToken(String address,okhttp3.Callback callback){
+        OkHttpClient client=new OkHttpClient();
+        Request request=new Request.Builder().addHeader("Authorization",GlobalUserInfo.userInfo.tokenType+GlobalUserInfo.userInfo.token).url(address).build();
         client.newCall(request).enqueue(callback);
     }
 }

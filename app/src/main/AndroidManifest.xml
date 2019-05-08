@@ -45,10 +45,10 @@
         <activity
             android:name=".TopicsNewTopicActivity"
             android:screenOrientation="portrait" />
-        <activity android:name=".UserSelfTopicListActivity">
-
-        </activity>
-        <activity android:name=".TopicParticularsActivity"></activity>
+        <activity android:name=".UserSelfTopicListActivity" />
+        <activity android:name=".TopicParticularsActivity" />
+        <activity android:name=".TopicReplyActivity" />
+        <activity android:name=".TopicReplyPublishActivity"></activity>
     </application>
 
 </manifest>

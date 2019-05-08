@@ -34,6 +34,7 @@ public class Config {
     public static final String NEW_TOPIC_INFO="https://mamer.club/api/topics";
     public static final String USER_RECOMMEND="https://mamer.club/api/actived/users";
     public static final String RECOMMEND_RESOURCE="https://mamer.club/api/links";
+    public static final String REFRESH_TOKEN="https://mamer.club/api/authorizations/current";
 
     //    http返回码
     public final static int HTTP_OK=201;
@@ -44,6 +45,7 @@ public class Config {
     public final static int HTTP_OVERNUM=500;
     public final static int HTTP_OVERTIME=429;
     public final static int HTTP_NOT_FOUND=404;
+
 //    循环消息常量
     public final static int DISMISS_DIALOG=7;
     public final static int MESSAGE_ERROR=9;

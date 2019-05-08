@@ -30,13 +30,10 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 
-import okhttp3.Authenticator;
 import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import okhttp3.Route;
 
 import static com.example.my.mamer.config.Config.DISMISS_DIALOG;
 import static com.example.my.mamer.config.Config.HTTP_OK;
@@ -333,23 +330,22 @@ public class LoginActivity extends AppCompatActivity {
                             finish();
                             break;
 //                            令牌失效，重新请求
-                        case HTTP_USER_ERROR:
-                            Message msg4=new Message();
-                            msg4.what=DISMISS_DIALOG;
-                            msg4.obj=loadingDraw;
-                            msgHandler.sendMessage(msg4);
-
-                            Authenticator authenticator=new Authenticator() {
-                                @Override
-                                public Request authenticate(Route route, Response response) throws IOException {
-//    刷新token
-                                    return response.request().newBuilder().addHeader("Authorization", GlobalUserInfo.userInfo.tokenType+GlobalUserInfo.userInfo.token).build();
-                                }
-                            };
-                            break;
+//                        case HTTP_USER_ERROR:
+//                            Message msg4=new Message();
+//                            msg4.what=DISMISS_DIALOG;
+//                            msg4.obj=loadingDraw;
+//                            msgHandler.sendMessage(msg4);
+//
+//                            Authenticator authenticator=new Authenticator() {
+//                                @Override
+//                                public Request authenticate(Route route, Response response) throws IOException {
+////    刷新token
+//                                    return response.request().newBuilder().addHeader("Authorization", GlobalUserInfo.userInfo.tokenType+GlobalUserInfo.userInfo.token).build();
+//                                }
+//                            };
+//                            break;
                         default:
                             break;
-
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();

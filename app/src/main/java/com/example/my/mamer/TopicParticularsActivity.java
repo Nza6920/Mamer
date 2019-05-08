@@ -19,11 +19,13 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.example.my.mamer.bean.ReplyUser;
 import com.example.my.mamer.bean.TopicContent;
 import com.example.my.mamer.config.GlobalUserInfo;
 import com.example.my.mamer.util.HttpUtil;
 import com.example.my.mamer.util.LoadingDraw;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -36,6 +38,7 @@ import okhttp3.Response;
 
 import static com.example.my.mamer.MyApplication.getContext;
 import static com.example.my.mamer.config.Config.DISMISS_DIALOG;
+import static com.example.my.mamer.config.Config.HTTP_NOT_FOUND;
 import static com.example.my.mamer.config.Config.HTTP_USER_GET_INFORMATION;
 import static com.example.my.mamer.config.Config.MESSAGE_ERROR;
 import static com.example.my.mamer.config.Config.UNLOGIN;
@@ -57,10 +60,19 @@ public class TopicParticularsActivity extends AppCompatActivity {
     private LinearLayout layoutNowUser;
     private Button btnDel;
     private Button btnEdit;
+    private Button btnReply;
 //    外部评论
     private LinearLayout layoutComment;
     private ArrayList<TopicContent> listData=new ArrayList<>();
     private LoadingDraw loadingDraw;
+//评论列表仅显示一个,有评论就显示，没有就不显示
+    private LinearLayout replyLayout;
+    private ImageView imgReplyUser;
+    private TextView tvReplyUserName;
+    private TextView tvReplyUserContent;
+    private ArrayList<ReplyUser> replyUsers=new ArrayList<>();
+
+    private TextView replyNone;
 
     private final Handler msgHandler=new Handler(){
         @Override
@@ -131,7 +143,13 @@ public class TopicParticularsActivity extends AppCompatActivity {
         layoutNowUser=findViewById(R.id.set_topic);
         btnDel=findViewById(R.id.topic_particulars_delete);
         btnEdit=findViewById(R.id.topic_particulars_edit);
+        btnReply=findViewById(R.id.topic_particulars_reply);
         layoutComment=findViewById(R.id.topic_particulars_comment);
+        replyLayout=findViewById(R.id.reply_user);
+        imgReplyUser=findViewById(R.id.reply_user_img);
+        tvReplyUserName=findViewById(R.id.reply_user_name);
+        tvReplyUserContent=findViewById(R.id.reply_user_content);
+        replyNone=findViewById(R.id.reply_none);
 
 //        填充
         Drawable tvBackPic=ContextCompat.getDrawable(this,R.mipmap.ic_title_back);
@@ -140,6 +158,7 @@ public class TopicParticularsActivity extends AppCompatActivity {
         tvTitle.setTextSize(20);
         final SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(this);
         getTopicParticulas(prefs.getString("id",null));
+        getTopicReplyList(prefs.getString("id",null));
 //        动态显示话题分类
         switch (prefs.getString("categoryId",null)){
             case "1":
@@ -196,16 +215,13 @@ public class TopicParticularsActivity extends AppCompatActivity {
                     startActivity(intent);
                     finish();
                 }
-
-
-
             }
         });
 //        删除话题
         btnDel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                delTopic(prefs.getString("id",null));
             }
         });
 //        编辑话题
@@ -215,11 +231,39 @@ public class TopicParticularsActivity extends AppCompatActivity {
 
             }
         });
+
 //        发表评论
+        btnReply.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent=new Intent(TopicParticularsActivity.this,TopicReplyPublishActivity.class);
+                intent.putExtra("essayId",prefs.getString("id",null));
+                startActivity(intent);
+            }
+        });
         layoutComment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                Intent intent=new Intent(TopicParticularsActivity.this,TopicReplyPublishActivity.class);
+                intent.putExtra("essayId",prefs.getString("id",null));
+                startActivity(intent);
+            }
+        });
+//        更多评论
+        tvEssayParticulars.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent=new Intent(TopicParticularsActivity.this,TopicReplyActivity.class);
+                intent.putExtra("essayId",prefs.getString("id",null));
+                startActivity(intent);
+            }
+        });
+        replyLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent=new Intent(TopicParticularsActivity.this,TopicReplyActivity.class);
+                intent.putExtra("essayId",prefs.getString("id",null));
+                startActivity(intent);
             }
         });
     }
@@ -289,6 +333,139 @@ public class TopicParticularsActivity extends AppCompatActivity {
 //        从String加载文档
 //spaned
 //        Spanned contentStrs= Html.fromHtml();
+
+    }
+
+    private void delTopic(String essayId){
+        loadingDraw.show();
+        HttpUtil.sendOkHttpDelTopic(essayId, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Message msg1=new Message();
+                msg1.what=DISMISS_DIALOG;
+                msg1.obj=loadingDraw;
+                msgHandler.sendMessage(msg1);
+
+                Message msg2 = new Message();
+                msg2.what = MESSAGE_ERROR;
+                msg2.obj = "服务器异常,请检查网络";
+                msgHandler.sendMessage(msg2);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                    switch (response.code()){
+                        case HTTP_USER_GET_INFORMATION:
+                            Message msg1=new Message();
+                            msg1.what=DISMISS_DIALOG;
+                            msg1.obj=loadingDraw;
+                            msgHandler.sendMessage(msg1);
+
+                            Message msg3=new Message();
+                            msg3.what=MESSAGE_ERROR;
+                            msg3.obj="删除成功";
+                            msgHandler.sendMessage(msg3);
+
+                            Intent intent=new Intent(TopicParticularsActivity.this,UserSelfTopicListActivity.class);
+                            startActivity(intent);
+                            finish();
+                            break;
+                        case HTTP_NOT_FOUND:
+                            Message msg4=new Message();
+                            msg4.what=DISMISS_DIALOG;
+                            msg4.obj=loadingDraw;
+                            msgHandler.sendMessage(msg4);
+
+                            Message msg5=new Message();
+                            msg5.what=MESSAGE_ERROR;
+                            msg5.obj="出错啦，请稍后再试";
+                            msgHandler.sendMessage(msg5);
+                            break;
+                            default:
+                                break;
+
+                    }
+
+            }
+        });
+    }
+
+    private void getTopicReplyList(String essayId){
+        loadingDraw.show();
+        HttpUtil.sendOkHttpGetTopicReplyList(essayId, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Message msg1=new Message();
+                msg1.what=DISMISS_DIALOG;
+                msg1.obj=loadingDraw;
+                msgHandler.sendMessage(msg1);
+
+                Message msg2 = new Message();
+                msg2.what = MESSAGE_ERROR;
+                msg2.obj = "服务器异常,请检查网络";
+                msgHandler.sendMessage(msg2);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                JSONObject jresp = null;
+                JSONArray jsonArray=null;
+                try {
+                    jresp=new JSONObject(response.body().string());
+                    switch (response.code()){
+                        case HTTP_USER_GET_INFORMATION:
+                            Message msg1=new Message();
+                            msg1.what=DISMISS_DIALOG;
+                            msg1.obj=loadingDraw;
+                            msgHandler.sendMessage(msg1);
+
+                            if (jresp.has("data")){
+                               jsonArray=jresp.getJSONArray("data");
+//                               有评论
+                               if (jsonArray!=null){
+                                   for (int i=0;i<1;i++){
+                                       JSONObject jsonObject=jsonArray.getJSONObject(i);
+                                       ReplyUser replyUser=new ReplyUser();
+                                       replyUser.setContent(jsonObject.getString("content"));
+                                       if (jsonObject.has("user")){
+                                           JSONObject userStr=jsonObject.getJSONObject("user");
+                                           replyUser.setUserId(userStr.getString("id"));
+                                           replyUser.setUserName(userStr.getString("name"));
+                                           replyUser.setUserImg(userStr.getString("avatar"));
+                                       }
+
+                                       replyUsers.add(replyUser);
+                                   }
+                                   final Runnable setAvatarRunable=new Runnable() {
+                                       @Override
+                                       public void run() {
+                                           RequestOptions options=new RequestOptions()
+                                                   .error(R.mipmap.ic_image_error)
+                                                   .placeholder(R.mipmap.ic_image_error);
+                                           Glide.with(getContext())
+                                                   .asBitmap()
+                                                   .load(replyUsers.get(0).getUserImg())
+                                                   .apply(options)
+                                                   .into(imgReplyUser);
+                                           tvReplyUserName.setText(replyUsers.get(0).getUserName());
+                                           tvReplyUserContent.setText(replyUsers.get(0).getContent());
+                                       }
+                                   };
+                                   new Thread(){
+                                       @Override
+                                       public void run() {
+                                           msgHandler.post(setAvatarRunable);
+                                       }
+                                   }.start();
+                               }
+                            }
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
 
     }
 }

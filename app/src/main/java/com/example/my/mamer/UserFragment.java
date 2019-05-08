@@ -48,9 +48,11 @@ public class UserFragment extends Fragment implements View.OnClickListener {
 //    用户个人话题
     private LinearLayout layoutTopics;
     private TextView tvUserTopics;
-//    用户关注
-    private TextView tvUserattention;
+//    用户回复
+    private LinearLayout layoutReply;
+    private TextView tvUserReplyCount;
 //    用户收藏
+    private LinearLayout layoutCollect;
     private TextView tvUserCollect;
 //    活跃用户推荐,自定义recyclerView,适配器
     private ImageView imgUserRecommendAvatar;
@@ -103,8 +105,10 @@ public class UserFragment extends Fragment implements View.OnClickListener {
         userUnloginLayout=view.findViewById(R.id.user_un_login_layout);
         tvUserTopics=view.findViewById(R.id.user_my_topic_count);
         layoutTopics=view.findViewById(R.id.user_my_topic);
-        tvUserattention=view.findViewById(R.id.user_my_attention);
-        tvUserCollect=view.findViewById(R.id.user_my_collect);
+        tvUserReplyCount=view.findViewById(R.id.user_my_reply_count);
+        layoutReply=view.findViewById(R.id.user_my_reply);
+        tvUserCollect=view.findViewById(R.id.user_my_collect_count);
+        layoutCollect=view.findViewById(R.id.user_my_collect);
         imgUserRecommendAvatar=view.findViewById(R.id.user_recommend_users_img);
         tvUserRecommendName=view.findViewById(R.id.user_recommend_users_name);
         tvUserRecommendInfo=view.findViewById(R.id.user_recommend_users_info);
@@ -149,6 +153,33 @@ public class UserFragment extends Fragment implements View.OnClickListener {
                 }else {
                     Intent intent=new Intent(getActivity(),UserSelfTopicListActivity.class);
                     startActivity(intent);
+                }
+            }
+        });
+        layoutReply.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (GlobalUserInfo.userInfo.token==null){
+                    Message msg1=new Message();
+                    msg1.what=UNLOGIN;
+                    msgHandler.sendMessage(msg1);
+                }else {
+                    Intent intent=new Intent(getActivity(),TopicReplyActivity.class);
+                    startActivity(intent);
+                }
+            }
+        });
+
+        layoutCollect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (GlobalUserInfo.userInfo.token==null){
+                    Message msg1=new Message();
+                    msg1.what=UNLOGIN;
+                    msgHandler.sendMessage(msg1);
+                }else {
+//                    Intent intent=new Intent(getActivity(),);
+//                    startActivity(intent);
                 }
             }
         });
