@@ -164,7 +164,7 @@ public class UserFragment extends Fragment implements View.OnClickListener {
                     msg1.what=UNLOGIN;
                     msgHandler.sendMessage(msg1);
                 }else {
-                    Intent intent=new Intent(getActivity(),TopicReplyActivity.class);
+                    Intent intent=new Intent(getActivity(),UserSelfReplyActivity.class);
                     startActivity(intent);
                 }
             }
@@ -228,22 +228,22 @@ public class UserFragment extends Fragment implements View.OnClickListener {
                                     final Runnable setAvatarRunable=new Runnable() {
                                         @Override
                                         public void run() {
-                                                RequestOptions options=new RequestOptions()
-                                                        .error(R.mipmap.ic_image_error)
-                                                        .placeholder(R.mipmap.ic_image_error);
-                                                Glide.with(getContext())
-                                                        .asBitmap()
-                                                        .load(userRecommendDataList.get(0).getUserImg())
-                                                        .apply(options)
-                                                        .into(imgUserRecommendAvatar);
-                                                tvUserRecommendName.setText(userRecommendDataList.get(0).getUserName());
-                                                if (userRecommendDataList.get(0).getUserIntroduction().equals("null")){
-                                                    tvUserRecommendInfo.setText("没有留下信息哦~");
-                                                }else {
-                                                    tvUserRecommendInfo.setText(userRecommendDataList.get(0).getUserIntroduction());
-                                                }
-                                                userRecommendNoneLayout.setVisibility(View.GONE);
-                                                userRecommendLayout.setVisibility(View.VISIBLE);
+                                            RequestOptions options=new RequestOptions()
+                                                    .error(R.mipmap.ic_image_error)
+                                                    .placeholder(R.mipmap.ic_image_error);
+                                            Glide.with(getContext())
+                                                    .asBitmap()
+                                                    .load(userRecommendDataList.get(0).getUserImg())
+                                                    .apply(options)
+                                                    .into(imgUserRecommendAvatar);
+                                            tvUserRecommendName.setText(userRecommendDataList.get(0).getUserName());
+                                            if (userRecommendDataList.get(0).getUserIntroduction().equals("null")){
+                                                tvUserRecommendInfo.setText("没有留下信息哦~");
+                                            }else {
+                                                tvUserRecommendInfo.setText(userRecommendDataList.get(0).getUserIntroduction());
+                                            }
+                                            userRecommendNoneLayout.setVisibility(View.GONE);
+                                            userRecommendLayout.setVisibility(View.VISIBLE);
                                         }};
                                     new Thread(){
                                         public void run(){

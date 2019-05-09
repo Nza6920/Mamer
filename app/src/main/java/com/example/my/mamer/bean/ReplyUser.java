@@ -7,6 +7,7 @@ public class ReplyUser {
     private String replyId;
     private String essayId;
     private String content;
+    private String title;
 
     public ReplyUser(){}
     public ReplyUser(String userId, String userImg, String userName, String replyId, String essayId, String content) {
@@ -64,5 +65,13 @@ public class ReplyUser {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 }

@@ -21,11 +21,11 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.my.mamer.bean.ReplyUser;
 import com.example.my.mamer.bean.TopicContent;
+import com.example.my.mamer.config.GlobalTopicReply;
 import com.example.my.mamer.config.GlobalUserInfo;
 import com.example.my.mamer.util.HttpUtil;
 import com.example.my.mamer.util.LoadingDraw;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -42,7 +42,6 @@ import static com.example.my.mamer.config.Config.HTTP_NOT_FOUND;
 import static com.example.my.mamer.config.Config.HTTP_USER_GET_INFORMATION;
 import static com.example.my.mamer.config.Config.MESSAGE_ERROR;
 import static com.example.my.mamer.config.Config.UNLOGIN;
-import static com.example.my.mamer.config.Config.USER_SET_INFORMATION;
 
 public class TopicParticularsActivity extends AppCompatActivity {
 //    title
@@ -55,7 +54,6 @@ public class TopicParticularsActivity extends AppCompatActivity {
 //    文章
     private TextView tvEssayTitle;
     private TextView tvEssayContent;
-    private TextView tvEssayParticulars;
 //    当前用户
     private LinearLayout layoutNowUser;
     private Button btnDel;
@@ -66,11 +64,8 @@ public class TopicParticularsActivity extends AppCompatActivity {
     private ArrayList<TopicContent> listData=new ArrayList<>();
     private LoadingDraw loadingDraw;
 //评论列表仅显示一个,有评论就显示，没有就不显示
-    private LinearLayout replyLayout;
-    private ImageView imgReplyUser;
-    private TextView tvReplyUserName;
-    private TextView tvReplyUserContent;
-    private ArrayList<ReplyUser> replyUsers=new ArrayList<>();
+
+
 
     private TextView replyNone;
 
@@ -91,28 +86,10 @@ public class TopicParticularsActivity extends AppCompatActivity {
                     tvTitle.setText("公告");
                     break;
                 case DISMISS_DIALOG:
-                    loadingDraw.dismiss();
+                    ((LoadingDraw)msg.obj).dismiss();
                     break;
                 case MESSAGE_ERROR:
                     Toast.makeText(TopicParticularsActivity.this,(String)msg.obj,Toast.LENGTH_SHORT).show();
-                    break;
-                case  USER_SET_INFORMATION:
-                    Log.e("Tag","话题详情--设置数据");
-                    RequestOptions options=new RequestOptions()
-                            .error(R.mipmap.ic_image_error)
-                            .placeholder(R.mipmap.ic_image_error);
-                    Glide.with(getContext())
-                            .asBitmap()
-                            .load(listData.get(0).getTopicAuthorPic())
-                            .apply(options)
-                            .into(tvAuthorPic);
-                    Log.e("Tag","话题详情--设置头像");
-                    tvAuthorName.setText(listData.get(0).getTopicAuthorName());
-                    Log.e("Tag","话题详情--姓名");
-                    tvEssayTitle.setText(listData.get(0).getTopicTitle());
-                    Log.e("Tag","话题详情--标题");
-                    tvCreatedTime.setText(listData.get(0).getCreateTime());
-                    Log.e("Tag","话题详情--创建时间");
                     break;
                 case UNLOGIN:
                     Toast.makeText(TopicParticularsActivity.this,"登录以体验更多",Toast.LENGTH_SHORT).show();
@@ -126,8 +103,19 @@ public class TopicParticularsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        final SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(this);
+        ReplyUser replyUser=new ReplyUser();
+        GlobalTopicReply.reply.replyUser=replyUser;
+        GlobalTopicReply.reply.replyUser.setEssayId(prefs.getString("id",null));
+        GlobalTopicReply.reply.replyUser.setUserId(prefs.getString("userId",null));
+        GlobalTopicReply.reply.categoryId=prefs.getString("categoryId",null);
+        GlobalTopicReply.reply.tagId=prefs.getString("tagId",null);
+
         setContentView(R.layout.activity_topic_particulars);
         loadingDraw=new LoadingDraw(this);
+
+
         init();
 
     }
@@ -139,28 +127,29 @@ public class TopicParticularsActivity extends AppCompatActivity {
         tvCreatedTime=findViewById(R.id.topic_particulars_time);
         tvEssayTitle=findViewById(R.id.topic_particulars_title);
         tvEssayContent=findViewById(R.id.topic_particulars_content);
-        tvEssayParticulars=findViewById(R.id.topic_particulars_comment_list);
         layoutNowUser=findViewById(R.id.set_topic);
         btnDel=findViewById(R.id.topic_particulars_delete);
         btnEdit=findViewById(R.id.topic_particulars_edit);
         btnReply=findViewById(R.id.topic_particulars_reply);
         layoutComment=findViewById(R.id.topic_particulars_comment);
-        replyLayout=findViewById(R.id.reply_user);
-        imgReplyUser=findViewById(R.id.reply_user_img);
-        tvReplyUserName=findViewById(R.id.reply_user_name);
-        tvReplyUserContent=findViewById(R.id.reply_user_content);
         replyNone=findViewById(R.id.reply_none);
+
 
 //        填充
         Drawable tvBackPic=ContextCompat.getDrawable(this,R.mipmap.ic_title_back);
         tvBack.setBackground(tvBackPic);
 
         tvTitle.setTextSize(20);
-        final SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(this);
-        getTopicParticulas(prefs.getString("id",null));
-        getTopicReplyList(prefs.getString("id",null));
+
+
+
+
+        getTopicParticulas();
+
+
+
 //        动态显示话题分类
-        switch (prefs.getString("categoryId",null)){
+        switch (GlobalTopicReply.reply.categoryId){
             case "1":
                 Message msg1 = new Message();
                 msg1.what = 1;
@@ -186,11 +175,11 @@ public class TopicParticularsActivity extends AppCompatActivity {
         }
 //        判断用户是否登陆，
         if (GlobalUserInfo.userInfo.token!=null){
-            if (prefs.getString("userId",null)!=GlobalUserInfo.userInfo.user.getUserId()){
+            if (GlobalTopicReply.reply.replyUser.getUserId()!=GlobalUserInfo.userInfo.user.getUserId()){
 //            登录,非作者就只能评论
                 layoutComment.setVisibility(View.VISIBLE);
 
-            }else if (prefs.getString("userId",null)==GlobalUserInfo.userInfo.user.getUserId()){
+            }else if (GlobalTopicReply.reply.replyUser.getUserId()==GlobalUserInfo.userInfo.user.getUserId()){
 //            登陆，作者本人访问可删除和编辑帖子，以及评论
                 layoutNowUser.setVisibility(View.VISIBLE);
             }
@@ -205,11 +194,11 @@ public class TopicParticularsActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 //                从主页访问，返回首页
-                if (prefs.getString("tagId",null).equals("1")){
+                if (GlobalTopicReply.reply.tagId.equals("1")){
                     Intent intent=new Intent(TopicParticularsActivity.this,BottomNavigationBarActivity.class);
                     startActivity(intent);
                     finish();
-                }else if (prefs.getString("tagId",null).equals("2")){
+                }else if (GlobalTopicReply.reply.tagId.equals("2")){
 //                从个人访问，返回个人话题列表
                     Intent intent=new Intent(TopicParticularsActivity.this,UserSelfTopicListActivity.class);
                     startActivity(intent);
@@ -221,7 +210,7 @@ public class TopicParticularsActivity extends AppCompatActivity {
         btnDel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                delTopic(prefs.getString("id",null));
+                delTopic();
             }
         });
 //        编辑话题
@@ -237,7 +226,7 @@ public class TopicParticularsActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent=new Intent(TopicParticularsActivity.this,TopicReplyPublishActivity.class);
-                intent.putExtra("essayId",prefs.getString("id",null));
+                intent.putExtra("essayId",GlobalTopicReply.reply.replyUser.getEssayId());
                 startActivity(intent);
             }
         });
@@ -245,30 +234,14 @@ public class TopicParticularsActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent=new Intent(TopicParticularsActivity.this,TopicReplyPublishActivity.class);
-                intent.putExtra("essayId",prefs.getString("id",null));
-                startActivity(intent);
-            }
-        });
-//        更多评论
-        tvEssayParticulars.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent=new Intent(TopicParticularsActivity.this,TopicReplyActivity.class);
-                intent.putExtra("essayId",prefs.getString("id",null));
-                startActivity(intent);
-            }
-        });
-        replyLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent=new Intent(TopicParticularsActivity.this,TopicReplyActivity.class);
-                intent.putExtra("essayId",prefs.getString("id",null));
+                intent.putExtra("essayId",GlobalTopicReply.reply.replyUser.getEssayId());
                 startActivity(intent);
             }
         });
     }
 
-    private void getTopicParticulas(String essayId){
+    private void getTopicParticulas(){
+        String essayId=GlobalTopicReply.reply.replyUser.getEssayId();
         loadingDraw.show();
         HttpUtil.sendOkHttpGetTopicParticulars(essayId,new Callback() {
             @Override
@@ -311,11 +284,32 @@ public class TopicParticularsActivity extends AppCompatActivity {
                             Log.e("Tag","话题详情--暂存数据");
                             listData.add(topicContent);
 //处理内容
-                            jsoupUtil(topicContent.getTopicConten());
+//                            jsoupUtil(topicContent.getTopicConten());
                             Log.e("Tag","话题详情--更新数据");
-                            Message msg4 = new Message();
-                            msg4.what = USER_SET_INFORMATION;
-                            msgHandler.sendMessage(msg4);
+                            final Runnable setAvatarRunable=new Runnable() {
+                                @Override
+                                public void run() {
+                                    RequestOptions options=new RequestOptions()
+                                            .error(R.mipmap.ic_image_error)
+                                            .placeholder(R.mipmap.ic_image_error);
+                                    Glide.with(getContext())
+                                            .asBitmap()
+                                            .load(listData.get(0).getTopicAuthorPic())
+                                            .apply(options)
+                                            .into(tvAuthorPic);
+                                    Log.e("Tag","话题详情--设置头像");
+                                    tvAuthorName.setText(listData.get(0).getTopicAuthorName());
+                                    Log.e("Tag","话题详情--姓名");
+                                    tvEssayTitle.setText(listData.get(0).getTopicTitle());
+                                    Log.e("Tag","话题详情--标题");
+                                    tvCreatedTime.setText(listData.get(0).getCreateTime());
+                                    Log.e("Tag","话题详情--创建时间");
+                                }};
+                            new Thread(){
+                                public void run(){
+                                    msgHandler.post(setAvatarRunable);
+                                }
+                            }.start();
 
                             break;
                             default:
@@ -336,7 +330,8 @@ public class TopicParticularsActivity extends AppCompatActivity {
 
     }
 
-    private void delTopic(String essayId){
+    private void delTopic(){
+        String essayId=GlobalTopicReply.reply.replyUser.getEssayId();
         loadingDraw.show();
         HttpUtil.sendOkHttpDelTopic(essayId, new Callback() {
             @Override
@@ -388,84 +383,5 @@ public class TopicParticularsActivity extends AppCompatActivity {
 
             }
         });
-    }
-
-    private void getTopicReplyList(String essayId){
-        loadingDraw.show();
-        HttpUtil.sendOkHttpGetTopicReplyList(essayId, new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                Message msg1=new Message();
-                msg1.what=DISMISS_DIALOG;
-                msg1.obj=loadingDraw;
-                msgHandler.sendMessage(msg1);
-
-                Message msg2 = new Message();
-                msg2.what = MESSAGE_ERROR;
-                msg2.obj = "服务器异常,请检查网络";
-                msgHandler.sendMessage(msg2);
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                JSONObject jresp = null;
-                JSONArray jsonArray=null;
-                try {
-                    jresp=new JSONObject(response.body().string());
-                    switch (response.code()){
-                        case HTTP_USER_GET_INFORMATION:
-                            Message msg1=new Message();
-                            msg1.what=DISMISS_DIALOG;
-                            msg1.obj=loadingDraw;
-                            msgHandler.sendMessage(msg1);
-
-                            if (jresp.has("data")){
-                               jsonArray=jresp.getJSONArray("data");
-//                               有评论
-                               if (jsonArray!=null){
-                                   for (int i=0;i<1;i++){
-                                       JSONObject jsonObject=jsonArray.getJSONObject(i);
-                                       ReplyUser replyUser=new ReplyUser();
-                                       replyUser.setContent(jsonObject.getString("content"));
-                                       if (jsonObject.has("user")){
-                                           JSONObject userStr=jsonObject.getJSONObject("user");
-                                           replyUser.setUserId(userStr.getString("id"));
-                                           replyUser.setUserName(userStr.getString("name"));
-                                           replyUser.setUserImg(userStr.getString("avatar"));
-                                       }
-
-                                       replyUsers.add(replyUser);
-                                   }
-                                   final Runnable setAvatarRunable=new Runnable() {
-                                       @Override
-                                       public void run() {
-                                           RequestOptions options=new RequestOptions()
-                                                   .error(R.mipmap.ic_image_error)
-                                                   .placeholder(R.mipmap.ic_image_error);
-                                           Glide.with(getContext())
-                                                   .asBitmap()
-                                                   .load(replyUsers.get(0).getUserImg())
-                                                   .apply(options)
-                                                   .into(imgReplyUser);
-                                           tvReplyUserName.setText(replyUsers.get(0).getUserName());
-                                           tvReplyUserContent.setText(replyUsers.get(0).getContent());
-                                       }
-                                   };
-                                   new Thread(){
-                                       @Override
-                                       public void run() {
-                                           msgHandler.post(setAvatarRunable);
-                                       }
-                                   }.start();
-                               }
-                            }
-                    }
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
     }
 }

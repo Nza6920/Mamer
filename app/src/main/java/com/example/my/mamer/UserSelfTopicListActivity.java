@@ -46,7 +46,7 @@ public class UserSelfTopicListActivity extends AppCompatActivity {
     private UserSelfTopicAdapter mAdapter;
     private TextView tvBack;
     private TextView tvTitle;
-
+    private LoadingDraw loadingDraw;
     //ui
     private final Handler msgHandler=new Handler(){
         @Override
@@ -72,11 +72,13 @@ public class UserSelfTopicListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_self_topic_list);
+        loadingDraw=new LoadingDraw(this);
         initUI();
         onDataLoad();
         mAdapter=new UserSelfTopicAdapter(getApplicationContext(),getListData());
         listView.setAdapter(mAdapter);
         initEvent();
+
 
     }
 
@@ -116,6 +118,10 @@ public class UserSelfTopicListActivity extends AppCompatActivity {
         HttpUtil.sendOkHttpGetUserTopicList(GlobalUserInfo.userInfo.user.getUserId(),1, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
+                Message msg1 = new Message();
+                msg1.what = DISMISS_DIALOG;
+                msg1.obj=loadingDraw;
+                msgHandler.sendMessage(msg1);
 
                 Message msg2 = new Message();
                 msg2.what = MESSAGE_ERROR;
@@ -129,16 +135,22 @@ public class UserSelfTopicListActivity extends AppCompatActivity {
                 JSONArray jsonArray=null;
                 try {
                     jresp = new JSONObject(response.body().string());
+
                     switch (response.code()) {
                         case HTTP_USER_GET_INFORMATION:
+
+                            Message msg1 = new Message();
+                            msg1.what = DISMISS_DIALOG;
+                            msg1.obj=loadingDraw;
+                            msgHandler.sendMessage(msg1);
+
                             if (jresp.has("data")) {
                                 jsonArray=jresp.getJSONArray("data");
                                 if (jsonArray==null){
-
-                                    Message msg1 = new Message();
-                                    msg1.what = MESSAGE_ERROR;
-                                    msg1.obj="您还没有发表过文章呢";
-                                    msgHandler.sendMessage(msg1);
+                                    Message msg2 = new Message();
+                                    msg2.what = MESSAGE_ERROR;
+                                    msg2.obj="您还没有发表过文章呢";
+                                    msgHandler.sendMessage(msg2);
                                 }else {
                                     int jsonSize=jsonArray.length();
                                     for (int i=0;i<jsonSize;i++) {
@@ -162,10 +174,15 @@ public class UserSelfTopicListActivity extends AppCompatActivity {
                             }
                             break;
                         case HTTP_NOT_FOUND:
-                            Message msg3 = new Message();
-                            msg3.what = MESSAGE_ERROR;
-                            msg3.obj="对不起，我好像出现了一点问题";
-                            msgHandler.sendMessage(msg3);
+                            Message msg4 = new Message();
+                            msg4.what = DISMISS_DIALOG;
+                            msg4.obj=loadingDraw;
+                            msgHandler.sendMessage(msg4);
+
+                            Message msg5 = new Message();
+                            msg5.what = MESSAGE_ERROR;
+                            msg5.obj="对不起，我好像出现了一点问题";
+                            msgHandler.sendMessage(msg5);
                             break;
 
                         default:

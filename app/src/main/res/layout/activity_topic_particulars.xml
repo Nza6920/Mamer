@@ -47,6 +47,7 @@
 
         </RelativeLayout>
         <ScrollView
+            android:id="@+id/topic_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="15dp"
@@ -70,41 +71,7 @@
                     android:layout_marginTop="15dp"
                     android:textSize="15sp"
                     android:textColor="#000"/>
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="评论"
-                        android:textSize="15sp"
-                        android:layout_centerVertical="true"/>
 
-                    <TextView
-                        android:id="@+id/topic_particulars_comment_list"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:textSize="15sp"
-                        android:textColor="#000"
-                        android:layout_marginTop="20dp"
-                        android:background="@mipmap/ic_user_top_bar_right"
-                        android:enabled="true"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerVertical="true"/>
-                </RelativeLayout>
-
-                <LinearLayout
-                    android:id="@+id/reply_user"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="10dp">
-                    <ListView
-                        android:id="@+id/reply_user_list"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-
-                        android:background="@drawable/divide_line"/>
-                </LinearLayout>
                 <TextView
                     android:id="@+id/reply_none"
                     android:layout_width="match_parent"
@@ -116,6 +83,35 @@
             </LinearLayout>
 
         </ScrollView>
+        <RelativeLayout
+            android:id="@+id/topic_particulars_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="15dp"
+            android:layout_marginLeft="15dp"
+            android:layout_below="@+id/topic_content">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="评论"
+                android:textSize="15sp"
+                android:layout_centerVertical="true"/>
+        </RelativeLayout>
+        <FrameLayout
+            android:id="@+id/reply_user"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="15dp"
+            android:layout_marginLeft="15dp"
+            android:layout_below="@+id/topic_particulars_name">
+            <fragment
+                android:id="@+id/reply_user_fragment"
+                android:name="com.example.my.mamer.fragment.TopicReplyFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"/>
+        </FrameLayout>
+
         <LinearLayout
             android:id="@+id/set_topic"
             android:layout_width="match_parent"

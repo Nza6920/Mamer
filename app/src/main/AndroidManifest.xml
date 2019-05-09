@@ -20,7 +20,9 @@
         <activity android:name=".RegisterPhoneNumActivity" />
         <activity android:name=".RegisterPicCode" />
         <activity android:name=".RegisterActivity" />
-        <activity android:name=".TestActivity" />
+        <activity android:name=".TestActivity" >
+
+        </activity>
         <activity android:name=".LoginActivity" />
         <activity android:name=".UserHomePageActivity" />
         <activity android:name=".UserEditorInformationActivity" />
@@ -47,8 +49,8 @@
             android:screenOrientation="portrait" />
         <activity android:name=".UserSelfTopicListActivity" />
         <activity android:name=".TopicParticularsActivity" />
-        <activity android:name=".TopicReplyActivity" />
-        <activity android:name=".TopicReplyPublishActivity"></activity>
+        <activity android:name=".TopicReplyPublishActivity" />
+        <activity android:name=".UserSelfReplyActivity"></activity>
     </application>
 
 </manifest>

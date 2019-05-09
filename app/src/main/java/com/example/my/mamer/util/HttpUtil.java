@@ -98,6 +98,13 @@ public class HttpUtil {
         Request request=new Request.Builder().url(GET_TOPIC_REPLY_LIST).build();
         client.newCall(request).enqueue(callback);
     }
+//    获取用户回复列表
+    public static void sendOkHttpGetUserReplyList(String userId,okhttp3.Callback callback){
+        String GET_USER_REPLY_LIST="https://mamer.club/api/users/"+userId+"/replies?include=topic,user&page=1";
+        OkHttpClient client=new OkHttpClient();
+        Request request=new Request.Builder().url(GET_USER_REPLY_LIST).build();
+        client.newCall(request).enqueue(callback);
+    }
 //    获取活跃用户
     public static void sendOkHttpGetUserRecommend(okhttp3.Callback callback){
         OkHttpClient client=new OkHttpClient();
