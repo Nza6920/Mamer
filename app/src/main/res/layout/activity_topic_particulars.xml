@@ -149,6 +149,8 @@
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:layout_alignParentBottom="true"
+        android:clickable="true"
+        android:background="#29444444"
         android:visibility="gone">
         <Button
             android:layout_width="40dp"
@@ -156,6 +158,7 @@
             android:layout_marginLeft="15dp"
             android:background="@mipmap/ic_topic_particulars_comment"/>
         <Button
+            android:id="@+id/topic_particulars_comment_btn"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:hint="我要评论"

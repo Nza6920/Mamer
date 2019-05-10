@@ -61,6 +61,7 @@ public class TopicParticularsActivity extends AppCompatActivity {
     private Button btnReply;
 //    外部评论
     private LinearLayout layoutComment;
+    private Button btnComment;
     private ArrayList<TopicContent> listData=new ArrayList<>();
     private LoadingDraw loadingDraw;
 //评论列表仅显示一个,有评论就显示，没有就不显示
@@ -132,6 +133,7 @@ public class TopicParticularsActivity extends AppCompatActivity {
         btnEdit=findViewById(R.id.topic_particulars_edit);
         btnReply=findViewById(R.id.topic_particulars_reply);
         layoutComment=findViewById(R.id.topic_particulars_comment);
+        btnComment=findViewById(R.id.topic_particulars_comment_btn);
         replyNone=findViewById(R.id.reply_none);
 
 
@@ -230,7 +232,7 @@ public class TopicParticularsActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-        layoutComment.setOnClickListener(new View.OnClickListener() {
+        btnComment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent=new Intent(TopicParticularsActivity.this,TopicReplyPublishActivity.class);

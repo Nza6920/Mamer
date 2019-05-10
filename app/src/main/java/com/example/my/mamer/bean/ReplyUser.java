@@ -8,6 +8,8 @@ public class ReplyUser {
     private String essayId;
     private String content;
     private String title;
+    private String UserInfo;
+    private String emil;
 
     public ReplyUser(){}
     public ReplyUser(String userId, String userImg, String userName, String replyId, String essayId, String content) {
@@ -73,5 +75,21 @@ public class ReplyUser {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getUserInfo() {
+        return UserInfo;
+    }
+
+    public void setUserInfo(String userInfo) {
+        UserInfo = userInfo;
+    }
+
+    public String getEmil() {
+        return emil;
+    }
+
+    public void setEmil(String emil) {
+        this.emil = emil;
     }
 }

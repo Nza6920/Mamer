@@ -274,7 +274,6 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
     private void loginSuccess(JSONObject jresp) throws JSONException {
-        loadingDraw.show();
         User user=new User();
         GlobalUserInfo.userInfo.user=user;
         GlobalUserInfo.userInfo.token=jresp.getString("access_token");
@@ -283,10 +282,6 @@ public class LoginActivity extends AppCompatActivity {
         HttpUtil.sendOkHttpRequestGet(USER_INFORMATION, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                Message msg1=new Message();
-                msg1.what=DISMISS_DIALOG;
-                msg1.obj=loadingDraw;
-                msgHandler.sendMessage(msg1);
 
                 Message msg2=new Message();
                 msg2.what=MESSAGE_ERROR;
@@ -300,10 +295,6 @@ public class LoginActivity extends AppCompatActivity {
                     JSONObject jresp=new JSONObject(response.body().string());
                     switch (response.code()){
                         case HTTP_USER_GET_INFORMATION:
-                            Message msg3=new Message();
-                            msg3.what=DISMISS_DIALOG;
-                            msg3.obj=loadingDraw;
-                            msgHandler.sendMessage(msg3);
 
                             GlobalUserInfo.userInfo.user.setUserId(jresp.getString("id"));
                             GlobalUserInfo.userInfo.user.setUserName(jresp.getString("name"));

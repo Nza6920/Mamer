@@ -20,9 +20,7 @@
         <activity android:name=".RegisterPhoneNumActivity" />
         <activity android:name=".RegisterPicCode" />
         <activity android:name=".RegisterActivity" />
-        <activity android:name=".TestActivity" >
-
-        </activity>
+        <activity android:name=".TestActivity"></activity>
         <activity android:name=".LoginActivity" />
         <activity android:name=".UserHomePageActivity" />
         <activity android:name=".UserEditorInformationActivity" />
@@ -50,7 +48,8 @@
         <activity android:name=".UserSelfTopicListActivity" />
         <activity android:name=".TopicParticularsActivity" />
         <activity android:name=".TopicReplyPublishActivity" />
-        <activity android:name=".UserSelfReplyActivity"></activity>
+        <activity android:name=".UserSelfReplyActivity" />
+        <activity android:name=".ShowReplyUserActivity"></activity>
     </application>
 
 </manifest>

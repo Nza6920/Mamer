@@ -39,6 +39,7 @@ public class Config {
     //    http返回码
     public final static int HTTP_OK=201;
     public final static int HTTP_USER_GET_INFORMATION=200;
+    public final static int HTTP_DEL_REPLY_OK=204;
     public final static int HTTP_USER_ERROR=401;
     public final static int HTTP_USER_NULL=422;
     public final static int HTTP_USER_FORMAT_ERROR=403;
