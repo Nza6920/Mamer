@@ -8,6 +8,9 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 
 import static com.example.my.mamer.config.Config.CONTENT_TYPEs;
+import static com.example.my.mamer.config.Config.NOTIFICATION_LIST;
+import static com.example.my.mamer.config.Config.NOTIFICATION_READ;
+import static com.example.my.mamer.config.Config.NOTIFICATION_STATE;
 import static com.example.my.mamer.config.Config.RECOMMEND_RESOURCE;
 import static com.example.my.mamer.config.Config.USER_RECOMMEND;
 
@@ -109,7 +112,26 @@ public class HttpUtil {
     public static void sendOkHttpDelReply(String essayId,String replyId,okhttp3.Callback callback){
         String DEL_REPLY="https://mamer.club/api/topics/"+essayId+"/replies/"+replyId;
         OkHttpClient client=new OkHttpClient();
-        Request request=new Request.Builder().addHeader("Authorization",GlobalUserInfo.userInfo.tokenType+GlobalUserInfo.userInfo.token).url(DEL_REPLY).build();
+        Request request=new Request.Builder().delete().addHeader("Authorization",GlobalUserInfo.userInfo.tokenType+GlobalUserInfo.userInfo.token).url(DEL_REPLY).build();
+        client.newCall(request).enqueue(callback);
+    }
+//    消息通知列表
+    public static void sendOkHttpGetNotificationList(okhttp3.Callback callback){
+        OkHttpClient client=new OkHttpClient();
+        Request request=new Request.Builder().get().addHeader("Authorization",GlobalUserInfo.userInfo.tokenType+GlobalUserInfo.userInfo.token).url(NOTIFICATION_LIST).build();
+        client.newCall(request).enqueue(callback);
+    }
+//    未读消息数
+    public static void sendOkHttpGetNotificationState(okhttp3.Callback callback){
+        OkHttpClient client=new OkHttpClient();
+        Request request=new Request.Builder().get().addHeader("Authorization",GlobalUserInfo.userInfo.tokenType+GlobalUserInfo.userInfo.token).url(NOTIFICATION_STATE).build();
+        client.newCall(request).enqueue(callback);
+
+    }
+//    消息已读
+    public static void sendOkHttpGetNotificationRead(okhttp3.Callback callback){
+        OkHttpClient client=new OkHttpClient();
+        Request request=new Request.Builder().get().addHeader("Authorization",GlobalUserInfo.userInfo.tokenType+GlobalUserInfo.userInfo.token).url(NOTIFICATION_READ).build();
         client.newCall(request).enqueue(callback);
     }
 //    获取活跃用户

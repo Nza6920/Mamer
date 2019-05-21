@@ -36,6 +36,7 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
 //首页话题和我的
     private TopicsFragment topicsFragment;
     private UserFragment userFragment;
+    private NotificationFragment notificationFragment;
 
 //侧滑菜单
 //    private DrawerLayout drawerLayout;
@@ -51,6 +52,8 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
     private Button btnTopicClassify;
     private TextView tvTopicName;
     private Button btnTopicNewTopic;
+//    消息
+    private RelativeLayout notificationlayout;
 //    我的user bar,用户名，跳转个人资料
     private RelativeLayout userlayout;
     private TextView tvUserName;
@@ -94,6 +97,7 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
         btnTopicClassify=findViewById(R.id.topic_top_bar_classify);
         tvTopicName=findViewById(R.id.topic_top_bar_name);
         btnTopicNewTopic=findViewById(R.id.topic_top_bar_new);
+        notificationlayout=findViewById(R.id.notification_top_bar);
         userlayout=findViewById(R.id.user_top_bar);
         tvUserName=findViewById(R.id.user_top_bar_name);
         btnUserHomePage=findViewById(R.id.user_top_bar_right);
@@ -112,16 +116,21 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
         bottomNavigationBar.setBackgroundStyle(BottomNavigationBar.BACKGROUND_STYLE_STATIC);
 //        添加item数
         bottomNavigationBar.addItem(new BottomNavigationItem(R.mipmap.ic_topics_selected,"话题")
-//               选中时的颜色
-                .setActiveColor("#12A3E9")
-//               未选中时的颜色
-                .setInActiveColor("#999999")
-//              未选中时的图片资源
-                .setInactiveIconResource(R.mipmap.ic_topics_none))
-            .addItem(new BottomNavigationItem(R.mipmap.ic_personal_change,"我的")
-            .setActiveColor("#12A3E9")
-            .setInActiveColor("#999999")
-            .setInactiveIconResource(R.mipmap.ic_personal))
+            //               选中时的颜色
+                            .setActiveColor("#12A3E9")
+            //               未选中时的颜色
+                            .setInActiveColor("#999999")
+            //              未选中时的图片资源
+                            .setInactiveIconResource(R.mipmap.ic_topics_none))
+                .addItem(new BottomNavigationItem(R.mipmap.ic_notification,"信息")
+                        .setActiveColor("#12A3E9")
+                        .setInActiveColor("#999999")
+                        .setInactiveIconResource(R.mipmap.ic_notification_none))
+                .addItem(new BottomNavigationItem(R.mipmap.ic_personal_change,"我的")
+                        .setActiveColor("#12A3E9")
+                        .setInActiveColor("#999999")
+                        .setInactiveIconResource(R.mipmap.ic_personal))
+
 //                设置默认选中项
                 .setFirstSelectedPosition(lastSelectionedPosition)
                 .initialise();
@@ -169,6 +178,7 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
     private void setDefaultFragment(){
 //        隐藏user top bar
         userlayout.setVisibility(View.GONE);
+        notificationlayout.setVisibility(View.GONE);
 
         mFragmentManager=getSupportFragmentManager();
         FragmentTransaction transaction=mFragmentManager.beginTransaction();
@@ -187,6 +197,7 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
         hideFragment(transaction);
         switch (position){
             case 0:
+                notificationlayout.setVisibility(View.GONE);
                 userlayout.setVisibility(View.GONE);
                 topiclayout.setVisibility(View.VISIBLE);
 //                没有topics就创建topics
@@ -198,6 +209,9 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
                     transaction.add(R.id.fragment_content,topicsFragment);
                 }else {
 //                    如果userFragment不为空，则隐藏userFragment
+                    if (notificationFragment !=null){
+                        transaction.hide(notificationFragment);
+                    }
                     if (userFragment!=null){
                         transaction.hide(userFragment);
                     }
@@ -209,6 +223,26 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
                 break;
             case 1:
                 topiclayout.setVisibility(View.GONE);
+                userlayout.setVisibility(View.GONE);
+                notificationlayout.setVisibility(View.VISIBLE);
+                if (notificationFragment ==null){
+                    notificationFragment =new NotificationFragment();
+                }
+                if (!notificationFragment.isAdded()){
+                    transaction.add(R.id.fragment_content, notificationFragment);
+                }else {
+                    if (topicsFragment!=null){
+                        transaction.hide(topicsFragment);
+                    }
+                    if (userFragment!=null){
+                        transaction.hide(userFragment);
+                    }
+                    transaction.show(notificationFragment);
+                }
+                break;
+            case 2:
+                topiclayout.setVisibility(View.GONE);
+                notificationlayout.setVisibility(View.GONE);
                 userlayout.setVisibility(View.VISIBLE);
 
 //                没有userFragment就创建
@@ -222,6 +256,9 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
 //                    如果topicsFragment不为空，则隐藏
                     if (topicsFragment!=null){
                         transaction.hide(topicsFragment);
+                    }
+                    if (notificationFragment !=null){
+                        transaction.hide(notificationFragment);
                     }
 //                    显示userFragment
                     transaction.show(userFragment);
@@ -237,6 +274,9 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
     private void hideFragment(FragmentTransaction transaction){
         if(topicsFragment!=null){
             transaction.hide(topicsFragment);
+        }
+        if (notificationFragment !=null){
+            transaction.hide(notificationFragment);
         }
         if (userFragment!=null){
             transaction.hide(userFragment);

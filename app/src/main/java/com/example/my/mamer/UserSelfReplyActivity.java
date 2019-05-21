@@ -33,7 +33,6 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 
-import static com.example.my.mamer.config.Config.DISMISS_DIALOG;
 import static com.example.my.mamer.config.Config.HTTP_DEL_REPLY_OK;
 import static com.example.my.mamer.config.Config.HTTP_USER_ERROR;
 import static com.example.my.mamer.config.Config.HTTP_USER_GET_INFORMATION;
@@ -54,9 +53,7 @@ public class UserSelfReplyActivity extends AppCompatActivity {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what){
-                case DISMISS_DIALOG:
-                    ((LoadingDraw)msg.obj).dismiss();
-                    break;
+
                 case MESSAGE_ERROR:
                     Toast.makeText(UserSelfReplyActivity.this, (String) msg.obj, Toast.LENGTH_SHORT).show();
                     break;
@@ -111,15 +108,10 @@ public class UserSelfReplyActivity extends AppCompatActivity {
     }
 
     private void onDataLoad(){
-        loadingDraw.show();
 
         HttpUtil.sendOkHttpGetUserReplyList(GlobalUserInfo.userInfo.user.getUserId(), new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                Message msg1 = new Message();
-                msg1.what = DISMISS_DIALOG;
-                msg1.obj=loadingDraw;
-                msgHandler.sendMessage(msg1);
 
                 Message msg2 = new Message();
                 msg2.what = MESSAGE_ERROR;
@@ -135,10 +127,6 @@ public class UserSelfReplyActivity extends AppCompatActivity {
                     jresp=new JSONObject(response.body().string());
                     switch (response.code()){
                         case HTTP_USER_GET_INFORMATION:
-                            Message msg1 = new Message();
-                            msg1.what = DISMISS_DIALOG;
-                            msg1.obj=loadingDraw;
-                            msgHandler.sendMessage(msg1);
 
                             if (jresp.has("data")){
                                 jsonArray=jresp.getJSONArray("data");
@@ -208,15 +196,10 @@ public class UserSelfReplyActivity extends AppCompatActivity {
         });
     }
     private void delReply(String essayId,String replyId){
-        loadingDraw.show();
 
         HttpUtil.sendOkHttpDelReply(essayId, replyId, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                Message msg1=new Message();
-                msg1.what=DISMISS_DIALOG;
-                msg1.obj=loadingDraw;
-                msgHandler.sendMessage(msg1);
 
                 Message msg2=new Message();
                 msg2.what = MESSAGE_ERROR;
@@ -231,10 +214,6 @@ public class UserSelfReplyActivity extends AppCompatActivity {
                     switch (response.code()){
                         case HTTP_DEL_REPLY_OK:
 
-                            Message msg3=new Message();
-                            msg3.what=DISMISS_DIALOG;
-                            msg3.obj=loadingDraw;
-                            msgHandler.sendMessage(msg3);
 
                             Message msg4=new Message();
                             msg4.what=MESSAGE_ERROR;
@@ -242,10 +221,6 @@ public class UserSelfReplyActivity extends AppCompatActivity {
                             msgHandler.sendMessage(msg4);
                             break;
                         case HTTP_USER_ERROR:
-                            Message msg5=new Message();
-                            msg5.what=DISMISS_DIALOG;
-                            msg5.obj=loadingDraw;
-                            msgHandler.sendMessage(msg5);
 
                             HttpUtil.sendOkHttpRefreshToken(REFRESH_TOKEN, new Callback() {
                                 @Override

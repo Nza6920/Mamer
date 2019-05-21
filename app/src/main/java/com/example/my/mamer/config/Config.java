@@ -1,30 +1,28 @@
 package com.example.my.mamer.config;
 
-import com.example.my.mamer.bean.User;
-
 import okhttp3.MediaType;
 
 //配置类
 public class Config {
 
-    private class Globle {
-        User user;
-        String token;
-
-        Globle(User user, String token)
-        {
-            this.user = user;
-            this.token = token;
-        }
-    }
-    public static Globle globle = null;
-
-    public void login(User user, String token)
-    {
-        if (Config.globle == null) {
-            Config.globle = new Config.Globle(user, token);
-        }
-    }
+//    private class Globle {
+//        User user;
+//        String token;
+//
+//        Globle(User user, String token)
+//        {
+//            this.user = user;
+//            this.token = token;
+//        }
+//    }
+//    public static Globle globle = null;
+//
+//    public void login(User user, String token)
+//    {
+//        if (Config.globle == null) {
+//            Config.globle = new Config.Globle(user, token);
+//        }
+//    }
     public static final String PHONE_NUMBER="https://mamer.club/api/captchas";
     public static final String PIC_CODE="https://mamer.club/api/verificationCodes";
     public static final String REGISTER="https://mamer.club/api/users";
@@ -35,6 +33,9 @@ public class Config {
     public static final String USER_RECOMMEND="https://mamer.club/api/actived/users";
     public static final String RECOMMEND_RESOURCE="https://mamer.club/api/links";
     public static final String REFRESH_TOKEN="https://mamer.club/api/authorizations/current";
+    public static final String NOTIFICATION_LIST="https://mamer.club/api/user/notifications";
+    public static final String NOTIFICATION_STATE="https://mamer.club/api/user/notifications/stats";
+    public static final String NOTIFICATION_READ="https://mamer.club/api/user/read/notifications";
 
     //    http返回码
     public final static int HTTP_OK=201;

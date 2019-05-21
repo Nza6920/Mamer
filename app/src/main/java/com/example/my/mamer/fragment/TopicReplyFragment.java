@@ -48,9 +48,9 @@ public class TopicReplyFragment extends BaseLazyLoadFragment {
 
 
 
-    private final Handler msgHandler=new Handler(){
+    private  final Handler msgHandler=new Handler(new Handler.Callback() {
         @Override
-        public void handleMessage(Message msg) {
+        public boolean handleMessage(Message msg) {
             switch (msg.what){
                 case MESSAGE_ERROR:
                     Toast.makeText(getActivity(), (String) msg.obj, Toast.LENGTH_SHORT).show();
@@ -58,10 +58,9 @@ public class TopicReplyFragment extends BaseLazyLoadFragment {
                 default:
                     break;
             }
+            return false;
         }
-    };
-
-
+    });
 
 
 //初始化视图
