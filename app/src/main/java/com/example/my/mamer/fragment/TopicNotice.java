@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -68,6 +69,7 @@ public class TopicNotice extends BaseLazyLoadFragment {
         View view=inflater.inflate(R.layout.fragment_topic_content_view,container,false);
         listView=view.findViewById(R.id.topic_content_list_view);
         mAdapter=new TopicContentAdapter(getContext(),getListData());
+        Log.e("listFragment","视图公告");
         listView.setAdapter(mAdapter);
 
         return view;
@@ -84,10 +86,11 @@ public class TopicNotice extends BaseLazyLoadFragment {
     //    数据加载接口
     @Override
     public void onLazyLoad() {
-        HttpUtil.sendOkHttpGetTopicList(4," ", 1, new Callback() {
+
+        HttpUtil.sendOkHttpGetTopicList("user,category",4 ,"recent", 1, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-
+                Log.e("sendOkHttpGetTopicList","获取话题列表失败");
                 Message msg2 = new Message();
                 msg2.what = MESSAGE_ERROR;
                 msg2.obj = "服务器异常,请检查网络";
@@ -118,6 +121,7 @@ public class TopicNotice extends BaseLazyLoadFragment {
                                         JSONObject userInfo=jsonObject.getJSONObject("user");
                                         topicContent.setTopicAuthorName(userInfo.getString("name"));
                                         topicContent.setTopicAuthorId(userInfo.getString("id"));
+                                        Log.e("话题列表","user:"+userInfo.getString("avatar"));
                                         topicContent.setTopicAuthorPic(userInfo.getString("avatar"));
                                     }
                                     listData.add(topicContent);

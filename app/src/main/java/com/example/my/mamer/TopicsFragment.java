@@ -70,7 +70,6 @@ public class TopicsFragment extends Fragment {
         titleInfoLayout.addTab(titleInfoLayout.newTab().setText(listTitle.get(2)));
         titleInfoLayout.addTab(titleInfoLayout.newTab().setText(listTitle.get(3)));
         adapter=new TopicTabAdapter(getChildFragmentManager(),listFragment,listTitle);
-
 //        viewPager加载adapter
         contentInfoView.setAdapter(adapter);
 //        tabLayout加载viewPager

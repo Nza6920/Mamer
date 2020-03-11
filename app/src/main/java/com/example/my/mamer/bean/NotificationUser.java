@@ -1,5 +1,7 @@
 package com.example.my.mamer.bean;
 
+
+
 public class NotificationUser {
     private String userName;
     private String userId;
@@ -8,6 +10,7 @@ public class NotificationUser {
     private String topicName;
     private String userContent;
     private String time;
+
 
     public NotificationUser() {
     }

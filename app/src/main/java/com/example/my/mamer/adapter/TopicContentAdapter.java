@@ -82,7 +82,7 @@ public class TopicContentAdapter extends BaseAdapter {
                     .load(data.get(position).getTopicAuthorPic())
                     .apply(options)
                     .into(listViewItem.authorImage);
-        listViewItem. topicContentTitle.setText(( data.get(position)).getTopicTitle());
+        listViewItem.topicContentTitle.setText(( data.get(position)).getTopicTitle());
         listViewItem.topicAuthorName.setText(( data.get(position)).getTopicAuthorName());
         listViewItem.topicTime.setText(( data.get(position)).getCreateTime());
         listViewItem.topicDiscussCount.setText((data.get(position)).getReplyCount());

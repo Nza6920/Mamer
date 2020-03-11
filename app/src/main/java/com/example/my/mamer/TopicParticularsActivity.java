@@ -351,6 +351,7 @@ public class TopicParticularsActivity extends AppCompatActivity {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
+                Log.e("话题删除","del:"+response.code());
                     switch (response.code()){
                         case HTTP_USER_GET_INFORMATION:
                             Message msg1=new Message();

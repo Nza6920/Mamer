@@ -315,7 +315,7 @@ public class UserEditorInformationActivity extends AppCompatActivity {
                                 GlobalUserInfo.userInfo.user.setUserImg(jresp.getString("avatar"));
                                 GlobalUserInfo.userInfo.user.setUserIntroduction(jresp.getString("introduction"));
                                 GlobalUserInfo.userInfo.user.setEmail_verified(jresp.getBoolean("email_verified"));
-                                GlobalUserInfo.userInfo.user.setUserBornDate(jresp.getString("bound_phone"));
+                                GlobalUserInfo.userInfo.user.setBoundPhone(jresp.getBoolean("bound_phone"));
 
                                 Intent intent=new Intent(UserEditorInformationActivity.this,UserHomePageActivity.class);
                                 startActivity(intent);

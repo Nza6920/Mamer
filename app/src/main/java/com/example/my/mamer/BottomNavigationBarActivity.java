@@ -1,13 +1,13 @@
 package com.example.my.mamer;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -17,17 +17,20 @@ import android.widget.Toast;
 
 import com.ashokvarma.bottomnavigation.BottomNavigationBar;
 import com.ashokvarma.bottomnavigation.BottomNavigationItem;
-import com.ashokvarma.bottomnavigation.ShapeBadgeItem;
 import com.ashokvarma.bottomnavigation.TextBadgeItem;
 import com.example.my.mamer.config.GlobalUserInfo;
-import com.example.my.mamer.util.LoadingDraw;
+import com.example.my.mamer.util.HttpUtil;
 
-import static com.example.my.mamer.config.Config.DISMISS_DIALOG;
-import static com.example.my.mamer.config.Config.HTTP_OK;
-import static com.example.my.mamer.config.Config.HTTP_USER_FORMAT_ERROR;
-import static com.example.my.mamer.config.Config.HTTP_USER_NULL;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
+
 import static com.example.my.mamer.config.Config.MESSAGE_ERROR;
-import static com.example.my.mamer.config.Config.USER_SET_INFORMATION;
 
 public class BottomNavigationBarActivity extends AppCompatActivity implements BottomNavigationBar.OnTabSelectedListener {
 
@@ -52,40 +55,28 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
     private Button btnTopicClassify;
     private TextView tvTopicName;
     private Button btnTopicNewTopic;
-//    消息
+//    消息,未读消息数
     private RelativeLayout notificationlayout;
+    private String notificationNum;
 //    我的user bar,用户名，跳转个人资料
     private RelativeLayout userlayout;
     private TextView tvUserName;
     private Button btnUserHomePage;
 
-    private final Handler msgHandler=new Handler(){
+    private Handler msgHandler=new Handler(new Handler.Callback() {
         @Override
-        public void handleMessage(Message msg) {
+        public boolean handleMessage(Message msg) {
             switch (msg.what){
-                case USER_SET_INFORMATION:
-                    Toast.makeText(BottomNavigationBarActivity.this,(String)msg.obj,Toast.LENGTH_SHORT).show();
-                    break;
-                case HTTP_OK:
-                    Toast.makeText(BottomNavigationBarActivity.this,(String)msg.obj,Toast.LENGTH_SHORT).show();
-                    break;
-                case HTTP_USER_NULL:
-                    Toast.makeText(BottomNavigationBarActivity.this,(String)msg.obj,Toast.LENGTH_SHORT).show();
-                    break;
-                case HTTP_USER_FORMAT_ERROR:
-                    Toast.makeText(BottomNavigationBarActivity.this,(String)msg.obj,Toast.LENGTH_SHORT).show();
-                    break;
-                case DISMISS_DIALOG:
-                    ((LoadingDraw)msg.obj).dismiss();
-                    break;
                 case MESSAGE_ERROR:
                     Toast.makeText(BottomNavigationBarActivity.this,(String)msg.obj,Toast.LENGTH_SHORT).show();
                     break;
                 default:
                     break;
             }
+            return false;
         }
-    };
+    });
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,6 +93,8 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
         tvUserName=findViewById(R.id.user_top_bar_name);
         btnUserHomePage=findViewById(R.id.user_top_bar_right);
 //        userMenuRightFragment= (UserMenuRightFragment) mFragmentManager.findFragmentById(R.id.user_menu_right);
+
+        getNotification();
 
         init();
 //        initView();
@@ -125,6 +118,7 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
                 .addItem(new BottomNavigationItem(R.mipmap.ic_notification,"信息")
                         .setActiveColor("#12A3E9")
                         .setInActiveColor("#999999")
+                        .setBadgeItem(textBadgeItem)
                         .setInactiveIconResource(R.mipmap.ic_notification_none))
                 .addItem(new BottomNavigationItem(R.mipmap.ic_personal_change,"我的")
                         .setActiveColor("#12A3E9")
@@ -283,42 +277,29 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
         }
     }
     private TextBadgeItem textBadgeItem;
-    private ShapeBadgeItem shapeBadgeItem;
 //    展示消息点
     private void showNumberAndShape(){
-//        消息
-        textBadgeItem=new TextBadgeItem()
+        String num=getNotificationNum();
+        if (num.equals(" ")&&num.equals("0")){
+            //        消息
+            textBadgeItem=new TextBadgeItem()
 //                显示的文本
-                .setText("m")
+                    .setText("m")
 //                文本颜色
-        .setTextColor("#ffffff")
+                    .setTextColor("#ffffff")
 //                圆环宽度
-        .setBorderWidth(5)
-//                圆环颜色
-        .setBorderColor(Color.parseColor("#000000"))
+                    .setBorderWidth(5)
+//               圆环颜色
+//        .setBorderColor(Color.parseColor("#fff"))
 //                背景颜色
-        .setBackgroundColor("#FF4081")
+                    .setBackgroundColor("#ff0008")
 //                选中是否隐藏
-        .setHideOnSelect(true)
+                    .setHideOnSelect(false)
 //                隐藏与动画的过渡时间
-        .setAnimationDuration(300)
+//        .setAnimationDuration(300)
 //                位置，默认右上角
-        .setGravity(Gravity.RIGHT|Gravity.TOP);
-
-//        形状
-        shapeBadgeItem=new ShapeBadgeItem()
-//                也可以设置为常量,形状
-        .setShape(ShapeBadgeItem.SHAPE_OVAL)
-//                颜色
-        .setShapeColor(Color.RED)
-//                距离item的边距，dp
-        .setEdgeMarginInDp(this,0)
-//                高宽值
-        .setSizeInDp(this,15,15)
-//                隐藏和展示的动画速度mm，和setHideOnSelect一起用
-        .setAnimationDuration(300)
-//                当选中状态时消失
-        .setHideOnSelect(true);
+                    .setGravity(Gravity.RIGHT|Gravity.TOP);
+        }
     }
 
     @Override
@@ -357,4 +338,43 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
 //        });
 //        userMenuRightFragment.setDrawerLayout(drawerLayout);
 //    }
+
+    private void getNotification(){
+        Log.i("getNotification","进入获取,此处不需要做权限");
+
+            HttpUtil.sendOkHttpGetNotificationState(new Callback() {
+
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    Message msg1 = new Message();
+                    msg1.what = MESSAGE_ERROR;
+                    msg1.obj = "服务器异常,请检查网络";
+                    msgHandler.sendMessage(msg1);
+                }
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    JSONObject jresp=null;
+                    try {
+                        jresp=new JSONObject(response.body().string());
+                        if (jresp.has("unread_count")){
+                            setNotificationNum(jresp.getString("unread_count"));
+                            showNumberAndShape();
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+
+
+    }
+
+    public void setNotificationNum(String notificationNum) {
+        this.notificationNum = notificationNum;
+    }
+
+    public String getNotificationNum() {
+        return notificationNum;
+    }
 }

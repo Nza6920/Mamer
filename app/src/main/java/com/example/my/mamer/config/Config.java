@@ -23,19 +23,19 @@ public class Config {
 //            Config.globle = new Config.Globle(user, token);
 //        }
 //    }
-    public static final String PHONE_NUMBER="https://mamer.club/api/captchas";
-    public static final String PIC_CODE="https://mamer.club/api/verificationCodes";
-    public static final String REGISTER="https://mamer.club/api/users";
-    public static final String LOGIN="https://mamer.club/api/authorizations";
-    public static final String USER_INFORMATION="https://mamer.club/api/user";
-    public static final String USER_AVATAR_IMG="https://mamer.club/api/images";
-    public static final String NEW_TOPIC_INFO="https://mamer.club/api/topics";
-    public static final String USER_RECOMMEND="https://mamer.club/api/actived/users";
-    public static final String RECOMMEND_RESOURCE="https://mamer.club/api/links";
-    public static final String REFRESH_TOKEN="https://mamer.club/api/authorizations/current";
-    public static final String NOTIFICATION_LIST="https://mamer.club/api/user/notifications";
-    public static final String NOTIFICATION_STATE="https://mamer.club/api/user/notifications/stats";
-    public static final String NOTIFICATION_READ="https://mamer.club/api/user/read/notifications";
+    public static final String PHONE_NUMBER="http://www.mamer.club/api/captchas";
+    public static final String PIC_CODE="http://www.mamer.club/api/verificationCodes";
+    public static final String REGISTER="http://www.mamer.club/api/users";
+    public static final String LOGIN="http://www.mamer.club/api/authorizations";
+    public static final String USER_INFORMATION="http://www.mamer.club/api/user";
+    public static final String USER_AVATAR_IMG="http://www.mamer.club/api/images";
+    public static final String NEW_TOPIC_INFO="http://www.mamer.club/api/topics";
+    public static final String USER_RECOMMEND="http://www.mamer.club/api/actived/users";
+    public static final String RECOMMEND_RESOURCE="http://www.mamer.club/api/links";
+    public static final String REFRESH_TOKEN="http://www.mamer.club/api/authorizations/current";
+    public static final String NOTIFICATION_LIST="http://www.mamer.club/api/user/notifications";
+    public static final String NOTIFICATION_STATE="http://www.mamer.club/api/user/notifications/stats";
+    public static final String NOTIFICATION_READ="http://www.mamer.club/api/user/read/notifications";
 
     //    http返回码
     public final static int HTTP_OK=201;

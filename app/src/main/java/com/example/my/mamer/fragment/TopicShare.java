@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,6 +39,7 @@ import static com.example.my.mamer.config.Config.USER_SET_INFORMATION;
 public class TopicShare extends BaseLazyLoadFragment {
 
 
+
     private ListView listView;
     private ArrayList<TopicContent> listData=new ArrayList<>();
     private TopicContentAdapter mAdapter;
@@ -68,6 +70,7 @@ public class TopicShare extends BaseLazyLoadFragment {
         View view=inflater.inflate(R.layout.fragment_topic_content_view,container,false);
         listView=view.findViewById(R.id.topic_content_list_view);
         mAdapter=new TopicContentAdapter(getContext(),getListData());
+        Log.e("listFragment","视图share");
         listView.setAdapter(mAdapter);
 
         return view;
@@ -84,7 +87,7 @@ public class TopicShare extends BaseLazyLoadFragment {
     //    数据加载接口
     @Override
     public void onLazyLoad() {
-        HttpUtil.sendOkHttpGetTopicList(1," ", 1, new Callback() {
+        HttpUtil.sendOkHttpGetTopicList("user,category",1,"recent", 1, new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
 
@@ -120,6 +123,7 @@ public class TopicShare extends BaseLazyLoadFragment {
                                             topicContent.setTopicAuthorId(userInfo.getString("id"));
                                             topicContent.setTopicAuthorPic(userInfo.getString("avatar"));
                                         }
+                                        Log.i("话题列表","1:"+topicContent.getTopicAuthorPic());
                                         listData.add(topicContent);
                                     }
                                     Message msg3 = new Message();

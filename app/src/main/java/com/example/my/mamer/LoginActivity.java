@@ -13,6 +13,7 @@ import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.style.AbsoluteSizeSpan;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -307,6 +308,8 @@ public class LoginActivity extends AppCompatActivity {
                             GlobalUserInfo.userInfo.user.setEmail_verified(jresp.getBoolean("email_verified"));
 //                            注册
                             GlobalUserInfo.userInfo.user.setUserBornDate(jresp.getString("created_at"));
+
+                            Log.e("userImg","img:"+ GlobalUserInfo.userInfo.user.getUserPassKey());
 
                             new Thread(){
                                 public void run(){

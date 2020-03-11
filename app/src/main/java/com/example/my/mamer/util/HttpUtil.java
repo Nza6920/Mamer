@@ -1,5 +1,7 @@
 package com.example.my.mamer.util;
 
+import android.util.Log;
+
 import com.example.my.mamer.config.GlobalUserInfo;
 
 import okhttp3.MediaType;
@@ -59,36 +61,37 @@ public class HttpUtil {
         client.newCall(request).enqueue(callback);
     }
 //获取所有话题列表
-    public static void sendOkHttpGetTopicList(int categoryId,String order,int pageCount,okhttp3.Callback callback){
-        String TOPIC_LIST="https://mamer.club/api/topics?include=user&category_id="+categoryId+"&order="+order+"&page="+pageCount;
+    public static void sendOkHttpGetTopicList(String include,int categoryId,String order,int pageCount,okhttp3.Callback callback){
+        String TOPIC_LIST="http://www.mamer.club/api/topics?include="+include+"&category_id="+categoryId+"&order="+order+"&page="+pageCount;
+        Log.e("sendOkHttpGetTopicList",TOPIC_LIST);
         OkHttpClient client=new OkHttpClient();
-        Request request=new Request.Builder().addHeader("Authorization", GlobalUserInfo.userInfo.tokenType+GlobalUserInfo.userInfo.token ).url(TOPIC_LIST).build();
+        Request request=new Request.Builder().url(TOPIC_LIST).build();
         client.newCall(request).enqueue(callback);
     }
 //    获取某一用户话题列表
     public static void sendOkHttpGetUserTopicList(String userId,int pageCount,okhttp3.Callback callback){
-        String USER_TOPIC_LIST="https://mamer.club/api/users/"+userId+"/topics?page="+pageCount;
+        String USER_TOPIC_LIST="http://www.mamer.club/api/users/"+userId+"/topics?page="+pageCount;
         OkHttpClient client=new OkHttpClient();
         Request request=new Request.Builder().url(USER_TOPIC_LIST).build();
         client.newCall(request).enqueue(callback);
     }
 //    获取某一话题详情
     public static void sendOkHttpGetTopicParticulars(String essayId,okhttp3.Callback callback){
-        String TOPIC_PARTICULARS="https://mamer.club/api/topics/"+essayId+"?include=user";
+        String TOPIC_PARTICULARS="http://www.mamer.club/api/topics/"+essayId+"?include=user";
         OkHttpClient client=new OkHttpClient();
         Request request=new Request.Builder().url(TOPIC_PARTICULARS).build();
         client.newCall(request).enqueue(callback);
     }
 //    删除话题
     public static void sendOkHttpDelTopic(String essayId,okhttp3.Callback callback){
-        String DEL_TOPIC="https://mamer.club/api/topics/"+essayId;
+        String DEL_TOPIC="http://www.mamer.club/api/topics/"+essayId;
         OkHttpClient client=new OkHttpClient();
         Request request=new Request.Builder().delete().addHeader("Authorization", GlobalUserInfo.userInfo.tokenType+GlobalUserInfo.userInfo.token).addHeader("Content-Type",CONTENT_TYPEs).url(DEL_TOPIC).build();
         client.newCall(request).enqueue(callback);
     }
 //    用户发布评论
     public static  void sendOkHttpPostReply(String essayId,RequestBody requestBody,okhttp3.Callback callback){
-        String Post_Reply="https://mamer.club/api/topics/"+essayId+"/replies";
+        String Post_Reply="http://www.mamer.club/api/topics/"+essayId+"/replies";
 
         OkHttpClient client=new OkHttpClient();
         Request request=new Request.Builder().post(requestBody).addHeader("Authorization",GlobalUserInfo.userInfo.tokenType+GlobalUserInfo.userInfo.token).url(Post_Reply).build();
@@ -96,21 +99,21 @@ public class HttpUtil {
     }
 //    获取话题回复列表
     public static void sendOkHttpGetTopicReplyList(String essayId,okhttp3.Callback callback){
-        String GET_TOPIC_REPLY_LIST="https://mamer.club/api/topics/"+essayId+"/replies?include=user&page=1";
+        String GET_TOPIC_REPLY_LIST="http://www.mamer.club/api/topics/"+essayId+"/replies?include=user&page=1";
         OkHttpClient client=new OkHttpClient();
         Request request=new Request.Builder().url(GET_TOPIC_REPLY_LIST).build();
         client.newCall(request).enqueue(callback);
     }
 //    获取用户回复列表
     public static void sendOkHttpGetUserReplyList(String userId,okhttp3.Callback callback){
-        String GET_USER_REPLY_LIST="https://mamer.club/api/users/"+userId+"/replies?include=topic,user&page=1";
+        String GET_USER_REPLY_LIST="http://www.mamer.club/api/users/"+userId+"/replies?include=topic,user&page=1";
         OkHttpClient client=new OkHttpClient();
         Request request=new Request.Builder().url(GET_USER_REPLY_LIST).build();
         client.newCall(request).enqueue(callback);
     }
 //    删除回复
     public static void sendOkHttpDelReply(String essayId,String replyId,okhttp3.Callback callback){
-        String DEL_REPLY="https://mamer.club/api/topics/"+essayId+"/replies/"+replyId;
+        String DEL_REPLY="http://mamer.club/api/topics/"+essayId+"/replies/"+replyId;
         OkHttpClient client=new OkHttpClient();
         Request request=new Request.Builder().delete().addHeader("Authorization",GlobalUserInfo.userInfo.tokenType+GlobalUserInfo.userInfo.token).url(DEL_REPLY).build();
         client.newCall(request).enqueue(callback);
