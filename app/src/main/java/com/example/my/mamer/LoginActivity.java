@@ -1,6 +1,5 @@
 package com.example.my.mamer;
 
-import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -319,8 +318,8 @@ public class LoginActivity extends AppCompatActivity {
                                 }
                             }.start();
 
-                            Intent intent=new Intent(LoginActivity.this,UserHomePageActivity.class);
-                            startActivity(intent);
+                            /*Intent intent=new Intent(LoginActivity.this,UserHomePageActivity.class);
+                            startActivity(intent);*/
                             finish();
                             break;
 //                            令牌失效，重新请求

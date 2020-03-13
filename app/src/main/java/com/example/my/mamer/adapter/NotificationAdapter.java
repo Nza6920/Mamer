@@ -69,11 +69,14 @@ public class NotificationAdapter extends BaseAdapter {
         RequestOptions options=new RequestOptions()
                 .error(R.mipmap.ic_image_error)
                 .placeholder(R.mipmap.ic_image_error);
-        Glide.with(getContext())
-                .asBitmap()
-                .load(notificationData.get(i).getUserImg())
-                .apply(options)
-                .into(listViewItem.userImg);
+        if (listViewItem.userImg != null) {
+
+            Glide.with(getContext())
+                    .asBitmap()
+                    .load(notificationData.get(i).getUserImg())
+                    .apply(options)
+                    .into(listViewItem.userImg);
+        }
         listViewItem.tvUserName.setText(notificationData.get(i).getUserName());
         listViewItem.tvTopic.setText(notificationData.get(i).getTopicName());
         listViewItem.tvContent.setText(notificationData.get(i).getUserContent());

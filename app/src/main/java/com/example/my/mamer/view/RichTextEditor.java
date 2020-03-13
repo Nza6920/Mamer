@@ -8,6 +8,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.content.ContextCompat;
+import android.text.Html;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -23,7 +24,6 @@ import android.widget.TextView;
 
 import com.example.my.mamer.MyApplication;
 import com.example.my.mamer.R;
-import com.example.my.mamer.bean.User;
 import com.example.my.mamer.config.GlobalUserInfo;
 import com.example.my.mamer.util.BaseUtils;
 import com.example.my.mamer.util.IdUtils;
@@ -212,6 +212,7 @@ public class RichTextEditor extends ScrollView {
         editText.setTag(viewTagIndex++);
         editText.setPadding(editNormalPadding,padding,editNormalPadding,padding);
         editText.setHint(hint);
+        editText.setText(Html.fromHtml("韩国v看见八年<img src=\\\"http://www.mamer.club/uploads/images/topics/202003/11/12_1583918205_fk8oe7t9Mk.jpeg\\\" alt=\\\"12_1583918205_fk8oe7t9Mk.jpeg\\\" /></p></div>"));
         editText.setOnFocusChangeListener(focusChangeListener);
         editText.setLineSpacing(BaseUtils.getInstance().dip2px(6),1);
 //        动态修改光标颜色，反射

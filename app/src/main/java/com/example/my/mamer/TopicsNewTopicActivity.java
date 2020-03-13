@@ -91,9 +91,9 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
     private int inputStrCountTag;
 
 
-    private final Handler msgHandler=new Handler(){
+    private  Handler msgHandler=new Handler(new Handler.Callback() {
         @Override
-        public void handleMessage(Message msg) {
+        public boolean handleMessage(Message msg) {
             switch (msg.what){
                 case USER_SET_INFORMATION:
                     Toast.makeText(TopicsNewTopicActivity.this,(String)msg.obj,Toast.LENGTH_SHORT).show();
@@ -116,8 +116,9 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
                 default:
                     break;
             }
+            return false;
         }
-    };
+    });
 
     @Override
     protected void setContentView() {
@@ -245,8 +246,8 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
                 }
                 break;
             case R.id.title_tv_close:
-                Intent i=new Intent(TopicsNewTopicActivity.this,BottomNavigationBarActivity.class);
-                startActivity(i);
+                /*Intent i=new Intent(TopicsNewTopicActivity.this,BottomNavigationBarActivity.class);
+                startActivity(i);*/
                 finish();
                 break;
                 default:

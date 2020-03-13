@@ -94,11 +94,10 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
         btnUserHomePage=findViewById(R.id.user_top_bar_right);
 //        userMenuRightFragment= (UserMenuRightFragment) mFragmentManager.findFragmentById(R.id.user_menu_right);
 
-        getNotification();
-
         init();
 //        initView();
     }
+
 //初始底部导航栏
     private void init(){
 //        item个数《=3
@@ -138,6 +137,7 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
 
             }
         });
+//       消息(右上角)-->新建话题
         btnTopicNewTopic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -152,6 +152,7 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
                 }
             }
         });
+//        我的(右上角)-->个人信息界面
         btnUserHomePage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -181,7 +182,8 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
         transaction.add(R.id.fragment_content,topicsFragment);
         transaction.commit();
     }
-//    切换事件
+
+//    底部导航栏-->切换事件
     @Override
     public void onTabSelected(int position) {
 //        每次点击赋值
@@ -276,6 +278,16 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
             transaction.hide(userFragment);
         }
     }
+
+//    获取未读消息数，循环间隔发起
+    @Override
+    protected void onResume() {
+        Log.e("Tag",":onResume()");
+        super.onResume();
+//        getNotification();
+    }
+
+    //    底部导航-->消息界面
     private TextBadgeItem textBadgeItem;
 //    展示消息点
     private void showNumberAndShape(){
@@ -284,7 +296,7 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
             //        消息
             textBadgeItem=new TextBadgeItem()
 //                显示的文本
-                    .setText("m")
+                    .setText(num)
 //                文本颜色
                     .setTextColor("#ffffff")
 //                圆环宽度
@@ -339,9 +351,11 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
 //        userMenuRightFragment.setDrawerLayout(drawerLayout);
 //    }
 
+//    获取公告消息数
     private void getNotification(){
         Log.i("getNotification","进入获取,此处不需要做权限");
 
+        if(MyApplication.globalUserInfo.token.equals(""))
             HttpUtil.sendOkHttpGetNotificationState(new Callback() {
 
                 @Override

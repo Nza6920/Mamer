@@ -123,10 +123,9 @@ public class UserFragment extends Fragment implements View.OnClickListener {
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-//        判断是否登录
-        if (GlobalUserInfo.userInfo.token ==null){
+    public void onResume() {
+        super.onResume();
+        if (MyApplication.globalUserInfo.token ==null){
             userUnloginLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -139,6 +138,13 @@ public class UserFragment extends Fragment implements View.OnClickListener {
             userUnloginLayout.setVisibility(View.GONE);
             userMamerEnergyLayout.setVisibility(View.VISIBLE);
         }
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+//        判断是否登录
+
  //        获取数据
         getUserRecommend();
         getRecommendResource();

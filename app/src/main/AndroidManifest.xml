@@ -44,12 +44,13 @@
         </activity>
         <activity
             android:name=".TopicsNewTopicActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:launchMode="singleTask"/>
         <activity android:name=".UserSelfTopicListActivity" />
         <activity android:name=".TopicParticularsActivity" />
         <activity android:name=".TopicReplyPublishActivity" />
         <activity android:name=".UserSelfReplyActivity" />
-        <activity android:name=".ShowReplyUserActivity"></activity>
+        <activity android:name=".ShowReplyUserActivity"/>
     </application>
 
 </manifest>
