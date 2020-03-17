@@ -15,12 +15,12 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.example.my.mamer.LoginActivity;
+import com.example.my.mamer.MyApplication;
 import com.example.my.mamer.R;
 import com.example.my.mamer.ShowReplyUserActivity;
 import com.example.my.mamer.adapter.TopicReplyAdapter;
 import com.example.my.mamer.bean.ReplyUser;
 import com.example.my.mamer.config.GlobalTopicReply;
-import com.example.my.mamer.config.GlobalUserInfo;
 import com.example.my.mamer.util.HttpUtil;
 
 import org.json.JSONArray;
@@ -80,6 +80,7 @@ public class TopicReplyFragment extends BaseLazyLoadFragment {
     public void setReplyUsers(ArrayList<ReplyUser> replyUsers) {
         this.replyUsers = replyUsers;
     }
+
 //    数据
     @Override
     public void onLazyLoad() {
@@ -152,8 +153,8 @@ public class TopicReplyFragment extends BaseLazyLoadFragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(final AdapterView<?> adapterView, final View view, final int position, long l) {
-                if (GlobalUserInfo.userInfo.token!=null){
-                    if (replyUsers.get(position).getUserId().equals(GlobalUserInfo.userInfo.user.getUserId())){
+                if (MyApplication.globalUserInfo.token!=null){
+                    if (replyUsers.get(position).getUserId().equals(MyApplication.globalUserInfo.user.getUserId())){
                         AlertDialog.Builder builder=new AlertDialog.Builder(getContext());
                         builder.setPositiveButton("删除该回复", new DialogInterface.OnClickListener() {
                             @Override
@@ -246,8 +247,8 @@ public class TopicReplyFragment extends BaseLazyLoadFragment {
                                     try {
                                         JSONObject jrep= new JSONObject(response.body().string());
 
-                                        GlobalUserInfo.userInfo.token=jrep.getString("access_token");
-                                        GlobalUserInfo.userInfo.tokenType=jrep.getString("token_type");
+                                        MyApplication.globalUserInfo.token=jrep.getString("access_token");
+                                        MyApplication.globalUserInfo.tokenType=jrep.getString("token_type");
 
                                         Message msg1 = new Message();
                                         msg1.what = MESSAGE_ERROR;

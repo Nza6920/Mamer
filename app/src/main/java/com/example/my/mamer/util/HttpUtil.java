@@ -2,7 +2,7 @@ package com.example.my.mamer.util;
 
 import android.util.Log;
 
-import com.example.my.mamer.config.GlobalUserInfo;
+import com.example.my.mamer.MyApplication;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -30,14 +30,14 @@ public class HttpUtil {
 //获取用户信息
     public static void sendOkHttpRequestGet(String address,okhttp3.Callback callback){
         OkHttpClient client=new OkHttpClient();
-        Request request=new Request.Builder().addHeader("Authorization", GlobalUserInfo.userInfo.tokenType+GlobalUserInfo.userInfo.token ).url(address).build();
+        Request request=new Request.Builder().addHeader("Authorization", MyApplication.globalUserInfo.tokenType+MyApplication.globalUserInfo.token ).url(address).build();
         client.newCall(request).enqueue(callback);
     }
 //编辑用户信息
     public static void sendOkHttpRequestPatch(String address,final  RequestBody requestBody,final okhttp3.Callback callback){
         OkHttpClient client=new OkHttpClient();
 
-        Request request=new Request.Builder().patch(requestBody).addHeader("Authorization", GlobalUserInfo.userInfo.tokenType+GlobalUserInfo.userInfo.token ).addHeader("Content-Type",CONTENT_TYPEs).url(address).build();
+        Request request=new Request.Builder().patch(requestBody).addHeader("Authorization", MyApplication.globalUserInfo.tokenType+MyApplication.globalUserInfo.token ).addHeader("Content-Type",CONTENT_TYPEs).url(address).build();
         client.newCall(request).enqueue(callback);
     }
 //下载头像
@@ -50,14 +50,14 @@ public class HttpUtil {
     public static void sendOkHttpRequestAvatars(String address, final RequestBody requestBody,final okhttp3.Callback callback){
         OkHttpClient client=new OkHttpClient();
 
-        Request request=new Request.Builder().addHeader("Authorization", GlobalUserInfo.userInfo.tokenType+GlobalUserInfo.userInfo.token ).url(address).post(requestBody).build();
+        Request request=new Request.Builder().addHeader("Authorization", MyApplication.globalUserInfo.tokenType+MyApplication.globalUserInfo.token ).url(address).post(requestBody).build();
         client.newCall(request).enqueue(callback);
     }
 //    上传新建话题
     public static void sendOkHttpRequestNewTopic(String address,final RequestBody requestBody,final okhttp3.Callback callback){
         OkHttpClient client=new OkHttpClient();
 
-        Request request=new Request.Builder().addHeader("Authorization", GlobalUserInfo.userInfo.tokenType+GlobalUserInfo.userInfo.token ).url(address).post(requestBody).build();
+        Request request=new Request.Builder().addHeader("Authorization", MyApplication.globalUserInfo.tokenType+MyApplication.globalUserInfo.token ).url(address).post(requestBody).build();
         client.newCall(request).enqueue(callback);
     }
 //获取所有话题列表
@@ -86,7 +86,7 @@ public class HttpUtil {
     public static void sendOkHttpDelTopic(String essayId,okhttp3.Callback callback){
         String DEL_TOPIC="http://www.mamer.club/api/topics/"+essayId;
         OkHttpClient client=new OkHttpClient();
-        Request request=new Request.Builder().delete().addHeader("Authorization", GlobalUserInfo.userInfo.tokenType+GlobalUserInfo.userInfo.token).addHeader("Content-Type",CONTENT_TYPEs).url(DEL_TOPIC).build();
+        Request request=new Request.Builder().delete().addHeader("Authorization", MyApplication.globalUserInfo.tokenType+MyApplication.globalUserInfo.token).addHeader("Content-Type",CONTENT_TYPEs).url(DEL_TOPIC).build();
         client.newCall(request).enqueue(callback);
     }
 //    用户发布评论
@@ -94,7 +94,7 @@ public class HttpUtil {
         String Post_Reply="http://www.mamer.club/api/topics/"+essayId+"/replies";
 
         OkHttpClient client=new OkHttpClient();
-        Request request=new Request.Builder().post(requestBody).addHeader("Authorization",GlobalUserInfo.userInfo.tokenType+GlobalUserInfo.userInfo.token).url(Post_Reply).build();
+        Request request=new Request.Builder().post(requestBody).addHeader("Authorization",MyApplication.globalUserInfo.tokenType+MyApplication.globalUserInfo.token).url(Post_Reply).build();
         client.newCall(request).enqueue(callback);
     }
 //    获取话题回复列表
@@ -105,8 +105,8 @@ public class HttpUtil {
         client.newCall(request).enqueue(callback);
     }
 //    获取用户回复列表
-    public static void sendOkHttpGetUserReplyList(String userId,okhttp3.Callback callback){
-        String GET_USER_REPLY_LIST="http://www.mamer.club/api/users/"+userId+"/replies?include=topic,user&page=1";
+    public static void sendOkHttpGetUserReplyList(String userId,int page,okhttp3.Callback callback){
+        String GET_USER_REPLY_LIST="http://www.mamer.club/api/users/"+userId+"/replies?page="+page;
         OkHttpClient client=new OkHttpClient();
         Request request=new Request.Builder().url(GET_USER_REPLY_LIST).build();
         client.newCall(request).enqueue(callback);
@@ -115,26 +115,26 @@ public class HttpUtil {
     public static void sendOkHttpDelReply(String essayId,String replyId,okhttp3.Callback callback){
         String DEL_REPLY="http://mamer.club/api/topics/"+essayId+"/replies/"+replyId;
         OkHttpClient client=new OkHttpClient();
-        Request request=new Request.Builder().delete().addHeader("Authorization",GlobalUserInfo.userInfo.tokenType+GlobalUserInfo.userInfo.token).url(DEL_REPLY).build();
+        Request request=new Request.Builder().delete().addHeader("Authorization",MyApplication.globalUserInfo.tokenType+MyApplication.globalUserInfo.token).url(DEL_REPLY).build();
         client.newCall(request).enqueue(callback);
     }
 //    消息通知列表
     public static void sendOkHttpGetNotificationList(okhttp3.Callback callback){
         OkHttpClient client=new OkHttpClient();
-        Request request=new Request.Builder().get().addHeader("Authorization",GlobalUserInfo.userInfo.tokenType+GlobalUserInfo.userInfo.token).url(NOTIFICATION_LIST).build();
+        Request request=new Request.Builder().get().addHeader("Authorization",MyApplication.globalUserInfo.tokenType+MyApplication.globalUserInfo.token).url(NOTIFICATION_LIST).build();
         client.newCall(request).enqueue(callback);
     }
 //    未读消息数
     public static void sendOkHttpGetNotificationState(okhttp3.Callback callback){
         OkHttpClient client=new OkHttpClient();
-        Request request=new Request.Builder().get().addHeader("Authorization",GlobalUserInfo.userInfo.tokenType+GlobalUserInfo.userInfo.token).url(NOTIFICATION_STATE).build();
+        Request request=new Request.Builder().get().addHeader("Authorization",MyApplication.globalUserInfo.tokenType+MyApplication.globalUserInfo.token).url(NOTIFICATION_STATE).build();
         client.newCall(request).enqueue(callback);
 
     }
 //    消息已读
     public static void sendOkHttpGetNotificationRead(okhttp3.Callback callback){
         OkHttpClient client=new OkHttpClient();
-        Request request=new Request.Builder().get().addHeader("Authorization",GlobalUserInfo.userInfo.tokenType+GlobalUserInfo.userInfo.token).url(NOTIFICATION_READ).build();
+        Request request=new Request.Builder().get().addHeader("Authorization",MyApplication.globalUserInfo.tokenType+MyApplication.globalUserInfo.token).url(NOTIFICATION_READ).build();
         client.newCall(request).enqueue(callback);
     }
 //    获取活跃用户
@@ -152,7 +152,7 @@ public class HttpUtil {
 //    刷新token
     public static void sendOkHttpRefreshToken(String address,okhttp3.Callback callback){
         OkHttpClient client=new OkHttpClient();
-        Request request=new Request.Builder().addHeader("Authorization",GlobalUserInfo.userInfo.tokenType+GlobalUserInfo.userInfo.token).url(address).build();
+        Request request=new Request.Builder().addHeader("Authorization",MyApplication.globalUserInfo.tokenType+MyApplication.globalUserInfo.token).url(address).build();
         client.newCall(request).enqueue(callback);
     }
 }

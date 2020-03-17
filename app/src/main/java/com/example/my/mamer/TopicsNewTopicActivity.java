@@ -20,7 +20,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.my.mamer.config.GlobalUserInfo;
 import com.example.my.mamer.util.HttpUtil;
 import com.example.my.mamer.util.LoadingDraw;
 import com.example.my.mamer.view.RichTextEditor;
@@ -124,8 +123,8 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
     protected void setContentView() {
         setContentView(R.layout.activity_topics_new_topic);
         loadingDraw=new LoadingDraw(this);
-        GlobalUserInfo.userInfo.user.imagePaths.clear();
-        GlobalUserInfo.userInfo.user.imageContentPaths.clear();
+        MyApplication.globalUserInfo.user.imagePaths.clear();
+        MyApplication.globalUserInfo.user.imageContentPaths.clear();
     }
 
     @Override
@@ -233,21 +232,19 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
                 break;
             case R.id.title_btn_next:
 //                先提交图片，获取所有需要提交的图片imagePath
-                HashMap<Integer,String> imagesPaths=  GlobalUserInfo.userInfo.user.getImagePaths();
+                HashMap<Integer,String> imagesPaths=  MyApplication.globalUserInfo.user.getImagePaths();
 //遍历hash
                 Iterator iterator=imagesPaths.keySet().iterator();
                 while (iterator.hasNext()){
                     Integer IdKey= (Integer) iterator.next();
                     String imagePath=imagesPaths.get(IdKey);
 //                    提交
-                    String imagePathInfo="第"+imageInfo+"张图片";
-                    postNewTopicPics(imagePath,imagePathInfo);
-                    imageInfo++;
+//                    String imagePathInfo="第"+imageInfo+"张图片";
+                    postNewTopicPics(imagePath);
+//                    imageInfo++;
                 }
                 break;
             case R.id.title_tv_close:
-                /*Intent i=new Intent(TopicsNewTopicActivity.this,BottomNavigationBarActivity.class);
-                startActivity(i);*/
                 finish();
                 break;
                 default:
@@ -311,7 +308,7 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
         if (resultCode==RESULT_OK){
 //            从相册获取
             if (requestCode==RESULT_LODA_IMAGE&& null!=data){
-//判断手机系统版本号
+//            判断手机系统版本号
                 try {
                     handleImageOnKitKat(data);
                     Log.e("imagePath", String.valueOf(data));
@@ -368,7 +365,7 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
 //                    将EditText中的换行符，空格符转换成html
                     String inputStr=itemData.inputStr.replace("\n","<p></p>").replace(" ","&nbsp;");
                     content.append("<p>").append(inputStr).append("</p>");
-                }else if ( GlobalUserInfo.userInfo.user.imageContentPaths!=null){
+                }else if ( MyApplication.globalUserInfo.user.imageContentPaths!=null){
                     content.append("<p style=\"text-align:center\"><img width=\"100%\" src=\"").append(itemData.imagePath).append("\"/></p>");
                 }
                 int inputStrCount=getInputEditStr(itemData.inputStr);
@@ -407,9 +404,8 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
         }
     }
 //    提交图片
-    private void postNewTopicPics(String imagesPaths, final String imagePathInfo){
+    private void postNewTopicPics(String imagesPaths){
         loadingDraw.show();
-
 
         MultipartBody.Builder builder = new MultipartBody.Builder().setType(MultipartBody.FORM);
         File file = new File(imagesPaths);
@@ -441,10 +437,10 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
                             msg3.obj = loadingDraw;
                             msgHandler.sendMessage(msg3);
 
-                            GlobalUserInfo.userInfo.user.imageContentPaths.add(jresp.getString("path"));
+                            MyApplication.globalUserInfo.user.imageContentPaths.add(jresp.getString("path"));
                             Message msg2 = new Message();
                             msg2.what = response.code();
-                            msg2.obj =imagePathInfo+ "上传成功";
+                            msg2.obj = "图片上传成功";
                             msgHandler.sendMessage(msg2);
                             if (isCommit()){
                                 try {
@@ -463,7 +459,7 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
 
                              Message msg6 = new Message();
                              msg6.what = response.code();
-                             msg6.obj = imagePathInfo+"上传失败，图片可能过大或过小";
+                             msg6.obj = "上传失败，图片可能过大或过小";
                              msgHandler.sendMessage(msg6);
                             break;
 //                            403
@@ -475,7 +471,7 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
 
                             Message msg8 = new Message();
                             msg8.what = response.code();
-                            msg8.obj = imagePathInfo+"格式不支持";
+                            msg8.obj ="格式不支持";
                             msgHandler.sendMessage(msg8);
                             break;
 //                    401
@@ -489,7 +485,7 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
                                 @Override
                                 public Request authenticate(Route route, Response response) throws IOException {
 //    刷新token
-                                    return response.request().newBuilder().addHeader("Authorization",  GlobalUserInfo.userInfo.tokenType +  GlobalUserInfo.userInfo.token).build();
+                                    return response.request().newBuilder().addHeader("Authorization",  MyApplication.globalUserInfo.tokenType +  MyApplication.globalUserInfo.token).build();
                                 }
                             };
                         default:
@@ -512,7 +508,7 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
             msg1.what = USER_SET_INFORMATION;
             msg1.obj = "请输入至少三个字符";
             msgHandler.sendMessage(msg1);
-        }
+        }else {
             getTopicTitleEditStr();
             final JSONObject jsonParam = new JSONObject();
             jsonParam.put("title", strTopicTitle);
@@ -544,8 +540,8 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
                             msg4.what = response.code();
                             msg4.obj = "发帖成功";
                             msgHandler.sendMessage(msg4);
-                            GlobalUserInfo.userInfo.user.imagePaths.clear();
-                            GlobalUserInfo.userInfo.user.imageContentPaths.clear();
+                            MyApplication.globalUserInfo.user.imagePaths.clear();
+                            MyApplication.globalUserInfo.user.imageContentPaths.clear();
                             Intent intent = new Intent(TopicsNewTopicActivity.this, BottomNavigationBarActivity.class);
                             startActivity(intent);
                             finish();
@@ -588,16 +584,18 @@ public class TopicsNewTopicActivity extends TopicsNewTopicBase implements View.O
                                 @Override
                                 public Request authenticate(Route route, Response response) throws IOException {
                                     //    刷新token
-                                    return response.request().newBuilder().addHeader("Authorization",  GlobalUserInfo.userInfo.tokenType +  GlobalUserInfo.userInfo.token).build();
+                                    return response.request().newBuilder().addHeader("Authorization",  MyApplication.globalUserInfo.tokenType +  MyApplication.globalUserInfo.token).build();
                                 }
                             };
-                            GlobalUserInfo.userInfo.user.setUserPassKey(String.valueOf(authenticator));
+                            MyApplication.globalUserInfo.user.setUserPassKey(String.valueOf(authenticator));
                             break;
                         default:
                             break;
                     }
                 }
             });
+        }
+
     }
 
     public int getInputStrCountTag() {

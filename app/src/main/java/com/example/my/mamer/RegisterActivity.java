@@ -1,6 +1,5 @@
 package com.example.my.mamer;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -80,9 +79,9 @@ public class RegisterActivity extends AppCompatActivity {
 
 
     //        UI
-    private final Handler msgHandler = new Handler() {
+    private final Handler msgHandler = new Handler(new Handler.Callback() {
         @Override
-        public void handleMessage(Message msg) {
+        public boolean handleMessage(Message msg) {
             switch (msg.what) {
                 case DISMISS_DIALOG:
                     ((LoadingDraw) msg.obj).dismiss();
@@ -99,8 +98,9 @@ public class RegisterActivity extends AppCompatActivity {
                 default:
                     break;
             }
+            return false;
         }
-    };
+    }) ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,7 +139,7 @@ public class RegisterActivity extends AppCompatActivity {
         setHintAll(etEmil, emils);
         setHintAll(etVerificationCodes, verificationCode);
 
-//        转到手机号验证页面
+//        返回调用界面-->registerPhoneNum
         tvClose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -393,8 +393,6 @@ public class RegisterActivity extends AppCompatActivity {
 
                             SharedPreferences.Editor editor=PreferenceManager.getDefaultSharedPreferences(RegisterActivity.this ).edit();
                             editor.clear().apply();
-                            Intent intent=new Intent(RegisterActivity.this,LoginActivity.class);
-                            startActivity(intent);
                             finish();
                             break;
                         case HTTP_USER_NULL:
@@ -479,10 +477,8 @@ public class RegisterActivity extends AppCompatActivity {
 
     //    跳转手机验证
     private void previous(){
-        Intent intent=new Intent(RegisterActivity.this,RegisterPhoneNumActivity.class);
         SharedPreferences.Editor editor=PreferenceManager.getDefaultSharedPreferences(RegisterActivity.this ).edit();
         editor.clear().apply();
-        startActivity(intent);
         finish();
     }
 

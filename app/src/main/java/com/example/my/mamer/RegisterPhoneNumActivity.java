@@ -55,27 +55,25 @@ public class RegisterPhoneNumActivity extends AppCompatActivity {
     private Button btnPhoneNum;
 //    返回按钮
     private TextView tvClose;
-//    密码登陆按钮
-    private Button btnLogin;
-
 //    已注册
     private TextView tvPhoneHad;
 //        UI
-    Handler msgHandler=new Handler(){
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what){
-                case DISMISS_DIALOG:
-                    ((LoadingDraw)msg.obj).dismiss();
-                    break;
-                case HTTP_USER_NULL:
-                    Toast.makeText(RegisterPhoneNumActivity.this,(String)msg.obj,Toast.LENGTH_SHORT).show();
+    Handler msgHandler=new Handler(new Handler.Callback() {
+    @Override
+    public boolean handleMessage(Message msg) {
+        switch (msg.what){
+            case DISMISS_DIALOG:
+                ((LoadingDraw)msg.obj).dismiss();
                 break;
-                default:
-                    break;
-            }
+            case HTTP_USER_NULL:
+                Toast.makeText(RegisterPhoneNumActivity.this,(String)msg.obj,Toast.LENGTH_SHORT).show();
+                break;
+            default:
+                break;
         }
-    };
+        return false;
+    }
+});
 
 
     @Override
@@ -92,7 +90,6 @@ public class RegisterPhoneNumActivity extends AppCompatActivity {
 
     public void init(){
         tvClose=findViewById(R.id.title_tv_close);
-        btnLogin=findViewById(R.id.title_btn_next);
         etPhoneNum=findViewById(R.id.register_phone_num);
         btnPhoneNum=findViewById(R.id.register_phone_num_btn);
         tvPhoneHad=findViewById(R.id.register_had);
@@ -100,36 +97,21 @@ public class RegisterPhoneNumActivity extends AppCompatActivity {
         Drawable tvClosePic=ContextCompat.getDrawable(this,R.mipmap.ic_title_close);
         tvClose.setBackground(tvClosePic);
 
-        btnLogin.setText("密码登陆");
         SpannableString sHint=new SpannableString("手机号");
         AbsoluteSizeSpan tSize =new AbsoluteSizeSpan(15,true);
         sHint.setSpan(tSize,0,sHint.length(),Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         etPhoneNum.setHint(sHint);
         btnPhoneNum.getBackground().setAlpha(111);
 
-
-
-//关闭页面
+//      关闭页面，返回到调用页面-->login
         tvClose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 finish();
             }
         });
-//        密码登陆
-
-        btnLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent=new Intent(RegisterPhoneNumActivity.this,LoginActivity.class);
-                startActivity(intent);
-                finish();
-            }
-        });
 //        输入监听
         etPhoneNum.addTextChangedListener(etWatcher);
-
-
 //        到图片验证码页面
         btnPhoneNum.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -139,12 +121,10 @@ public class RegisterPhoneNumActivity extends AppCompatActivity {
                 postInformation(PHONE_NUMBER,phoneNum);
             }
         });
-//        已注册
+//        已注册，返回调用界面-->login
         tvPhoneHad.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent=new Intent(RegisterPhoneNumActivity.this,LoginActivity.class);
-                startActivity(intent);
                 finish();
             }
         });
@@ -241,8 +221,8 @@ public class RegisterPhoneNumActivity extends AppCompatActivity {
                          editor.apply();
                          startActivity(intent);
 //                                Log.e("Tag","captcha_key:"+jresp.getString("captcha_key")+"expired_at: "+jresp.getJSONObject("expired_at").getString("date")+"captcha_image_content: "+jresp.getString("captcha_image_content"));
-                         finish();
-                         break;
+                            finish();
+                            break;
 
                          case HTTP_USER_NULL:
                              Message msg1=new Message();

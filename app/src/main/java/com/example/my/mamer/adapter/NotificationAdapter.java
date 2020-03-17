@@ -70,7 +70,6 @@ public class NotificationAdapter extends BaseAdapter {
                 .error(R.mipmap.ic_image_error)
                 .placeholder(R.mipmap.ic_image_error);
         if (listViewItem.userImg != null) {
-
             Glide.with(getContext())
                     .asBitmap()
                     .load(notificationData.get(i).getUserImg())

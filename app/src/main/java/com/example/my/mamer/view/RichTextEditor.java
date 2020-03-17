@@ -8,7 +8,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.content.ContextCompat;
-import android.text.Html;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -24,7 +23,6 @@ import android.widget.TextView;
 
 import com.example.my.mamer.MyApplication;
 import com.example.my.mamer.R;
-import com.example.my.mamer.config.GlobalUserInfo;
 import com.example.my.mamer.util.BaseUtils;
 import com.example.my.mamer.util.IdUtils;
 
@@ -187,7 +185,7 @@ public class RichTextEditor extends ScrollView {
     private void onImageCloseClick(View view){
         disappearingImageIndex=allLayout.indexOfChild(view);
         allLayout.removeView(view);
-        GlobalUserInfo.userInfo.user.imagePaths.remove(view.getId());
+        MyApplication.globalUserInfo.user.imagePaths.remove(view.getId());
         viewTagIndex--;
         imgCount--;
 //        当没有图片的时候，显示
@@ -212,7 +210,6 @@ public class RichTextEditor extends ScrollView {
         editText.setTag(viewTagIndex++);
         editText.setPadding(editNormalPadding,padding,editNormalPadding,padding);
         editText.setHint(hint);
-        editText.setText(Html.fromHtml("韩国v看见八年<img src=\\\"http://www.mamer.club/uploads/images/topics/202003/11/12_1583918205_fk8oe7t9Mk.jpeg\\\" alt=\\\"12_1583918205_fk8oe7t9Mk.jpeg\\\" /></p></div>"));
         editText.setOnFocusChangeListener(focusChangeListener);
         editText.setLineSpacing(BaseUtils.getInstance().dip2px(6),1);
 //        动态修改光标颜色，反射
@@ -327,7 +324,7 @@ public class RichTextEditor extends ScrollView {
 //        设置imageLayoutId
         imageLayout.setId(IdUtils.generateViewId());
 //        将Id和imagePath匹配
-        GlobalUserInfo.userInfo.user.imagePaths.put(imageLayout.getId(),imagePath);
+        MyApplication.globalUserInfo.user.imagePaths.put(imageLayout.getId(),imagePath);
         allLayout.addView(imageLayout,index);
 
         return imageLayout;
@@ -343,8 +340,8 @@ public class RichTextEditor extends ScrollView {
                 EditText item= (EditText) itemView;
                 itemData.inputStr=item.getText().toString();
             }else if (itemView instanceof RelativeLayout){
-                if ( GlobalUserInfo.userInfo.user.imageContentPaths.size()>imageP){
-                    itemData.imagePath= GlobalUserInfo.userInfo.user.imageContentPaths.get(imageP);
+                if ( MyApplication.globalUserInfo.user.imageContentPaths.size()>imageP){
+                    itemData.imagePath= MyApplication.globalUserInfo.user.imageContentPaths.get(imageP);
                     imageP++;
                 }
             }

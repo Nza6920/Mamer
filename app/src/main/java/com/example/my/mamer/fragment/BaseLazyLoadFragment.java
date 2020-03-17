@@ -23,6 +23,7 @@ public abstract class BaseLazyLoadFragment extends Fragment {
         return view;
     }
 
+//    视图创建后请求内容
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);

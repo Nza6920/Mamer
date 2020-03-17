@@ -19,7 +19,6 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.my.mamer.bean.RecommendResource;
 import com.example.my.mamer.bean.User;
-import com.example.my.mamer.config.GlobalUserInfo;
 import com.example.my.mamer.util.HttpUtil;
 
 import org.json.JSONArray;
@@ -38,6 +37,8 @@ import static com.example.my.mamer.config.Config.HTTP_USER_GET_INFORMATION;
 import static com.example.my.mamer.config.Config.HTTP_USER_NULL;
 import static com.example.my.mamer.config.Config.MESSAGE_ERROR;
 import static com.example.my.mamer.config.Config.UNLOGIN;
+import static com.example.my.mamer.config.Config.USER_REPLY_COUNT;
+import static com.example.my.mamer.config.Config.USER_TOPIC_COUNT;
 
 public class UserFragment extends Fragment implements View.OnClickListener {
 
@@ -47,10 +48,12 @@ public class UserFragment extends Fragment implements View.OnClickListener {
     private LinearLayout userUnloginLayout;
 //    用户个人话题
     private LinearLayout layoutTopics;
-    private TextView tvUserTopics;
+    private TextView tvUserTopicCount;
+    private int userTopicCount;
 //    用户回复
     private LinearLayout layoutReply;
     private TextView tvUserReplyCount;
+    private int userReplyCount;
 //    用户收藏
     private LinearLayout layoutCollect;
     private TextView tvUserCollect;
@@ -71,9 +74,9 @@ public class UserFragment extends Fragment implements View.OnClickListener {
     private TextView tvRecommendResourceMore;
 
     //    UI
-    private final Handler msgHandler=new Handler(){
+    private final Handler msgHandler=new Handler(new Handler.Callback() {
         @Override
-        public void handleMessage(Message msg){
+        public boolean handleMessage(Message msg) {
             switch (msg.what){
 
                 case HTTP_USER_NULL:
@@ -88,13 +91,18 @@ public class UserFragment extends Fragment implements View.OnClickListener {
                 case MESSAGE_ERROR:
                     Toast.makeText(getActivity(),(String)msg.obj,Toast.LENGTH_SHORT).show();
                     break;
-
-
+                case USER_TOPIC_COUNT:
+                    tvUserTopicCount.setText(String.valueOf(userTopicCount));
+                    break;
+                case USER_REPLY_COUNT:
+                    tvUserReplyCount.setText(String.valueOf(userReplyCount));
+                    break;
                 default:
                     break;
-                    }
+            }
+            return false;
         }
-    };
+    });
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -103,7 +111,7 @@ public class UserFragment extends Fragment implements View.OnClickListener {
         tvUserMamerEnergy=view.findViewById(R.id.user_mamer_energy);
         userMamerEnergyLayout=view.findViewById(R.id.user_mamer_energy_layout);
         userUnloginLayout=view.findViewById(R.id.user_un_login_layout);
-        tvUserTopics=view.findViewById(R.id.user_my_topic_count);
+        tvUserTopicCount=view.findViewById(R.id.user_my_topic_count);
         layoutTopics=view.findViewById(R.id.user_my_topic);
         tvUserReplyCount=view.findViewById(R.id.user_my_reply_count);
         layoutReply=view.findViewById(R.id.user_my_reply);
@@ -125,11 +133,13 @@ public class UserFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onResume() {
         super.onResume();
+        //        判断是否登录
         if (MyApplication.globalUserInfo.token ==null){
             userUnloginLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Intent intent=new Intent(getActivity(),RegisterPhoneNumActivity.class);
+//                    跳到登录界面
+                    Intent intent=new Intent(getActivity(),LoginActivity.class);
                     startActivity(intent);
                 }
             });
@@ -137,14 +147,18 @@ public class UserFragment extends Fragment implements View.OnClickListener {
         }else {
             userUnloginLayout.setVisibility(View.GONE);
             userMamerEnergyLayout.setVisibility(View.VISIBLE);
+
+//            请求数据，个人话题数，个人回复数，个人收藏数
+            getUserTopicsCount(1);
+            getUserReply(1);
+
+
         }
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-//        判断是否登录
-
  //        获取数据
         getUserRecommend();
         getRecommendResource();
@@ -152,7 +166,7 @@ public class UserFragment extends Fragment implements View.OnClickListener {
         layoutTopics.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (GlobalUserInfo.userInfo.token==null){
+                if (MyApplication.globalUserInfo.token==null){
                     Message msg1=new Message();
                     msg1.what=UNLOGIN;
                     msgHandler.sendMessage(msg1);
@@ -165,7 +179,7 @@ public class UserFragment extends Fragment implements View.OnClickListener {
         layoutReply.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (GlobalUserInfo.userInfo.token==null){
+                if (MyApplication.globalUserInfo.token==null){
                     Message msg1=new Message();
                     msg1.what=UNLOGIN;
                     msgHandler.sendMessage(msg1);
@@ -179,7 +193,7 @@ public class UserFragment extends Fragment implements View.OnClickListener {
         layoutCollect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (GlobalUserInfo.userInfo.token==null){
+                if (MyApplication.globalUserInfo.token==null){
                     Message msg1=new Message();
                     msg1.what=UNLOGIN;
                     msgHandler.sendMessage(msg1);
@@ -196,6 +210,97 @@ public class UserFragment extends Fragment implements View.OnClickListener {
         tvRecommendResourceT.setOnClickListener(this);
 
 
+    }
+//    获取用户个人话题数
+    private void  getUserTopicsCount(int pageCount){
+        HttpUtil.sendOkHttpGetUserTopicList(MyApplication.globalUserInfo.user.getUserId(), pageCount, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Message msg2 = new Message();
+                msg2.what = MESSAGE_ERROR;
+                msg2.obj = "服务器异常,请检查网络";
+                msgHandler.sendMessage(msg2);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                JSONObject jresp = null;
+                try{
+                    jresp = new JSONObject(response.body().string());
+                    switch (response.code()){
+                        case HTTP_USER_GET_INFORMATION:
+                            if (jresp.has("meta")) {
+                                jresp=jresp.getJSONObject("meta");
+                                if (jresp.has("pagination")){
+                                    jresp=jresp.getJSONObject("pagination");
+                                    userTopicCount= Integer.parseInt(jresp.getString("count"));
+                                }
+                                final Runnable setUserCount=new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Message msg3 = new Message();
+                                        msg3.what = USER_TOPIC_COUNT;
+                                        msgHandler.sendMessage(msg3);
+                                    }};
+                                new Thread(){
+                                    public void run(){
+                                        msgHandler.post(setUserCount);
+                                    }
+                                }.start();
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                }catch (JSONException e){
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+//    获取用户个人回复数
+    private void getUserReply(int pageCount){
+
+        HttpUtil.sendOkHttpGetUserReplyList(MyApplication.globalUserInfo.user.getUserId(),pageCount, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Message msg2 = new Message();
+                msg2.what = MESSAGE_ERROR;
+                msg2.obj = "服务器异常,请检查网络";
+                msgHandler.sendMessage(msg2);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                JSONObject jresp=null;
+
+                try {
+                    jresp=new JSONObject(response.body().toString());
+                    if (jresp.has("meta")){
+                        jresp=jresp.getJSONObject("meta");
+                        if (jresp.has("pagination")){
+                            jresp=jresp.getJSONObject("pagination");
+                            userReplyCount= Integer.parseInt(jresp.getString("total"));
+                        }
+                        final Runnable setUserCount=new Runnable() {
+                            @Override
+                            public void run() {
+                                Message msg1=new Message();
+                                msg1.what=USER_REPLY_COUNT;
+                                msgHandler.sendMessage(msg1);
+                            }};
+                        new Thread(){
+                            public void run(){
+                                msgHandler.post(setUserCount);
+                            }
+                        }.start();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
     }
 //    获取活跃用户信息
     private void getUserRecommend(){
@@ -341,6 +446,9 @@ public class UserFragment extends Fragment implements View.OnClickListener {
                 break;
             case R.id.user_recommend_resource_3:
                 openLink(recommendResourceList.get(2).getLink());
+                break;
+//                个人中心的功能，编辑个人信息，生成用户二维码
+            case R.id.user_top_bar:
                 break;
                 default:
                     break;

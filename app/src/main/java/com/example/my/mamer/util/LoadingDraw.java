@@ -16,7 +16,7 @@ public class LoadingDraw extends Dialog {
         getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         setContentView(R.layout.loading);
         tvText=findViewById(R.id.loading_message);
-       setCanceledOnTouchOutside(false);
+        setCanceledOnTouchOutside(false);
 
     }
     public LoadingDraw setMessage(String message){

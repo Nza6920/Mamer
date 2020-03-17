@@ -18,7 +18,6 @@ import android.widget.Toast;
 
 import com.example.my.mamer.adapter.UserSelfTopicAdapter;
 import com.example.my.mamer.bean.TopicContent;
-import com.example.my.mamer.config.GlobalUserInfo;
 import com.example.my.mamer.util.HttpUtil;
 import com.example.my.mamer.util.LoadingDraw;
 
@@ -48,25 +47,26 @@ public class UserSelfTopicListActivity extends AppCompatActivity {
     private TextView tvTitle;
     private LoadingDraw loadingDraw;
     //ui
-    private final Handler msgHandler=new Handler(){
+    private final Handler msgHandler=new Handler(new Handler.Callback() {
         @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what){
-                case DISMISS_DIALOG:
-                    ((LoadingDraw)msg.obj).dismiss();
-                    break;
-                case MESSAGE_ERROR:
-                    Toast.makeText(UserSelfTopicListActivity.this, (String) msg.obj, Toast.LENGTH_SHORT).show();
-                    break;
-                case USER_SET_INFORMATION:
-                    mAdapter.notifyDataSetChanged();
-                    Log.e("Tag","数据刷新完成");
-                    break;
-                default:
-                    break;
-            }
+        public boolean handleMessage(Message msg) {
+                switch (msg.what){
+                    case DISMISS_DIALOG:
+                        ((LoadingDraw)msg.obj).dismiss();
+                        break;
+                    case MESSAGE_ERROR:
+                        Toast.makeText(UserSelfTopicListActivity.this, (String) msg.obj, Toast.LENGTH_SHORT).show();
+                        break;
+                    case USER_SET_INFORMATION:
+                        mAdapter.notifyDataSetChanged();
+                        Log.e("Tag","数据刷新完成");
+                        break;
+                    default:
+                        break;
+                }
+            return false;
         }
-    };
+    });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,12 +98,10 @@ public class UserSelfTopicListActivity extends AppCompatActivity {
 
         Drawable tvBackPic=ContextCompat.getDrawable(this,R.mipmap.ic_title_back);
         tvBack.setBackground(tvBackPic);
-
+//返回调用界面
         tvBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent=new Intent(UserSelfTopicListActivity.this,BottomNavigationBarActivity.class);
-                startActivity(intent);
                 finish();
             }
         });
@@ -115,7 +113,7 @@ public class UserSelfTopicListActivity extends AppCompatActivity {
     //    数据加载接口
     public void onDataLoad() {
         Log.e("Tag","进入数据获取");
-        HttpUtil.sendOkHttpGetUserTopicList(GlobalUserInfo.userInfo.user.getUserId(),1, new Callback() {
+        HttpUtil.sendOkHttpGetUserTopicList(MyApplication.globalUserInfo.user.getUserId(),1, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 Message msg1 = new Message();
@@ -138,7 +136,6 @@ public class UserSelfTopicListActivity extends AppCompatActivity {
 
                     switch (response.code()) {
                         case HTTP_USER_GET_INFORMATION:
-
                             Message msg1 = new Message();
                             msg1.what = DISMISS_DIALOG;
                             msg1.obj=loadingDraw;
@@ -217,4 +214,5 @@ private void initEvent(){
             }
         });
 }
+
 }

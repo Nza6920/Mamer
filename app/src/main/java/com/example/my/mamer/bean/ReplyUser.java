@@ -11,6 +11,7 @@ public class ReplyUser {
     private String UserInfo;
     private String emil;
 
+
     public ReplyUser(){}
     public ReplyUser(String userId, String userImg, String userName, String replyId, String essayId, String content) {
         this.userId = userId;

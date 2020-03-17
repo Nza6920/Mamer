@@ -20,7 +20,6 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.example.my.mamer.config.GlobalUserInfo;
 import com.example.my.mamer.util.HttpUtil;
 import com.example.my.mamer.util.LoadingDraw;
 import com.example.my.mamer.util.PhotoPopupWindow;
@@ -76,28 +75,29 @@ public class UserEditorInformationActivity extends AppCompatActivity {
     private LoadingDraw loadingDraw;
 
 //    UI
-    private final Handler msgHandler=new Handler(){
-        @Override
-        public void handleMessage(Message msg){
-            switch (msg.what){
-                case DISMISS_DIALOG:
-                    ((LoadingDraw)msg.obj).dismiss();
-                    break;
-                case HTTP_USER_NULL:
-                    Toast.makeText(UserEditorInformationActivity.this,(String)msg.obj,Toast.LENGTH_SHORT).show();
-                    break;
-                case HTTP_USER_FORMAT_ERROR:
-                    Toast.makeText(UserEditorInformationActivity.this,(String)msg.obj,Toast.LENGTH_SHORT).show();
-                    break;
-                case HTTP_OK:
-                    Toast.makeText(UserEditorInformationActivity.this,(String)msg.obj,Toast.LENGTH_SHORT).show();
+    private final Handler msgHandler=new Handler(new Handler.Callback() {
+    @Override
+    public boolean handleMessage(Message msg) {
+        switch (msg.what){
+            case DISMISS_DIALOG:
+                ((LoadingDraw)msg.obj).dismiss();
+                break;
+            case HTTP_USER_NULL:
+                Toast.makeText(UserEditorInformationActivity.this,(String)msg.obj,Toast.LENGTH_SHORT).show();
+                break;
+            case HTTP_USER_FORMAT_ERROR:
+                Toast.makeText(UserEditorInformationActivity.this,(String)msg.obj,Toast.LENGTH_SHORT).show();
+                break;
+            case HTTP_OK:
+                Toast.makeText(UserEditorInformationActivity.this,(String)msg.obj,Toast.LENGTH_SHORT).show();
 
-                    break;
-                default:
-                    break;
-            }
+                break;
+            default:
+                break;
         }
-};
+        return false;
+    }
+});
 
 
     @Override
@@ -130,7 +130,7 @@ public class UserEditorInformationActivity extends AppCompatActivity {
                         .placeholder(R.mipmap.ic_image_error);
                 Glide.with(getApplication())
                         .asBitmap()
-                        .load(GlobalUserInfo.userInfo.user.getUserImg())
+                        .load(MyApplication.globalUserInfo.user.getUserImg())
                         .apply(options)
                         .into(imgUserInformationAvatar);
             }
@@ -141,10 +141,10 @@ public class UserEditorInformationActivity extends AppCompatActivity {
             }
         }.start();
 
-        etUserName.setText(GlobalUserInfo.userInfo.user.getUserName());
-        etUserEmail.setText(GlobalUserInfo.userInfo.user.getUserEmail());
-        etUserIntroduction.setText(GlobalUserInfo.userInfo.user.getUserIntroduction());
-        if (GlobalUserInfo.userInfo.user.getEmail_verified()){
+        etUserName.setText(MyApplication.globalUserInfo.user.getUserName());
+        etUserEmail.setText(MyApplication.globalUserInfo.user.getUserEmail());
+        etUserIntroduction.setText(MyApplication.globalUserInfo.user.getUserIntroduction());
+        if (MyApplication.globalUserInfo.user.getEmail_verified()){
             tvUserEmailInfo.setText("当前邮箱已通过邮箱验证，不可更改");
         }
         else {
@@ -181,10 +181,10 @@ public class UserEditorInformationActivity extends AppCompatActivity {
 //    PATC提交信息
     private void patchInformation() throws JSONException {
         getEditString();
-        if (GlobalUserInfo.userInfo.user.getUserImgId()!=null){
+        if (MyApplication.globalUserInfo.user.getUserImgId()!=null){
 //            修改头像
             RequestBody requestBody=new FormBody.Builder()
-                    .add("avatar_image_id",GlobalUserInfo.userInfo.user.getUserImgId())
+                    .add("avatar_image_id",MyApplication.globalUserInfo.user.getUserImgId())
                     .add("name",userName)
                     .add("introduction",userInformation)
                     .build();
@@ -217,15 +217,13 @@ public class UserEditorInformationActivity extends AppCompatActivity {
                                 msg3.obj=loadingDraw;
                                 msgHandler.sendMessage(msg3);
 
-                                GlobalUserInfo.userInfo.user.setUserId(jresp.getString("id"));
-                                GlobalUserInfo.userInfo.user.setUserName(jresp.getString("name"));
-                                GlobalUserInfo.userInfo.user.setUserImg(jresp.getString("avatar"));
-                                GlobalUserInfo.userInfo.user.setUserIntroduction(jresp.getString("introduction"));
-                                GlobalUserInfo.userInfo.user.setEmail_verified(jresp.getBoolean("email_verified"));
-                                GlobalUserInfo.userInfo.user.setUserBornDate(jresp.getString("bound_phone"));
+                                MyApplication.globalUserInfo.user.setUserId(jresp.getString("id"));
+                                MyApplication.globalUserInfo.user.setUserName(jresp.getString("name"));
+                                MyApplication.globalUserInfo.user.setUserImg(jresp.getString("avatar"));
+                                MyApplication.globalUserInfo.user.setUserIntroduction(jresp.getString("introduction"));
+                                MyApplication.globalUserInfo.user.setEmail_verified(jresp.getBoolean("email_verified"));
+                                MyApplication.globalUserInfo.user.setUserBornDate(jresp.getString("bound_phone"));
 
-                                Intent intent=new Intent(UserEditorInformationActivity.this,UserHomePageActivity.class);
-                                startActivity(intent);
                                 finish();
                                 break;
 //                            422
@@ -263,7 +261,7 @@ public class UserEditorInformationActivity extends AppCompatActivity {
                                     @Override
                                     public Request authenticate(Route route, Response response) throws IOException {
 //    刷新token
-                                        return response.request().newBuilder().addHeader("Authorization", GlobalUserInfo.userInfo.tokenType+GlobalUserInfo.userInfo.token).build();
+                                        return response.request().newBuilder().addHeader("Authorization", MyApplication.globalUserInfo.tokenType+MyApplication.globalUserInfo.token).build();
                                     }
                                 };
 
@@ -310,15 +308,13 @@ public class UserEditorInformationActivity extends AppCompatActivity {
                                 msg3.obj=loadingDraw;
                                 msgHandler.sendMessage(msg3);
 
-                                GlobalUserInfo.userInfo.user.setUserId(jresp.getString("id"));
-                                GlobalUserInfo.userInfo.user.setUserName(jresp.getString("name"));
-                                GlobalUserInfo.userInfo.user.setUserImg(jresp.getString("avatar"));
-                                GlobalUserInfo.userInfo.user.setUserIntroduction(jresp.getString("introduction"));
-                                GlobalUserInfo.userInfo.user.setEmail_verified(jresp.getBoolean("email_verified"));
-                                GlobalUserInfo.userInfo.user.setBoundPhone(jresp.getBoolean("bound_phone"));
+                                MyApplication.globalUserInfo.user.setUserId(jresp.getString("id"));
+                                MyApplication.globalUserInfo.user.setUserName(jresp.getString("name"));
+                                MyApplication.globalUserInfo.user.setUserImg(jresp.getString("avatar"));
+                                MyApplication.globalUserInfo.user.setUserIntroduction(jresp.getString("introduction"));
+                                MyApplication.globalUserInfo.user.setEmail_verified(jresp.getBoolean("email_verified"));
+                                MyApplication.globalUserInfo.user.setBoundPhone(jresp.getBoolean("bound_phone"));
 
-                                Intent intent=new Intent(UserEditorInformationActivity.this,UserHomePageActivity.class);
-                                startActivity(intent);
                                 finish();
                                 break;
 //                            422
@@ -351,7 +347,7 @@ public class UserEditorInformationActivity extends AppCompatActivity {
                                     @Override
                                     public Request authenticate(Route route, Response response) throws IOException {
 //    刷新token
-                                        return response.request().newBuilder().addHeader("Authorization", GlobalUserInfo.userInfo.tokenType+GlobalUserInfo.userInfo.token).build();
+                                        return response.request().newBuilder().addHeader("Authorization", MyApplication.globalUserInfo.tokenType+MyApplication.globalUserInfo.token).build();
                                     }
                                 };
 
@@ -445,10 +441,10 @@ public class UserEditorInformationActivity extends AppCompatActivity {
                                 msg3.obj = loadingDraw;
                                 msgHandler.sendMessage(msg3);
 
-                                GlobalUserInfo.userInfo.user.setUserImgId(jresp.getString("id"));
-                                GlobalUserInfo.userInfo.user.setUserId(jresp.getString("user_id"));
-                                GlobalUserInfo.userInfo.user.setUserImg(jresp.getString("path"));
-                                Log.e("Tag", "修改后，，" + String.valueOf(GlobalUserInfo.userInfo.user.getUserImg()));
+                                MyApplication.globalUserInfo.user.setUserImgId(jresp.getString("id"));
+                                MyApplication.globalUserInfo.user.setUserId(jresp.getString("user_id"));
+                                MyApplication.globalUserInfo.user.setUserImg(jresp.getString("path"));
+                                Log.e("Tag", "修改后，，" + String.valueOf(MyApplication.globalUserInfo.user.getUserImg()));
                                 final Runnable setAvatarRunable=new Runnable() {
                                     @Override
                                     public void run() {
@@ -457,7 +453,7 @@ public class UserEditorInformationActivity extends AppCompatActivity {
                                                 .placeholder(R.mipmap.ic_image_error);
                                         Glide.with(getApplication())
                                                 .asBitmap()
-                                                .load(GlobalUserInfo.userInfo.user.getUserImg())
+                                                .load(MyApplication.globalUserInfo.user.getUserImg())
                                                 .apply(options)
                                                 .into(imgUserInformationAvatar);
                                     }
@@ -515,7 +511,7 @@ public class UserEditorInformationActivity extends AppCompatActivity {
                                     @Override
                                     public Request authenticate(Route route, Response response) throws IOException {
 //    刷新token
-                                        return response.request().newBuilder().addHeader("Authorization", GlobalUserInfo.userInfo.tokenType + GlobalUserInfo.userInfo.token).build();
+                                        return response.request().newBuilder().addHeader("Authorization", MyApplication.globalUserInfo.tokenType + MyApplication.globalUserInfo.token).build();
                                     }
                                 };
                                 break;

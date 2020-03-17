@@ -66,9 +66,9 @@ public class RegisterPicCode extends AppCompatActivity {
     private Button btnCodeStr;
 
     //        UI
-   private final Handler msgHandler=new Handler(){
+   private final Handler msgHandler=new Handler(new Handler.Callback() {
         @Override
-        public void handleMessage(Message msg) {
+        public boolean handleMessage(Message msg) {
             switch (msg.what){
                 case DISMISS_DIALOG:
                     ((LoadingDraw)msg.obj).dismiss();
@@ -85,8 +85,9 @@ public class RegisterPicCode extends AppCompatActivity {
                 default:
                     break;
             }
+            return false;
         }
-    };
+    });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,12 +122,10 @@ public class RegisterPicCode extends AppCompatActivity {
 
 
 //监听事件
-//        关闭页面
+//        关闭页面,返回调用界面-->registerPhoneNum
         tvClose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent=new Intent(RegisterPicCode.this,RegisterPhoneNumActivity.class);
-                startActivity(intent);
                 finish();
             }
         });
@@ -371,10 +370,8 @@ public class RegisterPicCode extends AppCompatActivity {
     }
 //    跳转
     private void previous(){
-        Intent intent=new Intent(RegisterPicCode.this,RegisterPhoneNumActivity.class);
         SharedPreferences.Editor editor=PreferenceManager.getDefaultSharedPreferences(this ).edit();
         editor.clear().apply();
-        startActivity(intent);
         finish();
     }
 //UI

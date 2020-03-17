@@ -53,6 +53,11 @@ public class Config {
     public final static int MESSAGE_ERROR=9;
     public final static int USER_SET_INFORMATION=5;
     public final static int UNLOGIN=10;
+    public final static int USER_REPLY_COUNT=1;
+    public final static int USER_TOPIC_COUNT=3;
+    public final static int USER_TOPIC_EDIT=12;
+    public final static int USER_TOPIC_DEL=14;
+    public final static int USER_TOPIC_UPDATE=11;
 
 //    拍摄
     public final static int RESULT_CAMERA_IMAGE=6;
@@ -64,6 +69,8 @@ public class Config {
     public static final MediaType JSON=MediaType.parse("application/json;charset=utf-8");
     public static final String CONTENT_TYPEs="application/x-www-form-urlencoded;charset=utf-8";
     public static final MediaType MEDIA_TYPE_IMAGE=MediaType.parse("image/*");
+
+
 
 
 

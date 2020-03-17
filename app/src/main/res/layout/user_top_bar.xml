@@ -20,6 +20,6 @@
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_alignParentRight="true"
-        android:background="@mipmap/ic_user_top_bar_right"
+        android:background="@mipmap/ic_user_top_right"
         android:layout_marginRight="10dp"/>
 </RelativeLayout>

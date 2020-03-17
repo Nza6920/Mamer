@@ -18,7 +18,6 @@ import android.widget.Toast;
 
 import com.example.my.mamer.adapter.TopicReplyAdapter;
 import com.example.my.mamer.bean.ReplyUser;
-import com.example.my.mamer.config.GlobalUserInfo;
 import com.example.my.mamer.util.HttpUtil;
 import com.example.my.mamer.util.LoadingDraw;
 
@@ -49,9 +48,9 @@ public class UserSelfReplyActivity extends AppCompatActivity {
     private TextView tvTitle;
     private LoadingDraw loadingDraw;
 
-    private final Handler msgHandler=new Handler(){
+    private final Handler msgHandler=new Handler(new Handler.Callback() {
         @Override
-        public void handleMessage(Message msg) {
+        public boolean handleMessage(Message msg) {
             switch (msg.what){
 
                 case MESSAGE_ERROR:
@@ -64,8 +63,9 @@ public class UserSelfReplyActivity extends AppCompatActivity {
                 default:
                     break;
             }
+            return false;
         }
-    };
+    });
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -109,7 +109,7 @@ public class UserSelfReplyActivity extends AppCompatActivity {
 
     private void onDataLoad(){
 
-        HttpUtil.sendOkHttpGetUserReplyList(GlobalUserInfo.userInfo.user.getUserId(), new Callback() {
+        HttpUtil.sendOkHttpGetUserReplyList(MyApplication.globalUserInfo.user.getUserId(),1, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
 
@@ -240,8 +240,8 @@ public class UserSelfReplyActivity extends AppCompatActivity {
                                     try {
                                         JSONObject jrep= new JSONObject(response.body().string());
 
-                                        GlobalUserInfo.userInfo.token=jrep.getString("access_token");
-                                        GlobalUserInfo.userInfo.tokenType=jrep.getString("token_type");
+                                        MyApplication.globalUserInfo.token=jrep.getString("access_token");
+                                        MyApplication.globalUserInfo.tokenType=jrep.getString("token_type");
 
                                         Message msg1 = new Message();
                                         msg1.what = MESSAGE_ERROR;

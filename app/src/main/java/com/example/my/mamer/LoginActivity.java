@@ -1,5 +1,6 @@
 package com.example.my.mamer;
 
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -20,7 +21,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.my.mamer.bean.User;
-import com.example.my.mamer.config.GlobalUserInfo;
 import com.example.my.mamer.util.HttpUtil;
 import com.example.my.mamer.util.LoadingDraw;
 import com.example.my.mamer.util.NCopyPaste;
@@ -51,6 +51,8 @@ public class LoginActivity extends AppCompatActivity {
     private LoadingDraw loadingDraw;
 //    返回按钮
     private TextView tvClose;
+//    注册按钮
+    private TextView tvBtnNext;
 //    用户名
     private EditText etUName;
     private String uName;
@@ -60,9 +62,9 @@ public class LoginActivity extends AppCompatActivity {
 //    登录按钮
     private Button btnLogin;
 //ui
-    private final Handler msgHandler=new Handler(){
+    private final Handler msgHandler=new Handler(new Handler.Callback() {
     @Override
-    public void handleMessage(Message msg) {
+    public boolean handleMessage(Message msg) {
         switch (msg.what){
             case DISMISS_DIALOG:
                 ((LoadingDraw)msg.obj).dismiss();
@@ -82,8 +84,9 @@ public class LoginActivity extends AppCompatActivity {
             default:
                 break;
         }
+        return false;
     }
-};
+});
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,6 +97,7 @@ public class LoginActivity extends AppCompatActivity {
     }
     private void init(){
         tvClose=findViewById(R.id.title_tv_close);
+        tvBtnNext=findViewById(R.id.title_btn_next);
         etUName=findViewById(R.id.login_username);
         etPas=findViewById(R.id.login_password);
         btnLogin=findViewById(R.id.login_btn);
@@ -101,6 +105,7 @@ public class LoginActivity extends AppCompatActivity {
 //        设置
         Drawable tvClosePic=ContextCompat.getDrawable(this,R.mipmap.ic_title_close);
         tvClose.setBackground(tvClosePic);
+        tvBtnNext.setText("注册");
 
         final String userName="请输入手机号或邮箱";
         String passWord="请输入密码";
@@ -115,11 +120,19 @@ public class LoginActivity extends AppCompatActivity {
 
         btnLogin.getBackground().setAlpha(111);
 //        监听，点击事件
-//        返回按钮
+//        返回按钮,返回调用界面-->userFragment
         tvClose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 finish();
+            }
+        });
+//        -->注册
+        tvBtnNext.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(LoginActivity.this,RegisterPhoneNumActivity.class);
+                startActivity(intent);
             }
         });
 //        密码
@@ -275,9 +288,9 @@ public class LoginActivity extends AppCompatActivity {
     }
     private void loginSuccess(JSONObject jresp) throws JSONException {
         User user=new User();
-        GlobalUserInfo.userInfo.user=user;
-        GlobalUserInfo.userInfo.token=jresp.getString("access_token");
-        GlobalUserInfo.userInfo.tokenType=jresp.getString("token_type");
+        MyApplication.globalUserInfo.user=user;
+        MyApplication.globalUserInfo.token=jresp.getString("access_token");
+        MyApplication.globalUserInfo.tokenType=jresp.getString("token_type");
 
         HttpUtil.sendOkHttpRequestGet(USER_INFORMATION, new Callback() {
             @Override
@@ -295,20 +308,19 @@ public class LoginActivity extends AppCompatActivity {
                     JSONObject jresp=new JSONObject(response.body().string());
                     switch (response.code()){
                         case HTTP_USER_GET_INFORMATION:
-
-                            GlobalUserInfo.userInfo.user.setUserId(jresp.getString("id"));
-                            GlobalUserInfo.userInfo.user.setUserName(jresp.getString("name"));
-                            GlobalUserInfo.userInfo.user.setUserEmail(jresp.getString("email"));
-                            GlobalUserInfo.userInfo.user.setUserImg(jresp.getString("avatar"));
-                            GlobalUserInfo.userInfo.user.setUserIntroduction(jresp.getString("introduction"));
+                            MyApplication.globalUserInfo.user.setUserId(jresp.getString("id"));
+                            MyApplication.globalUserInfo.user.setUserName(jresp.getString("name"));
+                            MyApplication.globalUserInfo.user.setUserEmail(jresp.getString("email"));
+                            MyApplication.globalUserInfo.user.setUserImg(jresp.getString("avatar"));
+                            MyApplication.globalUserInfo.user.setUserIntroduction(jresp.getString("introduction"));
 //                            是否绑定
-                            GlobalUserInfo.userInfo.user.setBoundPhone(jresp.getBoolean("bound_phone"));
+                            MyApplication.globalUserInfo.user.setBoundPhone(jresp.getBoolean("bound_phone"));
 //                            是否验证邮箱
-                            GlobalUserInfo.userInfo.user.setEmail_verified(jresp.getBoolean("email_verified"));
+                            MyApplication.globalUserInfo.user.setEmail_verified(jresp.getBoolean("email_verified"));
 //                            注册
-                            GlobalUserInfo.userInfo.user.setUserBornDate(jresp.getString("created_at"));
+                            MyApplication.globalUserInfo.user.setUserBornDate(jresp.getString("created_at"));
 
-                            Log.e("userImg","img:"+ GlobalUserInfo.userInfo.user.getUserPassKey());
+                            Log.e("userImg","img:"+    MyApplication.globalUserInfo.user.getUserPassKey());
 
                             new Thread(){
                                 public void run(){
@@ -317,9 +329,7 @@ public class LoginActivity extends AppCompatActivity {
                                     msgHandler.sendMessage(msg5);
                                 }
                             }.start();
-
-                            /*Intent intent=new Intent(LoginActivity.this,UserHomePageActivity.class);
-                            startActivity(intent);*/
+//登录成功后，返回调用之前的界面
                             finish();
                             break;
 //                            令牌失效，重新请求

@@ -18,7 +18,6 @@ import android.widget.Toast;
 import com.ashokvarma.bottomnavigation.BottomNavigationBar;
 import com.ashokvarma.bottomnavigation.BottomNavigationItem;
 import com.ashokvarma.bottomnavigation.TextBadgeItem;
-import com.example.my.mamer.config.GlobalUserInfo;
 import com.example.my.mamer.util.HttpUtil;
 
 import org.json.JSONException;
@@ -141,7 +140,7 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
         btnTopicNewTopic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (GlobalUserInfo.userInfo.token !=null){
+                if (MyApplication.globalUserInfo.token !=null){
                 Intent intent=new Intent(BottomNavigationBarActivity.this,TopicsNewTopicActivity.class);
                 startActivity(intent);
                 }else {
@@ -156,7 +155,7 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
         btnUserHomePage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (GlobalUserInfo.userInfo.token!=null){
+                if (MyApplication.globalUserInfo.token!=null){
                     Intent intent=new Intent(BottomNavigationBarActivity.this,UserHomePageActivity.class);
                     startActivity(intent);
                     finish();
@@ -212,7 +211,6 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
                         transaction.hide(userFragment);
                     }
 //                    显示topicsFragment
-
                     transaction.show(topicsFragment);
 
                 }

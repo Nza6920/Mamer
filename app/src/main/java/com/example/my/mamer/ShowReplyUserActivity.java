@@ -26,11 +26,12 @@ public class ShowReplyUserActivity extends AppCompatActivity {
 
 
     //ui
-    private final Handler msgHandler=new Handler(){
+    private final Handler msgHandler=new Handler(new Handler.Callback() {
         @Override
-        public void handleMessage(Message msg) {
+        public boolean handleMessage(Message msg) {
+            return false;
         }
-    };
+    });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

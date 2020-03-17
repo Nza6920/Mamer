@@ -12,7 +12,6 @@ import android.widget.Toast;
 
 import com.example.my.mamer.adapter.NotificationAdapter;
 import com.example.my.mamer.bean.NotificationUser;
-import com.example.my.mamer.config.GlobalUserInfo;
 import com.example.my.mamer.fragment.BaseLazyLoadFragment;
 import com.example.my.mamer.util.HttpUtil;
 import com.example.my.mamer.util.LoadingDraw;
@@ -83,7 +82,7 @@ public class NotificationFragment extends BaseLazyLoadFragment {
         tvNotificationInfo=view.findViewById(R.id.notification_info);
         tvNotificationRead=view.findViewById(R.id.notification_read);
 
-        if (GlobalUserInfo.userInfo.token!=null){
+        if (MyApplication.globalUserInfo.token!=null){
             Message msg1 = new Message();
             msg1.what = DISMISS_DIALOG;
             msg1.obj=loadingDraw;
@@ -128,7 +127,7 @@ public class NotificationFragment extends BaseLazyLoadFragment {
 
     @Override
     public void onLazyLoad() {
-        if (GlobalUserInfo.userInfo.token!=null){
+        if (MyApplication.globalUserInfo.token!=null){
             loadingDraw.show();
             HttpUtil.sendOkHttpGetNotificationList(new Callback() {
                 @Override

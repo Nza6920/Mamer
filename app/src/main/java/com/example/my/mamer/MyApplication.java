@@ -13,7 +13,7 @@ public class MyApplication extends Application {
     public void onCreate() {
         super.onCreate();
         context=this;
-        globalUserInfo =GlobalUserInfo.userInfo;
+        globalUserInfo =new GlobalUserInfo();
     }
 
 //    获取全局Context对象

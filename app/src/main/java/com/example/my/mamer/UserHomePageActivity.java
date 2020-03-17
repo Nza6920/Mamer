@@ -14,7 +14,6 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.example.my.mamer.config.GlobalUserInfo;
 import com.example.my.mamer.util.LoadingDraw;
 
 import static com.example.my.mamer.config.Config.DISMISS_DIALOG;
@@ -38,9 +37,9 @@ public class UserHomePageActivity extends AppCompatActivity {
     private LoadingDraw loadingDraw;
 
     //ui
-    private final Handler msgHandler=new Handler(){
+    private final Handler msgHandler=new Handler(new Handler.Callback() {
         @Override
-        public void handleMessage(Message msg) {
+        public boolean handleMessage(Message msg) {
             switch (msg.what){
                 case DISMISS_DIALOG:
                     ((LoadingDraw)msg.obj).dismiss();
@@ -60,8 +59,9 @@ public class UserHomePageActivity extends AppCompatActivity {
                 default:
                     break;
             }
+            return false;
         }
-    };
+    });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,8 +69,14 @@ public class UserHomePageActivity extends AppCompatActivity {
         setContentView(R.layout.activity_user_home_page);
 
         loadingDraw=new LoadingDraw(this);
-        init();
 
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        init();
     }
 
     private void init(){
@@ -93,7 +99,7 @@ public class UserHomePageActivity extends AppCompatActivity {
                         .placeholder(R.mipmap.ic_image_error);
                 Glide.with(getApplication())
                         .asBitmap()
-                        .load(GlobalUserInfo.userInfo.user.getUserImg())
+                        .load(MyApplication.globalUserInfo.user.getUserImg())
                         .apply(options)
                         .into(imgUserAvatar);
             }
@@ -103,10 +109,10 @@ public class UserHomePageActivity extends AppCompatActivity {
                 msgHandler.post(setAvatarRunable);
             }
         }.start();
-        tvUserName.setText(GlobalUserInfo.userInfo.user.getUserName());
-        tvUserEmail.setText(GlobalUserInfo.userInfo.user.getUserEmail());
-        tvUserIntroduction.setText(GlobalUserInfo.userInfo.user.getUserIntroduction());
-        tvUserCreateTime.setText(GlobalUserInfo.userInfo.user.getUserBornDate());
+        tvUserName.setText(MyApplication.globalUserInfo.user.getUserName());
+        tvUserEmail.setText(MyApplication.globalUserInfo.user.getUserEmail());
+        tvUserIntroduction.setText(MyApplication.globalUserInfo.user.getUserIntroduction());
+        tvUserCreateTime.setText(MyApplication.globalUserInfo.user.getUserBornDate());
 
 //        监听
 //        点击返回
@@ -124,7 +130,7 @@ public class UserHomePageActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent=new Intent(UserHomePageActivity.this,UserEditorInformationActivity.class);
                 startActivity(intent);
-                finish();
+
             }
         });
     }
