@@ -240,6 +240,7 @@ public class RichTextEditor extends ScrollView {
     }
 //    插入一张图片
     public void insertImage(String imagePath){
+
         Bitmap bitmap=BitmapFactory.decodeFile(imagePath);
 //        所有文字
         String lastEditStr=lastFocusEdit.getText().toString();

@@ -447,7 +447,7 @@ public class UserFragment extends Fragment implements View.OnClickListener {
             case R.id.user_recommend_resource_3:
                 openLink(recommendResourceList.get(2).getLink());
                 break;
-//                个人中心的功能，编辑个人信息，生成用户二维码
+//                个人中心的功能，编辑个人信息
             case R.id.user_top_bar:
                 break;
                 default:

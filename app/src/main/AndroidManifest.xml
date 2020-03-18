@@ -20,7 +20,7 @@
         <activity android:name=".RegisterPhoneNumActivity" />
         <activity android:name=".RegisterPicCode" />
         <activity android:name=".RegisterActivity" />
-        <activity android:name=".TestActivity"></activity>
+        <activity android:name=".TestActivity" />
         <activity android:name=".LoginActivity" />
         <activity android:name=".UserHomePageActivity" />
         <activity android:name=".UserEditorInformationActivity" />
@@ -36,21 +36,31 @@
         </provider>
 
         <activity android:name=".BottomNavigationBarActivity">
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.MAIN" />-->
+
+                <!--<category android:name="android.intent.category.LAUNCHER" />-->
+            <!--</intent-filter>-->
+        </activity>
+        <activity
+            android:name=".TopicsNewTopicActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait" />
+        <activity android:name=".UserSelfTopicListActivity" />
+        <activity android:name=".TopicParticularsActivity" />
+        <activity android:name=".TopicReplyPublishActivity" />
+        <activity android:name=".UserSelfReplyActivity" />
+        <activity android:name=".ShowReplyUserActivity" />
+        <activity
+            android:name=".TopicParticularsTestActivity"
+            android:label="@string/title_activity_topic_particulars_test"
+            android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".TopicsNewTopicActivity"
-            android:screenOrientation="portrait"
-            android:launchMode="singleTask"/>
-        <activity android:name=".UserSelfTopicListActivity" />
-        <activity android:name=".TopicParticularsActivity" />
-        <activity android:name=".TopicReplyPublishActivity" />
-        <activity android:name=".UserSelfReplyActivity" />
-        <activity android:name=".ShowReplyUserActivity"/>
     </application>
 
 </manifest>

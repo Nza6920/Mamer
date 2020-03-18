@@ -36,7 +36,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="url" value="jar:file:/D:/android/android-studio/plugins/android/lib/android.jar!/images/material_design_icons/navigation/ic_more_horiz_black_24dp.xml" />
+                                                <entry key="url" value="jar:file:/D:/android/android-studio/plugins/android/lib/android.jar!/images/material_design_icons/hardware/ic_keyboard_arrow_down_black_24dp.xml" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -81,7 +81,7 @@
                                   <option name="values">
                                     <map>
                                       <entry key="iconShape" value="NONE" />
-                                      <entry key="outputName" value="ic_user_top_right" />
+                                      <entry key="outputName" value="ic_keyoard_down" />
                                     </map>
                                   </option>
                                 </PersistentState>
