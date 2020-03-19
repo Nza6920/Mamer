@@ -23,9 +23,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="color" value="727272" />
-                                                <entry key="paddingPercent" value="20" />
-                                                <entry key="trimmed" value="true" />
+                                                <entry key="color" value="12a3e9" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -36,7 +34,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="url" value="jar:file:/D:/android/android-studio/plugins/android/lib/android.jar!/images/material_design_icons/hardware/ic_keyboard_arrow_down_black_24dp.xml" />
+                                                <entry key="url" value="jar:file:/D:/android/android-studio/plugins/android/lib/android.jar!/images/material_design_icons/content/ic_add_black_24dp.xml" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -59,6 +57,7 @@
                                             <option name="values">
                                               <map>
                                                 <entry key="paddingPercent" value="25" />
+                                                <entry key="trimmed" value="true" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -81,7 +80,7 @@
                                   <option name="values">
                                     <map>
                                       <entry key="iconShape" value="NONE" />
-                                      <entry key="outputName" value="ic_keyoard_down" />
+                                      <entry key="outputName" value="ic_topic_flag_" />
                                     </map>
                                   </option>
                                 </PersistentState>

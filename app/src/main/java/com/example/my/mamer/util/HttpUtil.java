@@ -155,4 +155,10 @@ public class HttpUtil {
         Request request=new Request.Builder().addHeader("Authorization",MyApplication.globalUserInfo.tokenType+MyApplication.globalUserInfo.token).url(address).build();
         client.newCall(request).enqueue(callback);
     }
+//    获取话题分类
+    public static void sendOkHttpGetTopicDivid(okhttp3.Callback callback){
+        OkHttpClient client=new OkHttpClient();
+        Request request=new Request.Builder().url(RECOMMEND_RESOURCE).build();
+        client.newCall(request).enqueue(callback);
+    }
 }

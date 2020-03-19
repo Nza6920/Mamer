@@ -18,8 +18,11 @@ import android.widget.Toast;
 import com.ashokvarma.bottomnavigation.BottomNavigationBar;
 import com.ashokvarma.bottomnavigation.BottomNavigationItem;
 import com.ashokvarma.bottomnavigation.TextBadgeItem;
+import com.example.my.mamer.bean.TopicDIvid;
+import com.example.my.mamer.config.GlobalTopicReply;
 import com.example.my.mamer.util.HttpUtil;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -29,6 +32,7 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 
+import static com.example.my.mamer.config.Config.HTTP_USER_GET_INFORMATION;
 import static com.example.my.mamer.config.Config.MESSAGE_ERROR;
 
 public class BottomNavigationBarActivity extends AppCompatActivity implements BottomNavigationBar.OnTabSelectedListener {
@@ -369,10 +373,17 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
                     JSONObject jresp=null;
                     try {
                         jresp=new JSONObject(response.body().string());
-                        if (jresp.has("unread_count")){
-                            setNotificationNum(jresp.getString("unread_count"));
-                            showNumberAndShape();
+                        switch (response.code()){
+                            case HTTP_USER_GET_INFORMATION:
+                                if (jresp.has("unread_count")){
+                                    setNotificationNum(jresp.getString("unread_count"));
+                                    showNumberAndShape();
+                                }
+                                break;
+                                default:
+                                    break;
                         }
+
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -388,5 +399,48 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
 
     public String getNotificationNum() {
         return notificationNum;
+    }
+
+//    获取话题分类
+    private void getTopicDivid(){
+        HttpUtil.sendOkHttpGetTopicDivid(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Message msg1 = new Message();
+                msg1.what = MESSAGE_ERROR;
+                msg1.obj = "服务器异常,请检查网络";
+                msgHandler.sendMessage(msg1);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                JSONObject jresp=null;
+                JSONArray jsonArray=null;
+                try {
+                    jresp=new JSONObject(response.body().string());
+                    switch (response.code()){
+                        case HTTP_USER_GET_INFORMATION:
+                            if (jresp.has("data")){
+                                jsonArray=jresp.getJSONArray("data");
+                                int jsonSize=jsonArray.length();
+                                for (int i = 0; i < jsonSize; i++) {
+                                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                                    TopicDIvid topicDIvid=new TopicDIvid();
+                                    topicDIvid.setCategoryId(jsonObject.getString("id"));
+                                    topicDIvid.setCategoryName(jsonObject.getString("name"));
+                                    topicDIvid.setCategoryDesc(jsonObject.getString("description"));
+                                    GlobalTopicReply.reply.topicDivid.add(topicDIvid);
+                                }
+                            }
+                            break;
+                            default:
+                                break;
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 }

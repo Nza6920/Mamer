@@ -52,7 +52,7 @@
         <activity android:name=".UserSelfReplyActivity" />
         <activity android:name=".ShowReplyUserActivity" />
         <activity
-            android:name=".TopicParticularsTestActivity"
+            android:name=".TopicActivity"
             android:label="@string/title_activity_topic_particulars_test"
             android:theme="@style/AppTheme">
             <intent-filter>

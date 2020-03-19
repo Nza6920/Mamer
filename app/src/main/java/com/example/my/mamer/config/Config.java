@@ -36,6 +36,7 @@ public class Config {
     public static final String NOTIFICATION_LIST="http://www.mamer.club/api/user/notifications";
     public static final String NOTIFICATION_STATE="http://www.mamer.club/api/user/notifications/stats";
     public static final String NOTIFICATION_READ="http://www.mamer.club/api/user/read/notifications";
+    public static final String TOPIC_DIVID="http://www.mamer.club/api/categories";
 
     //    http返回码
     public final static int HTTP_OK=201;
