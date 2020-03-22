@@ -145,7 +145,7 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
             @Override
             public void onClick(View view) {
                 if (MyApplication.globalUserInfo.token !=null){
-                Intent intent=new Intent(BottomNavigationBarActivity.this,TopicsNewTopicActivity.class);
+                Intent intent=new Intent(BottomNavigationBarActivity.this,TopicActivity.class);
                 startActivity(intent);
                 }else {
                     Message msg1 = new Message();

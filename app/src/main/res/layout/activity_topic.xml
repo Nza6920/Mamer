@@ -29,7 +29,8 @@
                 android:layout_height="50dp"
                 android:hint="请输入标题"
                 android:textSize="25sp"
-                android:background="@drawable/bottom_line"/>
+                android:background="@drawable/bottom_line"
+                android:focusableInTouchMode="true"/>
             <LinearLayout
                 android:id="@+id/topic_flag_"
                 android:layout_width="45dp"
@@ -118,5 +119,6 @@
         </LinearLayout>
 
     </LinearLayout>
+
 
 </RelativeLayout>

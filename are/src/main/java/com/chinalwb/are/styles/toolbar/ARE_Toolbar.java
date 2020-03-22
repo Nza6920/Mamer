@@ -87,6 +87,7 @@ public class ARE_Toolbar extends LinearLayout {
 
 	/**
 	 * Supported styles list.
+	 * item添加列表
 	 */
 	private ArrayList<IARE_Style> mStylesList = new ArrayList<>();
 
@@ -202,6 +203,7 @@ public class ARE_Toolbar extends LinearLayout {
 
 	/**
 	 * Insert image style.
+	 * ARE_Image类型的底部工具栏选择图片的图片
 	 */
 	private ARE_Image mImageStyle;
 
@@ -327,6 +329,7 @@ public class ARE_Toolbar extends LinearLayout {
 
 	/**
 	 * Insert image button.
+	 * 插入图片按钮
 	 */
 	private ImageView mRteInsertImage;
 
@@ -448,6 +451,7 @@ public class ARE_Toolbar extends LinearLayout {
 		this.mAlignLeft = new ARE_Alignment(this.mRteAlignLeft, Alignment.ALIGN_NORMAL, this);
 		this.mAlignCenter = new ARE_Alignment(this.mRteAlignCenter, Alignment.ALIGN_CENTER, this);
 		this.mAlignRight = new ARE_Alignment(this.mRteAlignRight, Alignment.ALIGN_OPPOSITE, this);
+//		实例化一个ARE_Image，将item传入ARE_Image
 		this.mImageStyle = new ARE_Image(this.mRteInsertImage);
 		this.mVideoStyle = new ARE_Video(this.mRteInsertVideo);
 		this.mAtStyle = new ARE_At(this);
@@ -473,6 +477,7 @@ public class ARE_Toolbar extends LinearLayout {
 		this.mStylesList.add(this.mAlignLeft);
 		this.mStylesList.add(this.mAlignCenter);
 		this.mStylesList.add(this.mAlignRight);
+//		将item样式添加入样式列表
 		this.mStylesList.add(this.mImageStyle);
 		this.mStylesList.add(this.mVideoStyle);
 		this.mStylesList.add(this.mAtStyle);
@@ -486,8 +491,10 @@ public class ARE_Toolbar extends LinearLayout {
 		}
 	}
 
+//	得到当前editText
 	public void setEditText(AREditText editText) {
 		this.mEditText = editText;
+
 		bindToolbar();
 	}
 
@@ -504,6 +511,7 @@ public class ARE_Toolbar extends LinearLayout {
 		this.mFontColorStyle.setEditText(this.mEditText);
 		this.mBackgroundColoStyle.setEditText(this.mEditText);
 		this.mLinkStyle.setEditText(this.mEditText);
+//		将item与当前editText绑定
 		this.mImageStyle.setEditText(this.mEditText);
 		this.mVideoStyle.setEditText(this.mEditText);
 		this.mAtStyle.setEditText(this.mEditText);
@@ -585,7 +593,7 @@ public class ARE_Toolbar extends LinearLayout {
 
 	/**
 	 * On activity result.
-	 *
+	 *页面跳转去选择图片，操作后，返回数据
 	 * @param requestCode
 	 * @param resultCode
 	 * @param data
@@ -595,7 +603,9 @@ public class ARE_Toolbar extends LinearLayout {
 		mEmojiShownNow = false;
 		if (resultCode == Activity.RESULT_OK) {
 			if (REQ_IMAGE == requestCode) {
+//				返回的图片uri
 				Uri uri = data.getData();
+//				将数据传入具体操作
 				this.mImageStyle.insertImage(uri, AreImageSpan.ImageType.URI);
 			} else if (REQ_AT == requestCode) {
 				AtItem atItem = (AtItem) data.getSerializableExtra(ARE_At.EXTRA_TAG);
@@ -615,7 +625,7 @@ public class ARE_Toolbar extends LinearLayout {
 
 	/* -------- START: Keep it at the bottom of the class.. Keyboard and emoji ------------ */
 	/* -------- START: Keep it at the bottom of the class.. Keyboard and emoji ------------ */
-	private void initKeyboard() {
+	public void initKeyboard() {
 		final Window window = mContext.getWindow();
 		final View rootView = window.getDecorView().findViewById(android.R.id.content);
 		rootView.getViewTreeObserver().addOnGlobalLayoutListener(
@@ -640,6 +650,7 @@ public class ARE_Toolbar extends LinearLayout {
 						view.getWindowVisibleDisplayFrame(r);
 						int[] screenWandH = Util.getScreenWidthAndHeight(mContext);
 						int screenHeight = screenWandH[1];
+
 						final int keyboardHeight = screenHeight - r.bottom;
 
 						if (mPreviousKeyboardHeight != keyboardHeight) {

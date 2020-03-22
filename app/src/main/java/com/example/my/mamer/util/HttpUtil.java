@@ -14,6 +14,7 @@ import static com.example.my.mamer.config.Config.NOTIFICATION_LIST;
 import static com.example.my.mamer.config.Config.NOTIFICATION_READ;
 import static com.example.my.mamer.config.Config.NOTIFICATION_STATE;
 import static com.example.my.mamer.config.Config.RECOMMEND_RESOURCE;
+import static com.example.my.mamer.config.Config.TOPIC_DIVID;
 import static com.example.my.mamer.config.Config.USER_RECOMMEND;
 
 public class HttpUtil {
@@ -158,7 +159,7 @@ public class HttpUtil {
 //    获取话题分类
     public static void sendOkHttpGetTopicDivid(okhttp3.Callback callback){
         OkHttpClient client=new OkHttpClient();
-        Request request=new Request.Builder().url(RECOMMEND_RESOURCE).build();
+        Request request=new Request.Builder().url(TOPIC_DIVID).build();
         client.newCall(request).enqueue(callback);
     }
 }

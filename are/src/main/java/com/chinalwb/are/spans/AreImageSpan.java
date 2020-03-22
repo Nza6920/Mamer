@@ -8,8 +8,10 @@ import android.text.style.ImageSpan;
 
 import com.chinalwb.are.Constants;
 
+//图片插入
 public class AreImageSpan extends ImageSpan implements ARE_Clickable_Span {
 
+	//		图片路径类型：本地图片，线上图片，资源图片
 	public enum ImageType {
 		URI,
 		URL,

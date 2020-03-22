@@ -10,9 +10,9 @@ import java.util.List;
 /**
  * Created by wliu on 13/08/2018.
  */
-
+//底部功能栏
 public interface IARE_Toolbar {
-
+//    添加一个功能item
     public void addToolbarItem(IARE_ToolItem toolbarItem);
 
     public List<IARE_ToolItem> getToolItems();

@@ -10,7 +10,6 @@ import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.AlignmentSpan;
 import android.text.style.ImageSpan;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.EditText;
@@ -21,11 +20,11 @@ import com.bumptech.glide.request.transition.Transition;
 import com.chinalwb.are.AREditText;
 import com.chinalwb.are.Constants;
 import com.chinalwb.are.Util;
+import com.chinalwb.are.glidesupport.GlideApp;
+import com.chinalwb.are.glidesupport.GlideRequests;
 import com.chinalwb.are.spans.AreImageSpan;
 import com.chinalwb.are.styles.toolbar.ARE_Toolbar;
 import com.chinalwb.are.styles.windows.ImageSelectDialog;
-import com.chinalwb.are.glidesupport.GlideApp;
-import com.chinalwb.are.glidesupport.GlideRequests;
 
 import static com.chinalwb.are.spans.AreImageSpan.ImageType;
 
@@ -69,6 +68,7 @@ public class ARE_Image implements IARE_Style, IARE_Image {
 
 	/**
 	 * Open system image chooser page.
+	 * 打开dialog选择从哪里添加图片
 	 */
 	private void openImageChooser() {
 		ImageSelectDialog dialog = new ImageSelectDialog(mContext, this, ARE_Toolbar.REQ_IMAGE);
@@ -76,7 +76,9 @@ public class ARE_Image implements IARE_Style, IARE_Image {
 	}
 
 	/**
-	 *
+	 *插入图片
+	 * src：路径
+	 * type:路径类型
 	 */
 	public void insertImage(final Object src, final ImageType type) {
 		// Note for a possible bug:
@@ -99,16 +101,20 @@ public class ARE_Image implements IARE_Style, IARE_Image {
 		// So in temporary, I commented out this method invoke to prevent this known issue
 		// When someone run into the crash bug caused by this on Android 8
 		// I can then find out a solution to cover both cases
+//		Glide回调
 		SimpleTarget myTarget = new SimpleTarget<Bitmap>() {
+//			这个方法一旦Glide加载和处理完图片将会被调用。回调方法传回Bitmap作为参数，你可以在你所需要用的地方随意使用这个Bitmap对象
 			@Override
 			public void onResourceReady(Bitmap bitmap, Transition<? super Bitmap> transition) {
 				if (bitmap == null) { return; }
-
                 bitmap = Util.scaleBitmapToFitWidth(bitmap, sWidth);
                 ImageSpan imageSpan = null;
+//                处理系统图片
                 if (type == ImageType.URI) {
+//                	实例化AreImageSpan
                     imageSpan = new AreImageSpan(mContext, bitmap, ((Uri) src));
 				} else if (type == ImageType.URL) {
+//                	处理线上图片
 					imageSpan = new AreImageSpan(mContext, bitmap, ((String) src));
 				}
 				if (imageSpan == null) { return; }
@@ -116,7 +122,9 @@ public class ARE_Image implements IARE_Style, IARE_Image {
 			}
 		};
 
+//		处理图片
         if (type == ImageType.URI) {
+//        	将图片加载，centerCrop:均衡的缩放图像（保持图像原始比例），使图片的两个坐标（宽、高）都大于等于 相应的视图坐标（负的内边距）。图像则位于视图的中央
             sGlideRequests.asBitmap().load((Uri) src).centerCrop().into(myTarget);
         } else if (type == ImageType.URL) {
         	    sGlideRequests.asBitmap().load((String) src).centerCrop().into(myTarget);
@@ -127,10 +135,13 @@ public class ARE_Image implements IARE_Style, IARE_Image {
 	}
 
 	private void insertSpan(ImageSpan imageSpan) {
+//		取得文本可编辑对象
 		Editable editable = this.mEditText.getEditableText();
+//		光标
 		int start = this.mEditText.getSelectionStart();
 		int end = this.mEditText.getSelectionEnd();
 
+//		图片对齐方式：居中
 		AlignmentSpan centerSpan = new AlignmentSpan.Standard(Layout.Alignment.ALIGN_CENTER);
 		SpannableStringBuilder ssb = new SpannableStringBuilder();
 		ssb.append(Constants.CHAR_NEW_LINE);

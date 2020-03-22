@@ -51,7 +51,7 @@ import java.util.List;
  *
  */
 public class AREditText extends AppCompatEditText {
-
+//	底部功能栏
 	private IARE_Toolbar mToolbar;
 
 	private static boolean LOG = false;
