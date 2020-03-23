@@ -272,7 +272,6 @@ public class TopicActivity extends AppCompatActivity implements View.OnClickList
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
         Uri uri=data.getData();
         Log.e("html", String.valueOf(uri));
 //        判断图片的大小是否符合上传条件
@@ -286,9 +285,6 @@ public class TopicActivity extends AppCompatActivity implements View.OnClickList
                 e.printStackTrace();
             }
         }
-
-
-
     }
 
     @Override

@@ -10,7 +10,6 @@ import com.chinalwb.are.R;
 import com.chinalwb.are.Util;
 import com.chinalwb.are.styles.IARE_Style;
 import com.chinalwb.are.styles.toolitems.styles.ARE_Style_Hr;
-import com.chinalwb.are.styles.toolitems.styles.ARE_Style_ListBullet;
 
 /**
  * Created by wliu on 13/08/2018.
@@ -46,7 +45,6 @@ public class ARE_ToolItem_Hr extends ARE_ToolItem_Abstract {
             imageView.bringToFront();
             mToolItemView = imageView;
         }
-
         return mToolItemView;
     }
 

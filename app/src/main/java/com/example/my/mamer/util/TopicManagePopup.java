@@ -1,92 +1,116 @@
-//package com.example.my.mamer.util;
+package com.example.my.mamer.util;
+
+import android.app.Activity;
+import android.content.Context;
+import android.util.SparseArray;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.WindowManager;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
+
+import com.example.my.mamer.R;
+import com.example.my.mamer.util.PopupItemStyle.PopupStyle;
+
+import java.util.ArrayList;
+
+/**
+ * popupwindow工具类，
+ * 可以添加操作控件，数量可改变
+ * 1、需要一个添加item的接口，将需要的item的图片和文字加入
+ *  1、需要在popupwindow画出imageView和TextView才能将图片和文字显示
+ * 2、需要一个动作按钮的点击监听返回接口，当前页面需要对不同按钮做不同的响应
+ * 3、可以暂时将popupwindow的高度设置为定值
+ */
+public  class TopicManagePopup  {
+
+    private Context mContext;
+    private int codeId;
+    private PopupStyle popupStyle;
+    private ClickListener mCallBack;
+
+    public TopicManagePopup(Context context, SparseArray<View> viewSparseArray, ArrayList<View> views, ClickListener callback) {
+        this.mContext=context;
+        this.mCallBack=callback;
+        setCallBack(callback);
+
+        TopicManagePopupUtil  popupUtil=TopicManagePopupUtil.createView(context,viewSparseArray,views,mCallBack);
+    }
+
+    public static class TopicManagePopupUtil{
+       private ClickListener mCallBack;
+       private static PopupWindow popupWindow;
+       private SparseArray<View> viewSparseArray;
+       private View item;
+
+        private TopicManagePopupUtil(Context context,ClickListener mCallBack, SparseArray<View> viewSparseArray) {
+            this.viewSparseArray=viewSparseArray;
+            this.mCallBack = mCallBack;
+        }
+        public static TopicManagePopupUtil createView(final Context context,SparseArray<View> viewSparseArray,ArrayList<View> views,ClickListener callback){
+
+//        获取整个popupWindow样式
+            LayoutInflater mInflater= (LayoutInflater) ((Activity)context).getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View popupView= mInflater.inflate(R.layout.popup_util,null);
+
+            TopicManagePopupUtil popupUtil=new TopicManagePopupUtil(context,callback,viewSparseArray);
+//        获取屏幕高宽
+            int weight= context.getResources().getDisplayMetrics().widthPixels;
+            final int height=context.getResources().getDisplayMetrics().heightPixels*1/6;
+//            实例化popupwindow
+            popupWindow=new PopupWindow(popupView,weight,height);
+            popupWindow.setAnimationStyle(R.style.popup_window_anim);
+//            设置弹出窗体可点击
+            popupWindow.setFocusable(true);
+            popupWindow.setTouchable(true);
+//        点击外部popupwindow消失
+            popupWindow.setOutsideTouchable(true);
+            popupWindow.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+//            设置内部item
+
+            for (int i = 0; i < views.size(); i++) {
+                LinearLayout linearLayout=popupView.findViewById(R.id.popup_layout_content);
+                linearLayout.addView(views.get(i));
+            }
+//            点击事件回调
+            if (popupWindow!=null){
+                callback.setUplistener(popupUtil);
+            }
 //
-//import android.app.Activity;
-//import android.content.Context;
-//import android.content.Intent;
-//import android.os.Handler;
-//import android.view.Gravity;
-//import android.view.LayoutInflater;
-//import android.view.View;
-//import android.view.WindowManager;
-//import android.widget.LinearLayout;
-//import android.widget.PopupWindow;
-//
-//import com.example.my.mamer.R;
-//import com.example.my.mamer.TopicReplyPublishActivity;
-//import com.example.my.mamer.config.GlobalTopicReply;
-//
-//import static com.example.my.mamer.config.Config.USER_TOPIC_UPDATE;
-//
-//public class TopicManagePopup extends PopupWindow {
-//
-//    private View popupView;
-//    private Handler handler;
-//
-//    public TopicManagePopup(final Activity context){
-//        super(context);
-//        initView(context);
-//    }
-//
-//    private void initView(final Activity context){
-//        LayoutInflater mInflater= (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-//        popupView= mInflater.inflate(R.layout.popup_topic_manage,null,false);
-//        LinearLayout layoutEdit=popupView.findViewById(R.id.layout_popup_edit);
-//        LinearLayout layoutUpdate=popupView.findViewById(R.id.layout_popup_update);
-//        LinearLayout layoutDel=popupView.findViewById(R.id.layout_popup_del);
-//        LinearLayout layoutCancel=popupView.findViewById(R.id.layout_popup_cancel);
-////        获取屏幕高宽
-//        int weight= context.getResources().getDisplayMetrics().widthPixels;
-//        final int height=context.getResources().getDisplayMetrics().heightPixels*1/6;
-//
-//        final PopupWindow popupWindow=new PopupWindow(popupView,weight,height);
-//        popupWindow.setAnimationStyle(R.style.popup_window_anim);
-//        popupWindow.setFocusable(true);
-////        点击外部popupwindow消失
-//        popupWindow.setOutsideTouchable(true);
-////        点击事件
-////        删除
-//        layoutDel.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                popupWindow.dismiss();
-//
-//            }
-//        });
-////        编辑
-//        layoutEdit.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//            }
-//        });
-////        评论
-//        layoutUpdate.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent intent=new Intent(context,TopicReplyPublishActivity.class);
-//                intent.putExtra("essayId",GlobalTopicReply.reply.replyUser.getEssayId());
-//                context.startActivityForResult(intent,USER_TOPIC_UPDATE);
-//                popupWindow.dismiss();
-//            }
-//        });
-////        取消
-//        layoutCancel.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                popupWindow.dismiss();
-//            }
-//        });
-////        屏幕不透明
-//        popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener(){
-//            @Override
-//            public void onDismiss() {
-//                WindowManager.LayoutParams layoutParams=context.getWindow().getAttributes();
-//                layoutParams.alpha=1.0f;
-//                context.getWindow().setAttributes(layoutParams);
-//            }
-//        });
-//        WindowManager.LayoutParams layoutParam=context.getWindow().getAttributes();
-//        layoutParam.alpha=0.3f;
-//        context.getWindow().setAttributes(layoutParam);
-//        popupWindow.showAtLocation(popupView,Gravity.BOTTOM,0,10);
-//    }
-//}
+//        屏幕不透明
+            popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener(){
+                @Override
+                public void onDismiss() {
+                    WindowManager.LayoutParams layoutParams=((Activity)context).getWindow().getAttributes();
+                    layoutParams.alpha=1.0f;
+                    ((Activity)context).getWindow().setAttributes(layoutParams);
+                }
+            });
+
+            WindowManager.LayoutParams layoutParam=((Activity)context).getWindow().getAttributes();
+            layoutParam.alpha=0.3f;
+            ((Activity)context).getWindow().setAttributes(layoutParam);
+            popupWindow.showAtLocation(popupView,Gravity.BOTTOM,0,10);
+            return popupUtil;
+        }
+
+        //    得到视图
+        public <T extends View> T getView(int id){
+            T t= (T) viewSparseArray.get(id);
+            if (t ==null){
+                t=item.findViewById(id);
+            }
+
+            return t;
+        }
+    }
+
+    public interface ClickListener{
+        void setUplistener(TopicManagePopupUtil popupUtil);
+    }
+
+    private void setCallBack(ClickListener callback){
+        this.mCallBack=callback;
+    }
+}
