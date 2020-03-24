@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.SparseArray;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.example.my.mamer.util.PopupItemStyle.PopupStyle;
 import com.example.my.mamer.util.TopicManagePopup;
@@ -48,15 +49,16 @@ public class TestActivity extends AppCompatActivity {
                 popupUtil.getView(idComment).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-
+                        Toast.makeText(TestActivity.this,"发表评论",Toast.LENGTH_SHORT).show();
                     }
                 });
                 popupUtil.getView(idDel).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-
+                        Toast.makeText(TestActivity.this,"删除话题评论",Toast.LENGTH_SHORT).show();
                     }
                 });
+
 
             }
 

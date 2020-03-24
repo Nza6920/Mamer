@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.TextView;
 
 import com.example.my.mamer.R;
 import com.example.my.mamer.util.PopupItemStyle.PopupStyle;
@@ -73,6 +74,13 @@ public  class TopicManagePopup  {
                 LinearLayout linearLayout=popupView.findViewById(R.id.popup_layout_content);
                 linearLayout.addView(views.get(i));
             }
+            TextView tvClose=popupView.findViewById(R.id.popup_close_);
+            tvClose.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    popupWindow.dismiss();
+                }
+            });
 //            点击事件回调
             if (popupWindow!=null){
                 callback.setUplistener(popupUtil);
