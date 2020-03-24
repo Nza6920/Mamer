@@ -10,6 +10,8 @@ public class ReplyUser {
     private String title;
     private String UserInfo;
     private String emil;
+    private String time;
+    private String count;
 
 
     public ReplyUser(){}
@@ -92,5 +94,21 @@ public class ReplyUser {
 
     public void setEmil(String emil) {
         this.emil = emil;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
+    public String getCount() {
+        return count;
+    }
+
+    public void setCount(String count) {
+        this.count = count;
     }
 }

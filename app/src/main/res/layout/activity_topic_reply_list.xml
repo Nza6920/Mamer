@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".TopicReplyListActivity">
+    <include layout="@layout/title"/>
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/title_bar"
+        android:layout_above="@+id/reply_bottombar"
+        android:background="@drawable/divid_line">
+        <FrameLayout
+            android:id="@+id/reply_user"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
+            >
+            <fragment
+                android:id="@+id/reply_user_fragment"
+                android:name="com.example.my.mamer.fragment.TopicReplyFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"/>
+        </FrameLayout>
+    </ScrollView>
+    <LinearLayout
+        android:id="@+id/reply_bottombar"
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:background="@drawable/divid_line"
+        android:paddingLeft="5dp">
+        <TextView
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:gravity="center"
+            android:background="@mipmap/ic_reply_comment"/>
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="我要评论"
+            android:layout_marginLeft="5dp"
+            android:gravity="center_vertical"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="发布"
+            android:textSize="13sp"
+            android:textColor="#12A3E9"
+            android:gravity="center"
+            android:layout_marginRight="5dp"/>
+
+
+    </LinearLayout>
+
+</RelativeLayout>

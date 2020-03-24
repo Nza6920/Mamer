@@ -9,17 +9,14 @@
     android:background="#afefeded">
 
     <include layout="@layout/title"/>
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+
         <RelativeLayout
             android:id="@+id/author"
             android:layout_width="match_parent"
             android:layout_height="80dp"
             android:orientation="horizontal"
             android:paddingRight="15dp"
-            android:paddingLeft="15dp"
-            android:background="#fff">
+            android:paddingLeft="15dp">
 
             <ImageView
                 android:id="@+id/topic_particulars_author_pic"
@@ -37,13 +34,6 @@
                 android:layout_marginLeft="10dp"
                 android:layout_centerInParent="true"
                 android:layout_toRightOf="@id/topic_particulars_author_pic"/>
-            <TextView
-                android:id="@+id/topic_particulars_time"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="15sp"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentEnd="true"/>
 
         </RelativeLayout>
         <ScrollView
@@ -51,9 +41,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="15dp"
-            android:layout_marginTop="20dp"
             android:layout_marginRight="15dp"
-            android:layout_below="@+id/author">
+            android:layout_below="@+id/author"
+            android:background="@drawable/divid_line">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -62,54 +52,115 @@
                     android:id="@+id/topic_particulars_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
                     android:textColor="#000"
                     android:textSize="20sp"/>
-                <TextView
+
+                <com.chinalwb.are.AREditText
                     android:id="@+id/topic_particulars_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="top|left"
+                    android:textSize="17sp"
+                    android:layout_marginTop="15dp"/>
+                <TextView
+                    android:id="@+id/topic_particulars_time"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="15sp"
+                    android:layout_marginTop="10dp"
+                    android:gravity="right"/>
+                <LinearLayout
+                    android:id="@+id/reply_comment"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="15dp"
-                    android:textSize="15sp"
-                    android:textColor="#000"/>
+                    android:orientation="vertical"
+                    android:clickable="true">
 
-                <TextView
-                    android:id="@+id/reply_none"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="快来发表你的评论吧·"
-                    android:textSize="15sp"
-                    android:gravity="center"
-                    android:visibility="gone"/>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:text="评论"
+                            android:textSize="20sp" />
+                        <TextView
+                            android:id="@+id/reply_count"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="15sp"
+                            android:layout_marginLeft="5dp"/>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/reply_comment_list"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="10dp"
+                        android:visibility="gone">
+                        <ImageView
+                            android:id="@+id/reply_user_avatar"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp" />
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:layout_marginLeft="5dp">
+                            <TextView
+                                android:id="@+id/reply_name"
+                                android:layout_width="wrap_content"
+                                android:layout_height="20dp"
+                                android:textSize="15sp"
+                                android:textColor="#444"
+                                android:layout_marginTop="5dp"/>
+                            <TextView
+                                android:id="@+id/reply_content"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="15sp"
+                                android:textColor="#000"
+                                android:layout_marginTop="10dp"/>
+                        </LinearLayout>
+                    </LinearLayout>
+                    <TextView
+                        android:id="@+id/reply_time"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#000"
+                        android:textSize="15sp"
+                        android:layout_gravity="right"
+                        android:visibility="gone"/>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginBottom="5dp"
+                        android:orientation="horizontal"
+                        android:background="@drawable/register_phone_num_tab">
+                        <TextView
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:background="@mipmap/ic_reply_comment"/>
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:text="添加评论..."
+                            android:layout_marginLeft="10dp"
+                            android:gravity="center_vertical"
+                            />
+                    </LinearLayout>
+                </LinearLayout>
             </LinearLayout>
 
         </ScrollView>
-        <RelativeLayout
-            android:id="@+id/topic_particulars_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="15dp"
-            android:layout_marginLeft="15dp"
-            android:layout_below="@+id/topic_content">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="评论"
-                android:textSize="15sp"
-                android:layout_centerVertical="true"/>
-        </RelativeLayout>
-        <FrameLayout
-            android:id="@+id/reply_user"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="15dp"
-            android:layout_marginLeft="15dp"
-            android:layout_below="@+id/topic_particulars_name">
-            <fragment
-                android:id="@+id/reply_user_fragment"
-                android:name="com.example.my.mamer.fragment.TopicReplyFragment"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_gravity="center"/>
-        </FrameLayout>
-    </RelativeLayout>
+
+
+
 </LinearLayout>

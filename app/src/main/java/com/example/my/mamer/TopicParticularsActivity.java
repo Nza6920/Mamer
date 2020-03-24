@@ -26,12 +26,14 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.chinalwb.are.AREditText;
 import com.example.my.mamer.bean.ReplyUser;
 import com.example.my.mamer.bean.TopicContent;
 import com.example.my.mamer.config.GlobalTopicReply;
 import com.example.my.mamer.util.HttpUtil;
 import com.example.my.mamer.util.LoadingDraw;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -68,14 +70,18 @@ public class TopicParticularsActivity extends AppCompatActivity {
     private TopicManagePopup topicManagePopup;
     private AlertDialog.Builder delDialogBuilder;
     private View.OnClickListener onClickListener;
-//    外部评论
+//    外部评论//评论列表仅显示一个,有评论就显示，没有就不显示
     private ArrayList<TopicContent> listData=new ArrayList<>();
     private LoadingDraw loadingDraw;
-//评论列表仅显示一个,有评论就显示，没有就不显示
+    private LinearLayout layoutComment;
+    private LinearLayout layoutCommentList;
+    private ImageView imgAvatar;
+    private TextView tvReplyUserName;
+    private TextView tvReplyContent;
+    private TextView tvReplyTime;
+    private TextView tvReplyCount;
 
 
-
-    private TextView replyNone;
 
     public final Handler msgHandler=new Handler(new Handler.Callback() {
         @Override
@@ -126,15 +132,13 @@ public class TopicParticularsActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_topic_particulars);
         loadingDraw=new LoadingDraw(this);
-
-        init();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
         getTopicParticulas();
+        getTopicReply();
+        init();
+
     }
+
+
 
     private void init(){
         tvBack=findViewById(R.id.title_tv_close);
@@ -145,12 +149,17 @@ public class TopicParticularsActivity extends AppCompatActivity {
         tvCreatedTime=findViewById(R.id.topic_particulars_time);
         tvEssayTitle=findViewById(R.id.topic_particulars_title);
         tvEssayContent=findViewById(R.id.topic_particulars_content);
-        replyNone=findViewById(R.id.reply_none);
+        layoutComment=findViewById(R.id.reply_comment);
+        layoutCommentList=findViewById(R.id.reply_comment_list);
+        imgAvatar=findViewById(R.id.reply_user_avatar);
+        tvReplyUserName=findViewById(R.id.reply_name);
+        tvReplyContent=findViewById(R.id.reply_content);
+        tvReplyTime=findViewById(R.id.reply_time);
+        tvReplyCount=findViewById(R.id.reply_count);
 //        填充
         Drawable tvBackPic=ContextCompat.getDrawable(this,R.mipmap.ic_title_back);
         tvBack.setBackground(tvBackPic);
 
-        getTopicParticulas();
 //        动态显示话题分类
         switch (GlobalTopicReply.reply.categoryId){
             case "1":
@@ -212,9 +221,17 @@ public class TopicParticularsActivity extends AppCompatActivity {
                 finish();
             }
         });
+//        跳到评论列表界面
+        layoutComment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(TopicParticularsActivity.this,TopicReplyListActivity.class);
+                startActivity(intent);
+            }
+        });
 
     }
-//获得话题详情
+//  获得话题详情
     private void getTopicParticulas(){
         String essayId=GlobalTopicReply.reply.replyUser.getEssayId();
 //        loadingDraw.show();
@@ -277,8 +294,10 @@ public class TopicParticularsActivity extends AppCompatActivity {
                                     Log.e("Tag","话题详情--姓名");
                                     tvEssayTitle.setText(listData.get(0).getTopicTitle());
                                     Log.e("Tag","话题详情--标题");
-                                    tvCreatedTime.setText(listData.get(0).getCreateTime());
+                                    tvCreatedTime.setText("编辑于"+listData.get(0).getCreateTime());
                                     Log.e("Tag","话题详情--创建时间");
+                                    contentUtil(listData.get(0).getTopicConten());
+
                                 }};
                             new Thread(){
                                 public void run(){
@@ -297,12 +316,107 @@ public class TopicParticularsActivity extends AppCompatActivity {
         });
 
     }
-//    解析html
-    private void jsoupUtil(String contentStr){
-//        从String加载文档
-//spaned
-//        Spanned contentStrs= Html.fromHtml();
+//    获取评论
+    private void getTopicReply(){
 
+        HttpUtil.sendOkHttpGetTopicReplyList(GlobalTopicReply.reply.replyUser.getEssayId(), new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+
+                Message msg2 = new Message();
+                msg2.what = MESSAGE_ERROR;
+                msg2.obj = "服务器异常,请检查网络";
+                msgHandler.sendMessage(msg2);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                JSONObject jresp = null;
+                JSONArray jsonArray=null;
+                try {
+                    jresp=new JSONObject(response.body().string());
+                    switch (response.code()){
+                        case HTTP_USER_GET_INFORMATION:
+                            if (jresp.has("data")){
+                                jsonArray=jresp.getJSONArray("data");
+//                               有评论
+                                if (jsonArray!=null){
+                                    JSONObject jsonObject=jsonArray.getJSONObject(0);
+                                    final ReplyUser replyUser=new ReplyUser();
+                                    replyUser.setReplyId(jsonObject.getString("id"));
+                                    replyUser.setEssayId(jsonObject.getString("topic_id"));
+                                    replyUser.setContent(jsonObject.getString("content"));
+                                    replyUser.setTime(jsonObject.getString("updated_at"));
+                                    if (jsonObject.has("user")){
+                                        JSONObject userStr=jsonObject.getJSONObject("user");
+                                        replyUser.setUserId(userStr.getString("id"));
+                                        replyUser.setUserName(userStr.getString("name"));
+                                        replyUser.setUserImg(userStr.getString("avatar"));
+                                        }
+                                    final Runnable setAvatarRunable=new Runnable() {
+                                        @Override
+                                        public void run() {
+
+                                            layoutCommentList.setVisibility(View.VISIBLE);
+                                            tvReplyTime.setVisibility(View.VISIBLE);
+                                            RequestOptions options=new RequestOptions()
+                                                    .error(R.mipmap.ic_image_error)
+                                                    .placeholder(R.mipmap.ic_image_error);
+                                            Glide.with(getContext())
+                                                    .asBitmap()
+                                                    .load(replyUser.getUserImg())
+                                                    .apply(options)
+                                                    .into(imgAvatar);
+                                            tvReplyUserName.setText(replyUser.getUserName());
+                                            tvReplyContent.setText(replyUser.getContent());
+                                            tvReplyTime.setText(replyUser.getTime());
+
+
+                                        }};
+                                    new Thread(){
+                                        public void run(){
+                                            msgHandler.post(setAvatarRunable);
+                                        }
+                                    }.start();
+                                }
+
+
+                            }
+                            if (jresp.has("meta")){
+                                jresp=jresp.getJSONObject("meta");
+                                if (jresp.has("pagination")){
+                                    jresp=jresp.getJSONObject("pagination");
+                                    final String count=jresp.getString("total");
+                                    final Runnable setCountRunable=new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            tvReplyCount.setText(count);
+                                        }};
+                                    new Thread(){
+                                        public void run(){
+                                            msgHandler.post(setCountRunable);
+                                        }
+                                    }.start();
+                                }
+                                }
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+
+    }
+//    解析html
+    private void contentUtil(String contentStr){
+//        从String加载文档
+        AREditText mEditText=findViewById(R.id.topic_particulars_content);
+        mEditText.setFocusable(false);
+        mEditText.setFocusableInTouchMode(false);
+        Drawable edit=ContextCompat.getDrawable(this,R.drawable.backgraoud_color);
+        mEditText.setBackground(edit);
+        mEditText.fromHtml(contentStr);
     }
 //    删除提醒
     private void delAlert(){
@@ -478,4 +592,9 @@ public class TopicParticularsActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        getTopicReply();
+    }
 }
