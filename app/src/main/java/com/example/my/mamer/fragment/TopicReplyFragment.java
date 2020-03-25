@@ -83,9 +83,9 @@ public class TopicReplyFragment extends BaseLazyLoadFragment {
 
 //    数据
     @Override
-    public void onLazyLoad() {
+    public void onLazyLoad(int page) {
 
-        HttpUtil.sendOkHttpGetTopicReplyList(GlobalTopicReply.reply.replyUser.getEssayId(), new Callback() {
+        HttpUtil.sendOkHttpGetTopicReplyList(GlobalTopicReply.reply.replyUser.getEssayId(),page, new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
 

@@ -87,8 +87,8 @@ public class TopicShare extends BaseLazyLoadFragment {
 
     //    数据加载接口
     @Override
-    public void onLazyLoad() {
-        HttpUtil.sendOkHttpGetTopicList("user,category",1,"recent", 1, new Callback() {
+    public void onLazyLoad(int page) {
+        HttpUtil.sendOkHttpGetTopicList("user,category",1,"recent", page, new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
 

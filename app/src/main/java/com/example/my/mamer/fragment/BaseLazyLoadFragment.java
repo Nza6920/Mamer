@@ -28,7 +28,7 @@ public abstract class BaseLazyLoadFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         isViewCreated=true;
-        onLazyLoad();
+        onLazyLoad(1);
     }
 
     @Override
@@ -45,7 +45,7 @@ public abstract class BaseLazyLoadFragment extends Fragment {
     }
     private void isCanLoadData(){
         if (isViewCreated&&isVisible){
-            onLazyLoad();
+            onLazyLoad(1);
             isViewCreated=false;
             isVisible=false;
         }
@@ -60,7 +60,7 @@ public abstract class BaseLazyLoadFragment extends Fragment {
     }
 
     //    数据加载接口
-    public abstract void onLazyLoad();
+    public abstract void onLazyLoad(int page);
 //    初始化视图
     public  abstract View initView(LayoutInflater inflater,ViewGroup container);
 //    初始化事件接口

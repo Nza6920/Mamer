@@ -99,8 +99,8 @@ public class HttpUtil {
         client.newCall(request).enqueue(callback);
     }
 //    获取话题回复列表
-    public static void sendOkHttpGetTopicReplyList(String essayId,okhttp3.Callback callback){
-        String GET_TOPIC_REPLY_LIST="http://www.mamer.club/api/topics/"+essayId+"/replies?include=user&page=1";
+    public static void sendOkHttpGetTopicReplyList(String essayId,int page,okhttp3.Callback callback){
+        String GET_TOPIC_REPLY_LIST="http://www.mamer.club/api/topics/"+essayId+"/replies?include=user&page="+page;
         OkHttpClient client=new OkHttpClient();
         Request request=new Request.Builder().url(GET_TOPIC_REPLY_LIST).build();
         client.newCall(request).enqueue(callback);

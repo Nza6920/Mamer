@@ -72,7 +72,7 @@ public class UserSelfReplyActivity extends AppCompatActivity {
         setContentView(R.layout.activity_user_self_reply_list);
         loadingDraw=new LoadingDraw(this);
         initUI();
-        onDataLoad();
+        onDataLoad(1);
         mAdapter=new TopicReplyAdapter(getApplicationContext(),getListData());
         listView.setAdapter(mAdapter);
         initEvent();
@@ -107,9 +107,9 @@ public class UserSelfReplyActivity extends AppCompatActivity {
         tvTitle.setTextSize(25);
     }
 
-    private void onDataLoad(){
-
-        HttpUtil.sendOkHttpGetUserReplyList(MyApplication.globalUserInfo.user.getUserId(),1, new Callback() {
+//    回复列表数据
+    private void onDataLoad(int page){
+        HttpUtil.sendOkHttpGetUserReplyList(MyApplication.globalUserInfo.user.getUserId(),page, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
 
@@ -170,6 +170,7 @@ public class UserSelfReplyActivity extends AppCompatActivity {
         });
 
     }
+//    点击事件
     private void initEvent(){
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -195,6 +196,7 @@ public class UserSelfReplyActivity extends AppCompatActivity {
             }
         });
     }
+//    删除回复
     private void delReply(String essayId,String replyId){
 
         HttpUtil.sendOkHttpDelReply(essayId, replyId, new Callback() {

@@ -126,7 +126,7 @@ public class NotificationFragment extends BaseLazyLoadFragment {
     }
 
     @Override
-    public void onLazyLoad() {
+    public void onLazyLoad(int page) {
         if (MyApplication.globalUserInfo.token!=null){
             loadingDraw.show();
             HttpUtil.sendOkHttpGetNotificationList(new Callback() {

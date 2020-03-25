@@ -29,7 +29,6 @@ import com.bumptech.glide.request.RequestOptions;
 import com.chinalwb.are.AREditText;
 import com.example.my.mamer.bean.ReplyUser;
 import com.example.my.mamer.bean.TopicContent;
-import com.example.my.mamer.config.GlobalTopicReply;
 import com.example.my.mamer.util.HttpUtil;
 import com.example.my.mamer.util.LoadingDraw;
 
@@ -124,11 +123,11 @@ public class TopicParticularsActivity extends AppCompatActivity {
 
         final SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(this);
         ReplyUser replyUser=new ReplyUser();
-        GlobalTopicReply.reply.replyUser=replyUser;
-        GlobalTopicReply.reply.replyUser.setEssayId(prefs.getString("id",null));
-        GlobalTopicReply.reply.replyUser.setUserId(prefs.getString("userId",null));
-        GlobalTopicReply.reply.categoryId=prefs.getString("categoryId",null);
-        GlobalTopicReply.reply.tagId=prefs.getString("tagId",null);
+        MyApplication.globalTopicReply.reply.replyUser=replyUser;
+        MyApplication.globalTopicReply.reply.replyUser.setEssayId(prefs.getString("id",null));
+        MyApplication.globalTopicReply.reply.replyUser.setUserId(prefs.getString("userId",null));
+        MyApplication.globalTopicReply.reply.categoryId=prefs.getString("categoryId",null);
+        MyApplication.globalTopicReply.reply.tagId=prefs.getString("tagId",null);
 
         setContentView(R.layout.activity_topic_particulars);
         loadingDraw=new LoadingDraw(this);
@@ -161,7 +160,7 @@ public class TopicParticularsActivity extends AppCompatActivity {
         tvBack.setBackground(tvBackPic);
 
 //        动态显示话题分类
-        switch (GlobalTopicReply.reply.categoryId){
+        switch (MyApplication.globalTopicReply.reply.categoryId){
             case "1":
                 Message msg1 = new Message();
                 msg1.what = 1;
@@ -187,7 +186,7 @@ public class TopicParticularsActivity extends AppCompatActivity {
         }
 //        判断用户是否登陆，
         if (MyApplication.globalUserInfo.token!=null){
-            if (GlobalTopicReply.reply.replyUser.getUserId().equals(MyApplication.globalUserInfo.user.getUserId())){
+            if (MyApplication.globalTopicReply.reply.replyUser.getUserId().equals(MyApplication.globalUserInfo.user.getUserId())){
                 //            登陆，作者本人访问可删除和编辑帖子，以及评论
                 tvBtnNext.setText("管理");
                 //        管理点击事件
@@ -204,7 +203,7 @@ public class TopicParticularsActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
                         Intent intent=new Intent(TopicParticularsActivity.this,TopicReplyPublishActivity.class);
-                        intent.putExtra("essayId",GlobalTopicReply.reply.replyUser.getEssayId());
+                        intent.putExtra("essayId",MyApplication.globalTopicReply.reply.replyUser.getEssayId());
                         startActivity(intent);
                     }
                 });
@@ -225,6 +224,7 @@ public class TopicParticularsActivity extends AppCompatActivity {
         layoutComment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.e("tag",MyApplication.globalTopicReply.reply.replyUser.getEssayId());
                 Intent intent=new Intent(TopicParticularsActivity.this,TopicReplyListActivity.class);
                 startActivity(intent);
             }
@@ -233,7 +233,7 @@ public class TopicParticularsActivity extends AppCompatActivity {
     }
 //  获得话题详情
     private void getTopicParticulas(){
-        String essayId=GlobalTopicReply.reply.replyUser.getEssayId();
+        String essayId=MyApplication.globalTopicReply.reply.replyUser.getEssayId();
 //        loadingDraw.show();
         HttpUtil.sendOkHttpGetTopicParticulars(essayId,new Callback() {
             @Override
@@ -319,7 +319,7 @@ public class TopicParticularsActivity extends AppCompatActivity {
 //    获取评论
     private void getTopicReply(){
 
-        HttpUtil.sendOkHttpGetTopicReplyList(GlobalTopicReply.reply.replyUser.getEssayId(), new Callback() {
+        HttpUtil.sendOkHttpGetTopicReplyList(MyApplication.globalTopicReply.reply.replyUser.getEssayId(),1, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
 
@@ -438,7 +438,7 @@ public class TopicParticularsActivity extends AppCompatActivity {
     }
 //    删除话题
     private void delTopic(){
-        String essayId=GlobalTopicReply.reply.replyUser.getEssayId();
+        String essayId=MyApplication.globalTopicReply.reply.replyUser.getEssayId();
         loadingDraw.show();
         HttpUtil.sendOkHttpDelTopic(essayId, new Callback() {
             @Override
@@ -564,7 +564,7 @@ public class TopicParticularsActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     Intent intent=new Intent(context,TopicReplyPublishActivity.class);
-                    intent.putExtra("essayId",GlobalTopicReply.reply.replyUser.getEssayId());
+                    intent.putExtra("essayId",MyApplication.globalTopicReply.reply.replyUser.getEssayId());
                     context.startActivityForResult(intent,USER_TOPIC_UPDATE);
                     popupWindow.dismiss();
                 }
