@@ -1,6 +1,5 @@
 package com.example.my.mamer;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -14,13 +13,10 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.LayoutInflater;
+import android.util.SparseArray;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,6 +27,8 @@ import com.example.my.mamer.bean.ReplyUser;
 import com.example.my.mamer.bean.TopicContent;
 import com.example.my.mamer.util.HttpUtil;
 import com.example.my.mamer.util.LoadingDraw;
+import com.example.my.mamer.util.PopupItemStyle.PopupStyle;
+import com.example.my.mamer.util.TopicManagePopup;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -51,7 +49,6 @@ import static com.example.my.mamer.config.Config.HTTP_USER_GET_INFORMATION;
 import static com.example.my.mamer.config.Config.MESSAGE_ERROR;
 import static com.example.my.mamer.config.Config.UNLOGIN;
 import static com.example.my.mamer.config.Config.USER_TOPIC_DEL;
-import static com.example.my.mamer.config.Config.USER_TOPIC_UPDATE;
 
 public class TopicParticularsActivity extends AppCompatActivity {
 //    title
@@ -79,8 +76,13 @@ public class TopicParticularsActivity extends AppCompatActivity {
     private TextView tvReplyContent;
     private TextView tvReplyTime;
     private TextView tvReplyCount;
-
-
+//    popupwindow
+    private PopupStyle popupStyle=new PopupStyle();
+    private ArrayList<View> views=new ArrayList<>();
+    private SparseArray<View> viewSparseArray=new SparseArray<>();
+    private int idDel;
+    private int idEdit;
+    private int idHome;
 
     public final Handler msgHandler=new Handler(new Handler.Callback() {
         @Override
@@ -137,8 +139,6 @@ public class TopicParticularsActivity extends AppCompatActivity {
 
     }
 
-
-
     private void init(){
         tvBack=findViewById(R.id.title_tv_close);
         tvTitle=findViewById(R.id.title_tv_name);
@@ -158,6 +158,8 @@ public class TopicParticularsActivity extends AppCompatActivity {
 //        填充
         Drawable tvBackPic=ContextCompat.getDrawable(this,R.mipmap.ic_title_back);
         tvBack.setBackground(tvBackPic);
+        Drawable tvBtnNextPic=ContextCompat.getDrawable(this,R.mipmap.ic_reply_popup_show);
+        tvBtnNext.setBackground(tvBtnNextPic);
 
 //        动态显示话题分类
         switch (MyApplication.globalTopicReply.reply.categoryId){
@@ -184,27 +186,42 @@ public class TopicParticularsActivity extends AppCompatActivity {
                 default:
                     break;
         }
+//删除
+        View viewDel=popupStyle.getDelView(this);
+        idDel=popupStyle.getDelView(this).getId();
+//        编辑
+        View viewEdit=popupStyle.getEditView(this);
+        idEdit=popupStyle.getEditView(this).getId();
+//        返回首页
+        View viewHome=popupStyle.getHomeView(this);
+        idHome=popupStyle.getHomeView(this).getId();
+
 //        判断用户是否登陆，
         if (MyApplication.globalUserInfo.token!=null){
             if (MyApplication.globalTopicReply.reply.replyUser.getUserId().equals(MyApplication.globalUserInfo.user.getUserId())){
                 //            登陆，作者本人访问可删除和编辑帖子，以及评论
-                tvBtnNext.setText("管理");
+                views.add(viewDel);
+                views.add(viewEdit);
+                views.add(viewHome);
+
+                viewSparseArray.put(idDel,viewDel);
+                viewSparseArray.put(idEdit,viewEdit);
+                viewSparseArray.put(idHome,viewHome);
                 //        管理点击事件
                 tvBtnNext.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        topicManagePopup=new TopicManagePopup(TopicParticularsActivity.this);
+                        getmm(TopicParticularsActivity.this,viewSparseArray,views);
                     }
                 });
             }else {
+                views.add(viewHome);
+                viewSparseArray.put(idHome,viewHome);
                 //            登录,非作者就只能评论
-                tvBtnNext.setText("评论");
                 tvBtnNext.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent intent=new Intent(TopicParticularsActivity.this,TopicReplyPublishActivity.class);
-                        intent.putExtra("essayId",MyApplication.globalTopicReply.reply.replyUser.getEssayId());
-                        startActivity(intent);
+                        getmm(TopicParticularsActivity.this,viewSparseArray,views);
                     }
                 });
             }
@@ -425,7 +442,9 @@ public class TopicParticularsActivity extends AppCompatActivity {
                 .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
                         delTopic();
+
                     }
                 })
                 .setNegativeButton("取消",new DialogInterface.OnClickListener(){
@@ -469,8 +488,6 @@ public class TopicParticularsActivity extends AppCompatActivity {
                             msg3.obj="删除成功";
                             msgHandler.sendMessage(msg3);
 
-                            Intent intent=new Intent(TopicParticularsActivity.this,UserSelfTopicListActivity.class);
-                            startActivity(intent);
                             finish();
                             break;
                         case HTTP_OVERTIME:
@@ -504,97 +521,49 @@ public class TopicParticularsActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode,Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode){
-            case USER_TOPIC_DEL:
-                delAlert();
-                break;
-            case USER_TOPIC_UPDATE:
-                break;
-            default:
-                break;
-        }
-    }
-
-    public class TopicManagePopup extends PopupWindow {
-
-        private View popupView;
-
-        public TopicManagePopup(final Activity context){
-            super(context);
-            initView(context);
-        }
-
-        private void initView(final Activity context){
-            LayoutInflater mInflater= (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            popupView= mInflater.inflate(R.layout.popup_topic_manage,null,false);
-            LinearLayout layoutEdit=popupView.findViewById(R.id.layout_popup_edit);
-            LinearLayout layoutUpdate=popupView.findViewById(R.id.layout_popup_update);
-            LinearLayout layoutDel=popupView.findViewById(R.id.layout_popup_del);
-            LinearLayout layoutCancel=popupView.findViewById(R.id.layout_popup_cancel);
-//        获取屏幕高宽
-            int weight= context.getResources().getDisplayMetrics().widthPixels;
-            final int height=context.getResources().getDisplayMetrics().heightPixels*1/6;
-
-            final PopupWindow popupWindow=new PopupWindow(popupView,weight,height);
-            popupWindow.setAnimationStyle(R.style.popup_window_anim);
-            popupWindow.setFocusable(true);
-//        点击外部popupwindow消失
-            popupWindow.setOutsideTouchable(true);
-//        点击事件
-//        删除
-            layoutDel.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Message msg=new Message();
-                    msg.what=USER_TOPIC_DEL;
-                    msgHandler.sendMessage(msg);
-                    popupWindow.dismiss();
-                }
-            });
-//        编辑
-            layoutEdit.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                }
-            });
-//        评论
-            layoutUpdate.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent=new Intent(context,TopicReplyPublishActivity.class);
-                    intent.putExtra("essayId",MyApplication.globalTopicReply.reply.replyUser.getEssayId());
-                    context.startActivityForResult(intent,USER_TOPIC_UPDATE);
-                    popupWindow.dismiss();
-                }
-            });
-//        取消
-            layoutCancel.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    popupWindow.dismiss();
-                }
-            });
-//        屏幕不透明
-            popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener(){
-                @Override
-                public void onDismiss() {
-                    WindowManager.LayoutParams layoutParams=context.getWindow().getAttributes();
-                    layoutParams.alpha=1.0f;
-                    context.getWindow().setAttributes(layoutParams);
-                }
-            });
-            WindowManager.LayoutParams layoutParam=context.getWindow().getAttributes();
-            layoutParam.alpha=0.3f;
-            context.getWindow().setAttributes(layoutParam);
-            popupWindow.showAtLocation(popupView,Gravity.BOTTOM,0,10);
-        }
-    }
-
-    @Override
     protected void onResume() {
         super.onResume();
         getTopicReply();
     }
+//    popupwindow
+    private void getmm(final Context context, SparseArray viewSparseArray, ArrayList views){
+
+        final TopicManagePopup popup=new TopicManagePopup(context,viewSparseArray,views, new TopicManagePopup.ClickListener() {
+            @Override
+            public void setUplistener(final TopicManagePopup.TopicManagePopupUtil popupUtil) {
+                popupUtil.getView(idDel).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        delAlert();
+                        popupUtil.dismiss();
+                    }
+                });
+                popupUtil.getView(idEdit).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        SharedPreferences.Editor editor=PreferenceManager.getDefaultSharedPreferences(getContext()).edit();
+                        editor.putString("title",listData.get(0).getTopicTitle());
+                        editor.putString("body",listData.get(0).getTopicConten());
+                        editor.putString("categoryId",listData.get(0).getCategoryId());
+                        editor.putString("tagId","1");
+                        editor.apply();
+
+                       Intent intent=new Intent(TopicParticularsActivity.this,TopicActivity.class);
+                       startActivity(intent);
+                    }
+                });
+                popupUtil.getView(idHome).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        popupUtil.dismiss();
+                        finish();
+                    }
+                });
+
+
+            }
+
+        }) ;
+    }
+
 }

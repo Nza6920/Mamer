@@ -102,7 +102,6 @@ public  class TopicManagePopup  {
             popupWindow.showAtLocation(popupView,Gravity.BOTTOM,0,10);
             return popupUtil;
         }
-
         //    得到视图
         public <T extends View> T getView(int id){
             T t= (T) viewSparseArray.get(id);
@@ -112,6 +111,12 @@ public  class TopicManagePopup  {
 
             return t;
         }
+
+        public void dismiss() {
+                popupWindow.dismiss();
+
+        }
+
     }
 
     public interface ClickListener{
@@ -121,4 +126,5 @@ public  class TopicManagePopup  {
     private void setCallBack(ClickListener callback){
         this.mCallBack=callback;
     }
+
 }
