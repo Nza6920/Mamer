@@ -78,7 +78,7 @@ public class HttpUtil {
     }
 //    获取某一话题详情
     public static void sendOkHttpGetTopicParticulars(String essayId,okhttp3.Callback callback){
-        String TOPIC_PARTICULARS="http://www.mamer.club/api/topics/"+essayId+"?include=user";
+        String TOPIC_PARTICULARS="http://www.mamer.club/api/topics/"+essayId+"?include=user,category";
         OkHttpClient client=new OkHttpClient();
         Request request=new Request.Builder().url(TOPIC_PARTICULARS).build();
         client.newCall(request).enqueue(callback);

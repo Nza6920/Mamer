@@ -31,7 +31,7 @@ public  class TopicManagePopup  {
     private PopupStyle popupStyle;
     private ClickListener mCallBack;
 
-    public TopicManagePopup(Context context, SparseArray<View> viewSparseArray, ArrayList<View> views, ClickListener callback) {
+    public TopicManagePopup(Context context, SparseArray<LinearLayout> viewSparseArray, ArrayList<LinearLayout> views, ClickListener callback) {
         this.mContext=context;
         this.mCallBack=callback;
         setCallBack(callback);
@@ -42,14 +42,14 @@ public  class TopicManagePopup  {
     public static class TopicManagePopupUtil{
        private ClickListener mCallBack;
        private static PopupWindow popupWindow;
-       private SparseArray<View> viewSparseArray;
+       private SparseArray<LinearLayout> viewSparseArray;
        private View item;
 
-        private TopicManagePopupUtil(Context context,ClickListener mCallBack, SparseArray<View> viewSparseArray) {
+        private TopicManagePopupUtil(Context context,ClickListener mCallBack, SparseArray<LinearLayout> viewSparseArray) {
             this.viewSparseArray=viewSparseArray;
             this.mCallBack = mCallBack;
         }
-        public static TopicManagePopupUtil createView(final Context context,SparseArray<View> viewSparseArray,ArrayList<View> views,ClickListener callback){
+        public static TopicManagePopupUtil createView(final Context context,SparseArray<LinearLayout> viewSparseArray,ArrayList<LinearLayout> views,ClickListener callback){
 
 //        获取整个popupWindow样式
             LayoutInflater mInflater= (LayoutInflater) ((Activity)context).getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -103,7 +103,7 @@ public  class TopicManagePopup  {
             return popupUtil;
         }
         //    得到视图
-        public <T extends View> T getView(int id){
+        public <T extends LinearLayout> T getView(int id){
             T t= (T) viewSparseArray.get(id);
             if (t ==null){
                 t=item.findViewById(id);

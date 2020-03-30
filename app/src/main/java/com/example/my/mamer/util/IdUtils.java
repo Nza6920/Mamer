@@ -8,7 +8,7 @@ public class IdUtils {
         for (;;){
             final int result=sNextGeneratedId.get();
             int newValue=result+1;
-            if (newValue>0x00FFFFFF)newValue=1;
+            if (newValue > 0x00FFFFFF) newValue=1;
             if (sNextGeneratedId.compareAndSet(result,newValue)){
                 return result;
             }

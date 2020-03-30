@@ -4,12 +4,14 @@ import android.annotation.SuppressLint;
 import android.content.ContentUris;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.v4.content.ContextCompat;
@@ -99,6 +101,7 @@ public class TopicActivity extends AppCompatActivity implements View.OnClickList
     private LinearLayout layoutBottom;
 //    富文本
     private AREditText mEditText;
+    private String editText;
 //    键盘的收起与弹出
     private TextView tvKeyboardDown;
 
@@ -140,6 +143,8 @@ public class TopicActivity extends AppCompatActivity implements View.OnClickList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_topic);
         loadingDraw=new LoadingDraw(this);
+//        编辑话题
+        editTopic();
         initTitle();
         initToolbar();
     }
@@ -234,41 +239,6 @@ public class TopicActivity extends AppCompatActivity implements View.OnClickList
         mEditText = this.findViewById(R.id.topic_arEditText_);
         mEditText.setToolbar(mToolbar);
     }
-
-    private void setHtml() {
-        mEditText.getImageStrategy();
-//        转为html
-        String m=mEditText.getHtml();
-        Log.e("html:",m);
-//        将html展示出来
-        mEditText.fromHtml(m);
-    }
-
-
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        getMenuInflater().inflate(R.menu.main, menu);
-//        return true;
-//    }
-
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        int menuId = item.getItemId();
-//        if (menuId == com.chinalwb.are.R.id.action_save) {
-//            String html = this.mEditText.getHtml();
-//            Util.saveHtml(this, html);
-//            return true;
-//        }
-//        if (menuId == R.id.action_show_tv) {
-//            String html = this.mEditText.getHtml();
-//            Intent intent = new Intent(this, TextViewActivity.class);
-//            intent.putExtra(HTML_TEXT, html);
-//            startActivity(intent);
-//            return true;
-//        }
-//        return super.onOptionsItemSelected(item);
-//    }
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -663,11 +633,37 @@ public class TopicActivity extends AppCompatActivity implements View.OnClickList
             });
         }
 
-
     @Override
     protected void onResume() {
         super.onResume();
+    }
+    private void editTopic(){
+        SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(this);
+        if (prefs.getString("tagId",null).equals("1")){
+//            文章标题
+            strTopicTitle=prefs.getString("title",null);
+//            内容
+            editText=prefs.getString("body",null);
+//            标签
+            flagStr=prefs.getString("categoryName",null);
+            map.put(prefs.getString("categoryName",null),prefs.getString("categoryId",null));
+            final Runnable setEditContent=new Runnable() {
+                @Override
+                public void run() {
+                    editTitle.setText(strTopicTitle);
+                    mEditText.fromHtml(editText);
+                    tvFlag.setText("#"+flagStr+"#");
+                    layoutFlag.setVisibility(View.GONE);
+                    layoutFlagT.setVisibility(View.VISIBLE);
 
+
+                }};
+            new Thread(){
+                public void run(){
+                    msgHandler.post(setEditContent);
+                }
+            }.start();
+        }
 
     }
 }

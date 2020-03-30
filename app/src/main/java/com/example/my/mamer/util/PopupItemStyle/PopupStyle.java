@@ -24,12 +24,12 @@ public class PopupStyle {
     private LinearLayout linearLayout;
     private LinearLayout.LayoutParams params;
     private void init(Context context){
-        this.withlayout=context.getResources().getDisplayMetrics().widthPixels*1/7;
-        this.hightlayout=context.getResources().getDisplayMetrics().heightPixels*1/9;
-        this.picwTextView=withlayout*1/5;
-        this.pichTextView=hightlayout*3/5;
-        this.textwTextView=withlayout*1/4;
-        this.texthTextView=hightlayout*1/5;
+        this.withlayout=95;
+        this.hightlayout=110;
+        this.picwTextView=90;
+        this.pichTextView=85;
+        this.textwTextView=90;
+        this.texthTextView=25;
 
     }
 
@@ -37,11 +37,16 @@ public class PopupStyle {
         tvPic=new TextView(context);
         tvText=new TextView(context);
         linearLayout= new LinearLayout(context);
-        params = new LinearLayout.LayoutParams(withlayout, hightlayout);
+        params = new LinearLayout.LayoutParams(withlayout,hightlayout);
+        params.setMargins(20,0,0,0);
         linearLayout.setLayoutParams(params);
 //        纵向排列
         linearLayout.setOrientation(LinearLayout.VERTICAL);
         linearLayout.setGravity(Gravity.CENTER);
+//        Drawable layoutL=ContextCompat.getDrawable(context,R.drawable.photo_popup_window_close);
+//        linearLayout.setBackground(layoutL);
+
+
 
         tvPic.setWidth(picwTextView);
         tvPic.setHeight(pichTextView);
@@ -49,6 +54,9 @@ public class PopupStyle {
         tvText.setHeight(texthTextView);
         tvPic.setGravity(Gravity.CENTER);
         tvText.setGravity(Gravity.CENTER);
+        tvPic.setBackgroundColor(R.drawable.backgraoud_color);
+
+
     }
 //    编辑
     public LinearLayout getEditView(Context context) {
@@ -101,10 +109,25 @@ public class PopupStyle {
         initUI(context);
 
         linearLayout.setId(IdUtils.generateViewId());
+        switch (tags){
+            case "like":
+                Drawable tvClosePic=ContextCompat.getDrawable(context,R.mipmap.ic_popup_topic_manage_like);
+                tvPic.setBackground(tvClosePic);
+                tvText.setText("取消点赞");
+                break;
+            case "dislike":
+                Drawable tvClosePic2=ContextCompat.getDrawable(context,R.mipmap.ic_popup_topic_manage_like);
+                tvPic.setBackground(tvClosePic2);
+                tvText.setText("取消点赞");
+                break;
+            case "showlikes":
+                Drawable tvClosePic3=ContextCompat.getDrawable(context,R.mipmap.ic_popup_topic_manage_like);
+                tvPic.setBackground(tvClosePic3);
+                tvText.setText("取消点赞");
+                default:
+                    break;
+        }
 
-        Drawable tvClosePic=ContextCompat.getDrawable(context,R.mipmap.ic_popup_topic_manage_like);
-        tvPic.setBackground(tvClosePic);
-        tvText.setText(tags);
 
         linearLayout.addView(tvPic);
         linearLayout.addView(tvText);

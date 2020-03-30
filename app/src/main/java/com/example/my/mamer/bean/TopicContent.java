@@ -13,6 +13,7 @@ public class TopicContent {
     private   String updateTime;
     private   String categoryId;
     private   String topicConten;
+    private  String categoryName;
 
     public TopicContent() {
     }
@@ -105,6 +106,12 @@ public class TopicContent {
         this.topicConten = topicConten;
     }
 
+    public String getCategoryName() {
+        return categoryName;
+    }
 
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
+    }
 }
 

@@ -1,6 +1,5 @@
 package com.example.my.mamer;
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -76,30 +75,12 @@ public class TopicParticularsActivity extends AppCompatActivity {
     private TextView tvReplyContent;
     private TextView tvReplyTime;
     private TextView tvReplyCount;
-//    popupwindow
-    private PopupStyle popupStyle=new PopupStyle();
-    private ArrayList<View> views=new ArrayList<>();
-    private SparseArray<View> viewSparseArray=new SparseArray<>();
-    private int idDel;
-    private int idEdit;
-    private int idHome;
+
 
     public final Handler msgHandler=new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(Message msg) {
                 switch (msg.what){
-                    case 1:
-                        tvTitle.setText("分享");
-                        break;
-                    case 2:
-                        tvTitle.setText("教程");
-                        break;
-                    case 3:
-                        tvTitle.setText("问答");
-                        break;
-                    case 4:
-                        tvTitle.setText("公告");
-                        break;
                     case DISMISS_DIALOG:
                         ((LoadingDraw)msg.obj).dismiss();
                         break;
@@ -128,7 +109,6 @@ public class TopicParticularsActivity extends AppCompatActivity {
         MyApplication.globalTopicReply.reply.replyUser=replyUser;
         MyApplication.globalTopicReply.reply.replyUser.setEssayId(prefs.getString("id",null));
         MyApplication.globalTopicReply.reply.replyUser.setUserId(prefs.getString("userId",null));
-        MyApplication.globalTopicReply.reply.categoryId=prefs.getString("categoryId",null);
         MyApplication.globalTopicReply.reply.tagId=prefs.getString("tagId",null);
 
         setContentView(R.layout.activity_topic_particulars);
@@ -161,74 +141,42 @@ public class TopicParticularsActivity extends AppCompatActivity {
         Drawable tvBtnNextPic=ContextCompat.getDrawable(this,R.mipmap.ic_reply_popup_show);
         tvBtnNext.setBackground(tvBtnNextPic);
 
-//        动态显示话题分类
-        switch (MyApplication.globalTopicReply.reply.categoryId){
-            case "1":
-                Message msg1 = new Message();
-                msg1.what = 1;
-                msgHandler.sendMessage(msg1);
-                break;
-            case "2":
-                Message msg2 = new Message();
-                msg2.what = 2;
-                msgHandler.sendMessage(msg2);
-                break;
-            case "3":
-                Message msg3 = new Message();
-                msg3.what = 3;
-                msgHandler.sendMessage(msg3);
-                break;
-            case "4":
-                Message msg4 = new Message();
-                msg4.what = 2;
-                msgHandler.sendMessage(msg4);
-                break;
-                default:
-                    break;
-        }
-//删除
-        View viewDel=popupStyle.getDelView(this);
-        idDel=popupStyle.getDelView(this).getId();
-//        编辑
-        View viewEdit=popupStyle.getEditView(this);
-        idEdit=popupStyle.getEditView(this).getId();
-//        返回首页
-        View viewHome=popupStyle.getHomeView(this);
-        idHome=popupStyle.getHomeView(this).getId();
 
 //        判断用户是否登陆，
         if (MyApplication.globalUserInfo.token!=null){
             if (MyApplication.globalTopicReply.reply.replyUser.getUserId().equals(MyApplication.globalUserInfo.user.getUserId())){
                 //            登陆，作者本人访问可删除和编辑帖子，以及评论
-                views.add(viewDel);
-                views.add(viewEdit);
-                views.add(viewHome);
-
-                viewSparseArray.put(idDel,viewDel);
-                viewSparseArray.put(idEdit,viewEdit);
-                viewSparseArray.put(idHome,viewHome);
                 //        管理点击事件
                 tvBtnNext.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        getmm(TopicParticularsActivity.this,viewSparseArray,views);
+                        getmm("author");
                     }
                 });
             }else {
-                views.add(viewHome);
-                viewSparseArray.put(idHome,viewHome);
                 //            登录,非作者就只能评论
                 tvBtnNext.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        getmm(TopicParticularsActivity.this,viewSparseArray,views);
+                        getmm("reader");
                     }
                 });
             }
         }else {
-            Message msg1=new Message();
-            msg1.what=UNLOGIN;
-            msgHandler.sendMessage(msg1);
+            tvBtnNext.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    getmm("author");
+                }
+            });
+//            tvBtnNext.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    Message msg1=new Message();
+//                    msg1.what=UNLOGIN;
+//                    msgHandler.sendMessage(msg1);
+//                }
+//            });
         }
 //        返回调用界面
         tvBack.setOnClickListener(new View.OnClickListener() {
@@ -291,6 +239,11 @@ public class TopicParticularsActivity extends AppCompatActivity {
                                 topicContent.setTopicAuthorId(user.getString("id"));
                             }
                             Log.e("Tag","话题详情--暂存数据");
+                            if (jresp.has("category")){
+                                JSONObject category=jresp.getJSONObject("category");
+                                topicContent.setCategoryId(category.getString("id"));
+                                topicContent.setCategoryName(category.getString("name"));
+                            }
                             listData.add(topicContent);
 //处理内容
 //                            jsoupUtil(topicContent.getTopicConten());
@@ -314,6 +267,7 @@ public class TopicParticularsActivity extends AppCompatActivity {
                                     tvCreatedTime.setText("编辑于"+listData.get(0).getCreateTime());
                                     Log.e("Tag","话题详情--创建时间");
                                     contentUtil(listData.get(0).getTopicConten());
+                                    tvTitle.setText(listData.get(0).getCategoryName());
 
                                 }};
                             new Thread(){
@@ -526,9 +480,38 @@ public class TopicParticularsActivity extends AppCompatActivity {
         getTopicReply();
     }
 //    popupwindow
-    private void getmm(final Context context, SparseArray viewSparseArray, ArrayList views){
+    private void getmm(String tag){
+        //    popupwindow
+         PopupStyle popupStyle=new PopupStyle();
+         ArrayList<LinearLayout> views=new ArrayList<>();
+         SparseArray<LinearLayout> viewSparseArray=new SparseArray<>();
+        //删除
+        LinearLayout viewDel=popupStyle.getDelView(this);
+        final  int idDel=viewDel.getId();
+        //        编辑
+        LinearLayout viewEdit=popupStyle.getEditView(this);
+        final int idEdit=viewEdit.getId();
+        //        返回首页
+        LinearLayout viewHome=popupStyle.getHomeView(this);
+        final int idHome=viewHome.getId();
 
-        final TopicManagePopup popup=new TopicManagePopup(context,viewSparseArray,views, new TopicManagePopup.ClickListener() {
+        switch (tag){
+            case "author":
+                views.add(viewDel);
+                views.add(viewEdit);
+                views.add(viewHome);
+                viewSparseArray.put(idDel,viewDel);
+                viewSparseArray.put(idEdit,viewEdit);
+                viewSparseArray.put(idHome,viewHome);
+                break;
+            case "reader":
+                views.add(viewHome);
+                viewSparseArray.put(idHome,viewHome);
+                break;
+                default:break;
+        }
+
+        final TopicManagePopup popup=new TopicManagePopup(TopicParticularsActivity.this,viewSparseArray,views, new TopicManagePopup.ClickListener() {
             @Override
             public void setUplistener(final TopicManagePopup.TopicManagePopupUtil popupUtil) {
                 popupUtil.getView(idDel).setOnClickListener(new View.OnClickListener() {
@@ -545,11 +528,13 @@ public class TopicParticularsActivity extends AppCompatActivity {
                         editor.putString("title",listData.get(0).getTopicTitle());
                         editor.putString("body",listData.get(0).getTopicConten());
                         editor.putString("categoryId",listData.get(0).getCategoryId());
+                        editor.putString("categoryName",listData.get(0).getCategoryName());
                         editor.putString("tagId","1");
                         editor.apply();
 
                        Intent intent=new Intent(TopicParticularsActivity.this,TopicActivity.class);
                        startActivity(intent);
+                       popupUtil.dismiss();
                     }
                 });
                 popupUtil.getView(idHome).setOnClickListener(new View.OnClickListener() {

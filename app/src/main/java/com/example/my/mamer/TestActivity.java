@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.SparseArray;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.example.my.mamer.util.PopupItemStyle.PopupStyle;
@@ -31,14 +32,14 @@ public class TestActivity extends AppCompatActivity {
     private void getmm(){
         final PopupStyle popupStyle=new PopupStyle();
 
-        View viewDel=popupStyle.getDelView(this);
+        LinearLayout viewDel=popupStyle.getDelView(this);
         final int idDel=popupStyle.getDelView(this).getId();
 
-        final ArrayList<View> views=new ArrayList<>();
+        final ArrayList<LinearLayout> views=new ArrayList<>();
 
         views.add(viewDel);
 
-        final SparseArray<View> viewSparseArray=new SparseArray<>();
+        final SparseArray<LinearLayout> viewSparseArray=new SparseArray<>();
 
         viewSparseArray.put(idDel,viewDel);
 

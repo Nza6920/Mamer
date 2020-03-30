@@ -18,17 +18,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="15dp"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:background="@drawable/divid_line">
 
         </LinearLayout>
-
-
     </HorizontalScrollView>
     <LinearLayout
         android:id="@+id/popup_close"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_alignParentBottom="true"
+        android:layout_marginTop="15dp"
         android:padding="5dp">
         <TextView
             android:id="@+id/popup_close_"
@@ -40,7 +40,7 @@
             android:text="取消"
             android:textSize="18sp"
             android:gravity="center"
-            android:background="@drawable/popup_topic_manage"/>
+            android:background="@drawable/photo_popup_window_close"/>
     </LinearLayout>
 
 
