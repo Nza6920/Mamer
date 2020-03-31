@@ -165,18 +165,12 @@ public class TopicParticularsActivity extends AppCompatActivity {
         }else {
             tvBtnNext.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onClick(View view) {
-                    getmm("author");
+                public void onClick(View v) {
+                    Message msg1=new Message();
+                    msg1.what=UNLOGIN;
+                    msgHandler.sendMessage(msg1);
                 }
             });
-//            tvBtnNext.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    Message msg1=new Message();
-//                    msg1.what=UNLOGIN;
-//                    msgHandler.sendMessage(msg1);
-//                }
-//            });
         }
 //        返回调用界面
         tvBack.setOnClickListener(new View.OnClickListener() {
@@ -480,11 +474,11 @@ public class TopicParticularsActivity extends AppCompatActivity {
         getTopicReply();
     }
 //    popupwindow
-    private void getmm(String tag){
+    private void getmm(final String tag){
         //    popupwindow
          PopupStyle popupStyle=new PopupStyle();
          ArrayList<LinearLayout> views=new ArrayList<>();
-         SparseArray<LinearLayout> viewSparseArray=new SparseArray<>();
+         final SparseArray<LinearLayout> viewSparseArray=new SparseArray<>();
         //删除
         LinearLayout viewDel=popupStyle.getDelView(this);
         final  int idDel=viewDel.getId();
@@ -497,11 +491,11 @@ public class TopicParticularsActivity extends AppCompatActivity {
 
         switch (tag){
             case "author":
-                views.add(viewDel);
                 views.add(viewEdit);
+                views.add(viewDel);
                 views.add(viewHome);
-                viewSparseArray.put(idDel,viewDel);
                 viewSparseArray.put(idEdit,viewEdit);
+                viewSparseArray.put(idDel,viewDel);
                 viewSparseArray.put(idHome,viewHome);
                 break;
             case "reader":
@@ -514,29 +508,31 @@ public class TopicParticularsActivity extends AppCompatActivity {
         final TopicManagePopup popup=new TopicManagePopup(TopicParticularsActivity.this,viewSparseArray,views, new TopicManagePopup.ClickListener() {
             @Override
             public void setUplistener(final TopicManagePopup.TopicManagePopupUtil popupUtil) {
-                popupUtil.getView(idDel).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        delAlert();
-                        popupUtil.dismiss();
-                    }
-                });
-                popupUtil.getView(idEdit).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        SharedPreferences.Editor editor=PreferenceManager.getDefaultSharedPreferences(getContext()).edit();
-                        editor.putString("title",listData.get(0).getTopicTitle());
-                        editor.putString("body",listData.get(0).getTopicConten());
-                        editor.putString("categoryId",listData.get(0).getCategoryId());
-                        editor.putString("categoryName",listData.get(0).getCategoryName());
-                        editor.putString("tagId","1");
-                        editor.apply();
+                if (tag.equals("author")){
+                    popupUtil.getView(idEdit).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            SharedPreferences.Editor editor=PreferenceManager.getDefaultSharedPreferences(getContext()).edit();
+                            editor.putString("title",listData.get(0).getTopicTitle());
+                            editor.putString("body",listData.get(0).getTopicConten());
+                            editor.putString("categoryId",listData.get(0).getCategoryId());
+                            editor.putString("categoryName",listData.get(0).getCategoryName());
+                            editor.putString("tagId","1");
+                            editor.apply();
 
-                       Intent intent=new Intent(TopicParticularsActivity.this,TopicActivity.class);
-                       startActivity(intent);
-                       popupUtil.dismiss();
-                    }
-                });
+                            Intent intent=new Intent(TopicParticularsActivity.this,TopicActivity.class);
+                            startActivity(intent);
+                            popupUtil.dismiss();
+                        }
+                    });
+                    popupUtil.getView(idDel).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            delAlert();
+                            popupUtil.dismiss();
+                        }
+                    });
+                }
                 popupUtil.getView(idHome).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {

@@ -176,7 +176,7 @@ public class UserSelfReplyActivity extends AppCompatActivity {
             @Override
             public void onItemClick(final AdapterView<?> adapterView, final View view, final int position, long l) {
                 AlertDialog.Builder builder=new AlertDialog.Builder(UserSelfReplyActivity.this);
-                builder.setIcon(R.drawable.ic_delete_forever_black_24dp)
+                builder.setIcon(R.mipmap.ic_popup_topic_manage_del)
                         .setMessage("确定删除吗？")
                         .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                             @Override

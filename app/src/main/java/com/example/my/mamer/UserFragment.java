@@ -42,10 +42,14 @@ import static com.example.my.mamer.config.Config.USER_TOPIC_COUNT;
 
 public class UserFragment extends Fragment implements View.OnClickListener {
 
-//    mamer能量值
-    private TextView tvUserMamerEnergy;
+//    用户
     private LinearLayout userMamerEnergyLayout;
     private LinearLayout userUnloginLayout;
+    private ImageView userAvatar;
+    private TextView tvUserName;
+    private LinearLayout layoutToUserMine;
+    private LinearLayout layoutIntroduction;
+    private TextView tvUserIntroduction;
 //    用户个人话题
     private LinearLayout layoutTopics;
     private TextView tvUserTopicCount;
@@ -108,7 +112,12 @@ public class UserFragment extends Fragment implements View.OnClickListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view=inflater.inflate(R.layout.fragment_user,container,false);
 //        初始化控件
-        tvUserMamerEnergy=view.findViewById(R.id.user_mamer_energy);
+        userAvatar=view.findViewById(R.id.user_avatar);
+        tvUserName=view.findViewById(R.id.user_name);
+        layoutToUserMine=view.findViewById(R.id.user_mine_to);
+        tvUserIntroduction=view.findViewById(R.id.user_introduction);
+        layoutIntroduction=view.findViewById(R.id.user_introduction_layout);
+
         userMamerEnergyLayout=view.findViewById(R.id.user_mamer_energy_layout);
         userUnloginLayout=view.findViewById(R.id.user_un_login_layout);
         tvUserTopicCount=view.findViewById(R.id.user_my_topic_count);
@@ -148,6 +157,7 @@ public class UserFragment extends Fragment implements View.OnClickListener {
             userUnloginLayout.setVisibility(View.GONE);
             userMamerEnergyLayout.setVisibility(View.VISIBLE);
 
+            initUserInfo();
 //            请求数据，个人话题数，个人回复数，个人收藏数
             getUserTopicsCount(1);
             getUserReply(1);
@@ -163,6 +173,19 @@ public class UserFragment extends Fragment implements View.OnClickListener {
         getUserRecommend();
         getRecommendResource();
 //        点击事件
+        layoutToUserMine.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (MyApplication.globalUserInfo.token==null){
+                    Message msg1=new Message();
+                    msg1.what=UNLOGIN;
+                    msgHandler.sendMessage(msg1);
+                }else {
+                    Intent intent = new Intent(getActivity(), UserHomePageActivity.class);
+                    startActivity(intent);
+                }
+            }
+        });
         layoutTopics.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -211,6 +234,33 @@ public class UserFragment extends Fragment implements View.OnClickListener {
 
 
     }
+    private  void initUserInfo(){
+        final Runnable setAvatarRunable=new Runnable() {
+            @Override
+            public void run() {
+                RequestOptions options=new RequestOptions()
+                        .error(R.mipmap.ic_image_error)
+                        .placeholder(R.mipmap.ic_image_error);
+                Glide.with(getContext())
+                        .asBitmap()
+                        .load(MyApplication.globalUserInfo.user.getUserImg())
+                        .apply(options)
+                        .into(userAvatar);
+               tvUserName.setText(MyApplication.globalUserInfo.user.getUserName());
+               if (MyApplication.globalUserInfo.user.getUserIntroduction().equals("")){
+                   layoutIntroduction.setVisibility(View.GONE);
+               }else {
+                   tvUserIntroduction.setText(MyApplication.globalUserInfo.user.getUserIntroduction());
+               }
+
+            }};
+        new Thread(){
+            public void run(){
+                msgHandler.post(setAvatarRunable);
+            }
+        }.start();
+    }
+
 //    获取用户个人话题数
     private void  getUserTopicsCount(int pageCount){
         HttpUtil.sendOkHttpGetUserTopicList(MyApplication.globalUserInfo.user.getUserId(), pageCount, new Callback() {
@@ -446,9 +496,6 @@ public class UserFragment extends Fragment implements View.OnClickListener {
                 break;
             case R.id.user_recommend_resource_3:
                 openLink(recommendResourceList.get(2).getLink());
-                break;
-//                个人中心的功能，编辑个人信息
-            case R.id.user_top_bar:
                 break;
                 default:
                     break;

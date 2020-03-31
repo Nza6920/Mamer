@@ -103,8 +103,8 @@ public  class TopicManagePopup  {
             return popupUtil;
         }
         //    得到视图
-        public <T extends LinearLayout> T getView(int id){
-            T t= (T) viewSparseArray.get(id);
+        public  LinearLayout  getView(int id){
+            LinearLayout t=  viewSparseArray.get(id);
             if (t ==null){
                 t=item.findViewById(id);
             }

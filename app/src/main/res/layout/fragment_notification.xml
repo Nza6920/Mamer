@@ -1,30 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <RelativeLayout
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/divid_line">
+    <LinearLayout
         android:id="@+id/notification_text"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:background="@drawable/divid_line">
+        android:layout_height="40dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:background="@drawable/bottom_line">
         <TextView
             android:id="@+id/notification_info"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="消息列表"
-            android:textSize="15sp" />
-        <TextView
-            android:id="@+id/notification_read"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="一键已读"
             android:textSize="15sp"
-            android:clickable="true"
-            android:gravity="right"
-            android:layout_alignParentEnd="true"/>
-    </RelativeLayout>
+            android:layout_marginLeft="10dp"/>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="20dp"
+            android:layout_marginRight="10dp"
+            android:orientation="horizontal"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/notification_read"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="一键已读"
+                android:textSize="15sp"/>
+            <TextView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:background="@mipmap/ic_notification_checkall"/>
+        </LinearLayout>
+
+    </LinearLayout>
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -36,5 +50,16 @@
             android:layout_height="match_parent"
             android:background="#afefeded"/>
     </FrameLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:visibility="gone">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="登陆后体验更多"/>
+    </LinearLayout>
 
-</RelativeLayout>
+</LinearLayout>
