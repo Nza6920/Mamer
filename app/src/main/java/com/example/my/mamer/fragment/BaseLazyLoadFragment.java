@@ -14,7 +14,7 @@ public abstract class BaseLazyLoadFragment extends Fragment {
 //    fragment是否对用可见
     private boolean isVisible;
 //是否第一次加载
-//    private boolean isFirstLoad=false;
+    private boolean isFirstLoad=true;
 
     @Override
     public View onCreateView(LayoutInflater inflater,ViewGroup container,Bundle savedInstanceState) {
@@ -37,8 +37,10 @@ public abstract class BaseLazyLoadFragment extends Fragment {
 //        当View创建完成时，用户可见的请求，且仅当是第一次对用户可见的时候请求自动数据
         if (isVisibleToUser){
             isVisible=true;
-            isCanLoadData();
-
+            if (isFirstLoad){
+                isCanLoadData();
+                isFirstLoad=false;
+            }
         }else {
             isVisible=false;
         }

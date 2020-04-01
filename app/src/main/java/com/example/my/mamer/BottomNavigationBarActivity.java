@@ -39,10 +39,11 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
 
     private FragmentManager mFragmentManager;
     private BottomNavigationBar bottomNavigationBar;
-//首页话题和我的
+//首页推荐消息和我的
     private TopicsFragment topicsFragment;
     private UserFragment userFragment;
     private NotificationFragment notificationFragment;
+    private RecommendFragment recommendFragment;
 
 //侧滑菜单
 //    private DrawerLayout drawerLayout;
@@ -58,6 +59,8 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
     private Button btnTopicClassify;
     private TextView tvTopicName;
     private Button btnTopicNewTopic;
+//    推荐
+    private RelativeLayout recommendlayout;
 //    消息,未读消息数
     private RelativeLayout notificationlayout;
     private String notificationNum;
@@ -91,6 +94,7 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
         btnTopicClassify=findViewById(R.id.topic_top_bar_classify);
         tvTopicName=findViewById(R.id.topic_top_bar_name);
         btnTopicNewTopic=findViewById(R.id.topic_top_bar_new);
+        recommendlayout=findViewById(R.id.recommend_top_bar);
         notificationlayout=findViewById(R.id.notification_top_bar);
         userlayout=findViewById(R.id.user_top_bar);
         tvUserName=findViewById(R.id.user_top_bar_name);
@@ -117,6 +121,11 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
                             .setInActiveColor("#999999")
             //              未选中时的图片资源
                             .setInactiveIconResource(R.mipmap.ic_topics_none))
+                .addItem(new BottomNavigationItem(R.mipmap.ic_recommend,"推荐")
+                        .setActiveColor("#12A3E9")
+                        .setInActiveColor("#999999")
+                        .setBadgeItem(textBadgeItem)
+                        .setInactiveIconResource(R.mipmap.ic_recommend_none))
                 .addItem(new BottomNavigationItem(R.mipmap.ic_notification,"信息")
                         .setActiveColor("#12A3E9")
                         .setInActiveColor("#999999")
@@ -176,6 +185,7 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
     private void setDefaultFragment(){
 //        隐藏user top bar
         userlayout.setVisibility(View.GONE);
+        recommendlayout.setVisibility(View.GONE);
         notificationlayout.setVisibility(View.GONE);
 
         mFragmentManager=getSupportFragmentManager();
@@ -196,6 +206,7 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
         hideFragment(transaction);
         switch (position){
             case 0:
+                recommendlayout.setVisibility(View.GONE);
                 notificationlayout.setVisibility(View.GONE);
                 userlayout.setVisibility(View.GONE);
                 topiclayout.setVisibility(View.VISIBLE);
@@ -208,6 +219,9 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
                     transaction.add(R.id.fragment_content,topicsFragment);
                 }else {
 //                    如果userFragment不为空，则隐藏userFragment
+                    if (recommendFragment !=null){
+                        transaction.hide(recommendFragment);
+                    }
                     if (notificationFragment !=null){
                         transaction.hide(notificationFragment);
                     }
@@ -221,7 +235,33 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
                 break;
             case 1:
                 topiclayout.setVisibility(View.GONE);
+                notificationlayout.setVisibility(View.GONE);
                 userlayout.setVisibility(View.GONE);
+                recommendlayout.setVisibility(View.VISIBLE);
+//                没有topics就创建topics
+                if (recommendFragment==null){
+                    recommendFragment=new RecommendFragment();
+                }
+                if (!recommendFragment.isAdded()) {
+                    transaction.add(R.id.fragment_content,recommendFragment);
+                }else {
+                    if (topicsFragment !=null){
+                        transaction.hide(topicsFragment);
+                    }
+                    if (notificationFragment !=null){
+                        transaction.hide(notificationFragment);
+                    }
+                    if (userFragment!=null){
+                        transaction.hide(userFragment);
+                    }
+                    transaction.show(recommendFragment);
+
+                }
+                break;
+            case 2:
+                topiclayout.setVisibility(View.GONE);
+                userlayout.setVisibility(View.GONE);
+                recommendlayout.setVisibility(View.GONE);
                 notificationlayout.setVisibility(View.VISIBLE);
                 if (notificationFragment ==null){
                     notificationFragment =new NotificationFragment();
@@ -232,15 +272,19 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
                     if (topicsFragment!=null){
                         transaction.hide(topicsFragment);
                     }
+                    if (recommendFragment !=null){
+                        transaction.hide(recommendFragment);
+                    }
                     if (userFragment!=null){
                         transaction.hide(userFragment);
                     }
                     transaction.show(notificationFragment);
                 }
                 break;
-            case 2:
+            case 3:
                 topiclayout.setVisibility(View.GONE);
                 notificationlayout.setVisibility(View.GONE);
+                recommendlayout.setVisibility(View.GONE);
                 userlayout.setVisibility(View.VISIBLE);
 
 //                没有userFragment就创建
@@ -254,6 +298,9 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
 //                    如果topicsFragment不为空，则隐藏
                     if (topicsFragment!=null){
                         transaction.hide(topicsFragment);
+                    }
+                    if (recommendFragment !=null){
+                        transaction.hide(recommendFragment);
                     }
                     if (notificationFragment !=null){
                         transaction.hide(notificationFragment);
@@ -273,6 +320,9 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
         if(topicsFragment!=null){
             transaction.hide(topicsFragment);
         }
+        if (recommendFragment !=null){
+            transaction.hide(recommendFragment);
+        }
         if (notificationFragment !=null){
             transaction.hide(notificationFragment);
         }
@@ -284,7 +334,7 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
 //    获取未读消息数，循环间隔发起
     @Override
     protected void onResume() {
-        Log.e("Tag",":onResume()");
+//        Log.e("Tag",":onResume()");
         super.onResume();
 //        getNotification();
     }
@@ -353,7 +403,7 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
 //        userMenuRightFragment.setDrawerLayout(drawerLayout);
 //    }
 
-//    获取公告消息数
+//    获取通知消息数
     private void getNotification(){
         Log.i("getNotification","进入获取,此处不需要做权限");
 

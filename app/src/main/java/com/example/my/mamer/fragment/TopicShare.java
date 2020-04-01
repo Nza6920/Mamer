@@ -55,7 +55,6 @@ public class TopicShare extends BaseLazyLoadFragment {
                     break;
                 case USER_SET_INFORMATION:
                     if (mAdapter != null) {
-
                         mAdapter.notifyDataSetChanged();
                     }
                     break;

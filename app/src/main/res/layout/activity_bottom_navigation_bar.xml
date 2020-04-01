@@ -13,6 +13,7 @@
         android:orientation="vertical">
 
         <include layout="@layout/topic_top_bar"/>
+        <include layout="@layout/recommend_top_bar"/>
         <include layout="@layout/notification_top_bar"/>
         <include layout="@layout/user_top_bar"/>
 
