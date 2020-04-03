@@ -1,7 +1,7 @@
 package com.example.my.mamer.bean;
 
 public class TopicContent {
-//    话题Id,文章标题，作者id，作者头像，回复数，浏览数，创建时间，最新回复时间，话题分类,文章内容
+//    话题Id,文章标题，作者id，作者头像，回复数，浏览数，创建时间，最新回复时间，话题分类,文章内容，文章分类名称，话题内容摘要
     private   String topicId;
     private   String topicTitle;
     private   String topicAuthorId;
@@ -14,6 +14,7 @@ public class TopicContent {
     private   String categoryId;
     private   String topicConten;
     private  String categoryName;
+    private String topicExcerpt;
 
     public TopicContent() {
     }
@@ -112,6 +113,14 @@ public class TopicContent {
 
     public void setCategoryName(String categoryName) {
         this.categoryName = categoryName;
+    }
+
+    public String getTopicExcerpt() {
+        return topicExcerpt;
+    }
+
+    public void setTopicExcerpt(String topicExcerpt) {
+        this.topicExcerpt = topicExcerpt;
     }
 }
 
