@@ -1,9 +1,11 @@
 package com.example.my.mamer;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -32,6 +34,7 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 
+import static com.example.my.mamer.MyApplication.getContext;
 import static com.example.my.mamer.config.Config.HTTP_USER_GET_INFORMATION;
 import static com.example.my.mamer.config.Config.MESSAGE_ERROR;
 
@@ -154,6 +157,10 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
             @Override
             public void onClick(View view) {
                 if (MyApplication.globalUserInfo.token !=null){
+                    SharedPreferences.Editor editor=PreferenceManager.getDefaultSharedPreferences(getContext()).edit();
+                    editor.putString("tagId","2");
+                    editor.apply();
+
                 Intent intent=new Intent(BottomNavigationBarActivity.this,TopicActivity.class);
                 startActivity(intent);
                 }else {

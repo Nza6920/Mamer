@@ -14,7 +14,16 @@ public abstract class UserBaseAdapter<T> extends RecyclerView.Adapter<UserBaseAd
     private ArrayList<T> listData;
     private LayoutInflater layoutInflater;
     private Context context;
-    protected final int mItemLayoutId;
+    protected  int mItemLayoutId;
+
+    public UserBaseAdapter() {
+    }
+
+    public UserBaseAdapter(Context context, int mItemLayoutId) {
+        this.context = context;
+        this.mItemLayoutId = mItemLayoutId;
+        this.layoutInflater=LayoutInflater.from(context);
+    }
 
     public UserBaseAdapter(ArrayList<T> listData, Context context, int mItemLayoutId) {
         this.listData = listData;
@@ -80,4 +89,7 @@ public abstract class UserBaseAdapter<T> extends RecyclerView.Adapter<UserBaseAd
     public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
         this.onItemClickListener = onItemClickListener;
     }
+
+//    更新数据，并且清除之前的数据
+
 }

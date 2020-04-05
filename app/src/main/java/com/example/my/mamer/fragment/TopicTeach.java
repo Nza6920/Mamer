@@ -45,24 +45,25 @@ public class TopicTeach extends BaseLazyLoadFragment {
 
 
     //ui
-    private final Handler msgHandler=new Handler(){
+    private final Handler msgHandler=new Handler(new Handler.Callback() {
         @Override
-        public void handleMessage(Message msg) {
+        public boolean handleMessage(Message msg) {
             switch (msg.what){
-                case DISMISS_DIALOG:
-                    ((LoadingDraw)msg.obj).dismiss();
-                    break;
-                case MESSAGE_ERROR:
-                    Toast.makeText(getActivity(), (String) msg.obj, Toast.LENGTH_SHORT).show();
-                    break;
-                case USER_SET_INFORMATION:
-                    mAdapter.notifyDataSetChanged();
-                    break;
-                default:
-                    break;
-            }
+            case DISMISS_DIALOG:
+                ((LoadingDraw)msg.obj).dismiss();
+                break;
+            case MESSAGE_ERROR:
+                Toast.makeText(getActivity(), (String) msg.obj, Toast.LENGTH_SHORT).show();
+                break;
+            case USER_SET_INFORMATION:
+                mAdapter.notifyDataSetChanged();
+                break;
+            default:
+                break;
         }
-    };
+            return false;
+        }
+    });
     //    初始化视图
     @Override
     public View initView(LayoutInflater inflater, ViewGroup container) {

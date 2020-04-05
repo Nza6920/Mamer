@@ -6,6 +6,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,6 +41,10 @@ public class NotificationFragment extends BaseLazyLoadFragment {
     private LoadingDraw loadingDraw;
     private TextView tvNotificationInfo;
     private TextView tvNotificationRead;
+    private LinearLayout layoutread;
+    private LinearLayout layoutUnlogin;
+    private LinearLayout layoutText;
+    private FrameLayout layoutContent;
 
 //    防止内存泄漏,最正规的写法！！！！！
 //    private MyHandler handler=new MyHandler(this);
@@ -81,17 +87,12 @@ public class NotificationFragment extends BaseLazyLoadFragment {
         final View view=inflater.inflate(R.layout.fragment_notification,container,false);
         tvNotificationInfo=view.findViewById(R.id.notification_info);
         tvNotificationRead=view.findViewById(R.id.notification_read);
+        layoutread=view.findViewById(R.id.notification_read_layout);
+        layoutUnlogin=view.findViewById(R.id.notification_unlogin);
+        layoutText=view.findViewById(R.id.notification_text);
+        layoutContent=view.findViewById(R.id.notification_content);
 
         if (MyApplication.globalUserInfo.token!=null){
-            Message msg1 = new Message();
-            msg1.what = DISMISS_DIALOG;
-            msg1.obj=loadingDraw;
-            msgHandler.sendMessage(msg1);
-
-            listView=view.findViewById(R.id.notification_list);
-            mAdapter=new NotificationAdapter(getContext(),getNotificationUsers());
-            listView.setAdapter(mAdapter);
-        }else {
             Message msg1 = new Message();
             msg1.what = DISMISS_DIALOG;
             msg1.obj=loadingDraw;
@@ -100,15 +101,26 @@ public class NotificationFragment extends BaseLazyLoadFragment {
             final Runnable setRunable=new Runnable() {
                 @Override
                 public void run() {
-                   tvNotificationInfo.setText("登陆后体验更多");
-                   tvNotificationRead.setVisibility(View.GONE);
-
+                    layoutUnlogin.setVisibility(View.GONE);
+                    layoutText.setVisibility(View.VISIBLE);
+                    layoutContent.setVisibility(View.VISIBLE);
+                    listView=view.findViewById(R.id.notification_list);
+                    mAdapter=new NotificationAdapter(getContext(),getNotificationUsers());
+                    listView.setAdapter(mAdapter);
                 }};
             new Thread(){
                 public void run(){
                     msgHandler.post(setRunable);
                 }
             }.start();
+
+        }else {
+            Message msg1 = new Message();
+            msg1.what = DISMISS_DIALOG;
+            msg1.obj=loadingDraw;
+            msgHandler.sendMessage(msg1);
+
+
         }
 
 

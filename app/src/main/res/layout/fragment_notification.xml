@@ -11,7 +11,9 @@
         android:layout_height="40dp"
         android:orientation="horizontal"
         android:gravity="center"
-        android:background="@drawable/bottom_line">
+        android:background="@drawable/bottom_line"
+        android:visibility="gone"
+        android:layout_marginTop="20dp">
         <TextView
             android:id="@+id/notification_info"
             android:layout_width="0dp"
@@ -21,6 +23,7 @@
             android:textSize="15sp"
             android:layout_marginLeft="10dp"/>
         <LinearLayout
+            android:id="@+id/notification_read_layout"
             android:layout_width="wrap_content"
             android:layout_height="20dp"
             android:layout_marginRight="10dp"
@@ -40,10 +43,12 @@
 
     </LinearLayout>
     <FrameLayout
+        android:id="@+id/notification_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/notification_text"
-        android:layout_margin="10dp">
+        android:layout_margin="10dp"
+        android:visibility="gone">
         <ListView
             android:id="@+id/notification_list"
             android:layout_width="match_parent"
@@ -51,11 +56,11 @@
             android:background="#afefeded"/>
     </FrameLayout>
     <LinearLayout
+        android:id="@+id/notification_unlogin"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:gravity="center"
-        android:visibility="gone">
+        android:gravity="center">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

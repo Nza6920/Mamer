@@ -7,6 +7,7 @@ import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,9 +39,7 @@ import static com.example.my.mamer.config.Config.HTTP_USER_GET_INFORMATION;
 import static com.example.my.mamer.config.Config.HTTP_USER_NULL;
 import static com.example.my.mamer.config.Config.MESSAGE_ERROR;
 import static com.example.my.mamer.config.Config.UNLOGIN;
-import static com.example.my.mamer.config.Config.USER_REPLY_COUNT;
 import static com.example.my.mamer.config.Config.USER_SET_INFORMATION;
-import static com.example.my.mamer.config.Config.USER_TOPIC_COUNT;
 
 public class UserFragment extends Fragment {
 
@@ -52,19 +51,18 @@ public class UserFragment extends Fragment {
     private LinearLayout layoutToUserMine;
     private LinearLayout layoutIntroduction;
     private TextView tvUserIntroduction;
-//
-    private RecyclerView mRecyclerView;
-    private UserBaseAdapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
+
     private String count;
-    private LinearLayout.LayoutParams params;
 //    话题
     private ArrayList<TopicContent> contentArrayList=new ArrayList<>();
     private TextView tvTopicsCount;
     private LinearLayout layoutTopics;
     private LinearLayout layoutTopicsItem;
 //    回复
-    private ArrayList<ReplyUser> replyUserArrayList =new ArrayList<>();
+    private ArrayList<ReplyUser> replyArrayList =new ArrayList<>();
+    private TextView tvReplysCount;
+    private LinearLayout layoutReplys;
+    private LinearLayout layoutReplysItem;
 //    收藏
     //    UI
     private final Handler msgHandler=new Handler(new Handler.Callback() {
@@ -84,13 +82,8 @@ public class UserFragment extends Fragment {
                 case MESSAGE_ERROR:
                     Toast.makeText(getActivity(),(String)msg.obj,Toast.LENGTH_SHORT).show();
                     break;
-                case USER_TOPIC_COUNT:
-//                    tvUserTopicCount.setText(String.valueOf(userTopicCount));
-                    break;
-                case USER_REPLY_COUNT:
-//                    tvUserReplyCount.setText(String.valueOf(userReplyCount));
-                    break;
                 case USER_SET_INFORMATION:
+                    UserBaseAdapter mAdapter= (UserBaseAdapter) msg.obj;
                     mAdapter.notifyDataSetChanged();
                     break;
                 default:
@@ -116,8 +109,11 @@ public class UserFragment extends Fragment {
 
         tvTopicsCount=view.findViewById(R.id.user_my_topic_count);
         layoutTopics=view.findViewById(R.id.user_topics_more);
+        tvReplysCount=view.findViewById(R.id.user_my_reply_count);
+        layoutReplys=view.findViewById(R.id.user_reply_more);
 
         initTopicsView(view);
+        initReplyView(view);
         return view;
 
     }
@@ -143,7 +139,6 @@ public class UserFragment extends Fragment {
             initUserInfo();
 //            请求数据，个人话题数，个人回复数，个人收藏数
 
-            getUserReply(1);
 
 
         }
@@ -176,7 +171,21 @@ public class UserFragment extends Fragment {
                     msg1.what=UNLOGIN;
                     msgHandler.sendMessage(msg1);
                 }else {
-                    Intent intent = new Intent(getActivity(), UserHomePageActivity.class);
+                    Intent intent = new Intent(getActivity(), UserSelfTopicListActivity.class);
+                    startActivity(intent);
+                }
+            }
+        });
+//        回复更多-->回复列表
+        layoutReplys.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (MyApplication.globalUserInfo.token==null){
+                    Message msg1=new Message();
+                    msg1.what=UNLOGIN;
+                    msgHandler.sendMessage(msg1);
+                }else {
+                    Intent intent = new Intent(getActivity(), UserSelfReplyActivity.class);
                     startActivity(intent);
                 }
             }
@@ -215,27 +224,26 @@ public class UserFragment extends Fragment {
     }
 //    初始化话题recyclerView
     private void initTopicsView(View view){
-        mRecyclerView = view.findViewById(R.id.user_topics_recyclerview);
-        mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        getUserTopics(1);
-        params = new LinearLayout.LayoutParams(getContext().getResources().getDisplayMetrics().widthPixels*8/9,LinearLayout.LayoutParams.WRAP_CONTENT);
-
-        if (getContentArrayList() != null) {
-                mAdapter = new UserBaseAdapter(getContentArrayList(), getContext(), R.layout.user_topics_item) {
+        if (MyApplication.globalUserInfo.token!=null) {
+            RecyclerView mRecyclerView = view.findViewById(R.id.user_topics_recyclerview);
+            RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+            mRecyclerView.setLayoutManager(mLayoutManager);
+            final LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(getContext().getResources().getDisplayMetrics().widthPixels * 7 / 9, LinearLayout.LayoutParams.WRAP_CONTENT);
+            params.setMargins(0, 0, getContext().getResources().getDisplayMetrics().widthPixels * 1 / 9, 0);
+            if (getContentArrayList() != null) {
+                UserBaseAdapter mAdapter = new UserBaseAdapter(getContentArrayList(), getContext(), R.layout.user_topics_item) {
                     @Override
                     public void onBindViewHolder(UserBaseAdapter.mViewHolder viewHolder, int i) {
                         super.onBindViewHolder(viewHolder, i);
-                        layoutTopicsItem= (LinearLayout) viewHolder.view(R.id.user_topics_item);
+                        layoutTopicsItem = (LinearLayout) viewHolder.view(R.id.user_topics_item);
                         TextView tvTitle = (TextView) viewHolder.view(R.id.user_topics_title);
                         TextView tvExcerpt = (TextView) viewHolder.view(R.id.user_topics_excerpt);
                         layoutTopicsItem.setLayoutParams(params);
                         tvTitle.setText(getContentArrayList().get(i).getTopicTitle());
                         tvExcerpt.setText(getContentArrayList().get(i).getTopicExcerpt());
                     }
-
-
                 };
+                getUserTopics(1, mAdapter);
                 mAdapter.setOnItemClickListener(new UserBaseAdapter.OnItemClickListener() {
                     @Override
                     public void onItemClick(int position) {
@@ -244,14 +252,46 @@ public class UserFragment extends Fragment {
                 });
                 mRecyclerView.setAdapter(mAdapter);
             }
-
-
-
+        }
     }
 //    回复recyclerView
+    private void initReplyView(View view) {
+        if (MyApplication.globalUserInfo.token!=null) {
+            RecyclerView mRecyclerView = view.findViewById(R.id.user_reply_recyclerview);
+            RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+            mRecyclerView.setLayoutManager(mLayoutManager);
+
+            final LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(getContext().getResources().getDisplayMetrics().widthPixels * 7 / 9, LinearLayout.LayoutParams.WRAP_CONTENT);
+            params.setMargins(0, 0, getContext().getResources().getDisplayMetrics().widthPixels * 1 / 9, 0);
+            if (getReplyArrayList() != null) {
+                UserBaseAdapter mAdapter = new UserBaseAdapter(getReplyArrayList(), getContext(), R.layout.user_replys_item) {
+                    @Override
+                    public void onBindViewHolder(UserBaseAdapter.mViewHolder viewHolder, int i) {
+                        super.onBindViewHolder(viewHolder, i);
+                        layoutReplysItem = (LinearLayout) viewHolder.view(R.id.user_reply_item);
+                        TextView tvTitle = (TextView) viewHolder.view(R.id.user_reply_topic_title);
+                        TextView tvExcerpt = (TextView) viewHolder.view(R.id.user_reply_content);
+                        layoutReplysItem.setLayoutParams(params);
+                        tvTitle.setText(getReplyArrayList().get(i).getTitle());
+                        tvExcerpt.setText(getReplyArrayList().get(i).getContent());
+                    }
+                };
+                Log.e("回复adapter:", mAdapter.toString());
+                getUserReply(1, mAdapter);
+                mAdapter.setOnItemClickListener(new UserBaseAdapter.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(int position) {
+                        Toast.makeText(getContext(), "点击测试reply", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                mRecyclerView.setAdapter(mAdapter);
+            }
+        }
+    }
+
 //    收藏recyclerView
 //    获取用户个人话题（数+内容）
-    private void  getUserTopics(int pageCount){
+    private void  getUserTopics(int pageCount, final UserBaseAdapter adapter){
         HttpUtil.sendOkHttpGetUserTopicList("1", pageCount, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -290,6 +330,7 @@ public class UserFragment extends Fragment {
                                     }
                                     Message msg3 = new Message();
                                     msg3.what = USER_SET_INFORMATION;
+                                    msg3.obj=adapter;
                                     msgHandler.sendMessage(msg3);
                                 }
                             }
@@ -297,7 +338,7 @@ public class UserFragment extends Fragment {
                                 jresp=jresp.getJSONObject("meta");
                                 if (jresp.has("pagination")){
                                     jresp=jresp.getJSONObject("pagination");
-                                    count=jresp.getString("count");
+                                    final String count=jresp.getString("count");
                                     final Runnable setUserCount=new Runnable() {
                                         @Override
                                         public void run() {
@@ -322,9 +363,9 @@ public class UserFragment extends Fragment {
         });
     }
 //    获取用户个人回复(数+内容）
-    private void getUserReply(int pageCount){
+    private void getUserReply(int pageCount, final UserBaseAdapter adapter){
 
-        HttpUtil.sendOkHttpGetUserReplyList(MyApplication.globalUserInfo.user.getUserId(),pageCount, new Callback() {
+        HttpUtil.sendOkHttpGetUserReplyList("1",pageCount, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 Message msg2 = new Message();
@@ -335,32 +376,56 @@ public class UserFragment extends Fragment {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                JSONObject jresp=null;
-
+                JSONObject jresp = null;
+                JSONArray jsonArray=null;
                 try {
-                    jresp=new JSONObject(response.body().toString());
-                    if (jresp.has("meta")){
-                        jresp=jresp.getJSONObject("meta");
-                        if (jresp.has("pagination")){
-                            jresp=jresp.getJSONObject("pagination");
-                        }
-                        final Runnable setUserCount=new Runnable() {
-                            @Override
-                            public void run() {
-                                Message msg1=new Message();
-                                msg1.what=USER_REPLY_COUNT;
-                                msgHandler.sendMessage(msg1);
-                            }};
-                        new Thread(){
-                            public void run(){
-                                msgHandler.post(setUserCount);
+                    jresp=new JSONObject(response.body().string());
+                    switch (response.code()){
+                        case HTTP_USER_GET_INFORMATION:
+
+                            if (jresp.has("data")){
+                                jsonArray=jresp.getJSONArray("data");
+//                               有评论
+                                if (jsonArray!=null){
+                                    for (int i=0;i<jsonArray.length();i++){
+                                        JSONObject jsonObject=jsonArray.getJSONObject(i);
+                                        ReplyUser replyUser=new ReplyUser();
+                                        replyUser.setReplyId(jsonObject.getString("id"));
+                                        replyUser.setUserId(jsonObject.getString("user_id"));
+                                        replyUser.setEssayId(jsonObject.getString("topic_id"));
+                                        replyUser.setContent(jsonObject.getString("content"));
+                                        replyArrayList.add(replyUser);
+                                    }
+                                    Message msg3 = new Message();
+                                    msg3.what = USER_SET_INFORMATION;
+                                    msg3.obj=adapter;
+                                    msgHandler.sendMessage(msg3);
+
+                                }
+                                if (jresp.has("meta")) {
+                                    jresp=jresp.getJSONObject("meta");
+                                    if (jresp.has("pagination")){
+                                        jresp=jresp.getJSONObject("pagination");
+                                        count=jresp.getString("count");
+                                        final Runnable setUserReplyCount=new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                tvReplysCount.setText(count);
+                                            }};
+                                        new Thread(){
+                                            public void run(){
+                                                msgHandler.post(setUserReplyCount);
+                                            }
+                                        }.start();
+                                    }
+
+                                }
                             }
-                        }.start();
                     }
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
             }
         });
     }
@@ -373,11 +438,11 @@ public class UserFragment extends Fragment {
         this.contentArrayList = contentArrayList;
     }
 
-    public ArrayList<ReplyUser> getReplyUserArrayList() {
-        return replyUserArrayList;
+    public ArrayList<ReplyUser> getReplyArrayList() {
+        return replyArrayList;
     }
 
-    public void setReplyUserArrayList(ArrayList<ReplyUser> replyUserArrayList) {
-        this.replyUserArrayList = replyUserArrayList;
+    public void setReplyArrayList(ArrayList<ReplyUser> replyArrayList) {
+        this.replyArrayList = replyArrayList;
     }
 }

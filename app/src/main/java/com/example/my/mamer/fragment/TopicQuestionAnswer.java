@@ -45,9 +45,9 @@ public class TopicQuestionAnswer extends BaseLazyLoadFragment {
 
 
     //ui
-    private final Handler msgHandler=new Handler(){
+    private final Handler msgHandler=new Handler(new Handler.Callback() {
         @Override
-        public void handleMessage(Message msg) {
+        public boolean handleMessage(Message msg) {
             switch (msg.what){
                 case DISMISS_DIALOG:
                     ((LoadingDraw)msg.obj).dismiss();
@@ -61,8 +61,9 @@ public class TopicQuestionAnswer extends BaseLazyLoadFragment {
                 default:
                     break;
             }
+            return false;
         }
-    };
+    });
     //    初始化视图
     @Override
     public View initView(LayoutInflater inflater, ViewGroup container) {
