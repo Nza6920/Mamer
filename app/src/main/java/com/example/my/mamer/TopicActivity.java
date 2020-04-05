@@ -60,6 +60,7 @@ import java.util.List;
 import okhttp3.Authenticator;
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -82,8 +83,8 @@ import static com.example.my.mamer.config.Config.USER_SET_INFORMATION;
 
 //该activity用于编辑文章和新建文章
 public class TopicActivity extends AppCompatActivity implements View.OnClickListener{
-
-//    头部栏
+    private static final MediaType XWWW=MediaType.parse("application/x-www-form-urlencoded");
+    //    头部栏
     private TextView tvClose;
     private TextView tvTitle;
     private Button btnNext;
@@ -105,6 +106,7 @@ public class TopicActivity extends AppCompatActivity implements View.OnClickList
 //    键盘的收起与弹出
     private TextView tvKeyboardDown;
 
+    private SharedPreferences prefs;
     ArrayList arrayList=new ArrayList();
     HashMap<String,String> map=new HashMap<>();
     LoadingDraw loadingDraw;
@@ -141,6 +143,8 @@ public class TopicActivity extends AppCompatActivity implements View.OnClickList
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        prefs= PreferenceManager.getDefaultSharedPreferences(this);
+
         setContentView(R.layout.activity_topic);
         loadingDraw=new LoadingDraw(this);
 //        编辑话题
@@ -555,8 +559,86 @@ public class TopicActivity extends AppCompatActivity implements View.OnClickList
             jsonParam.put("body", mEditText.getHtml());
             jsonParam.put("category_id", map.get(flagStr));
             String jsonStr = jsonParam.toString();
-
             RequestBody requestBody = RequestBody.create(JSON, jsonStr);
+
+            if (prefs.getString("tagId",null).equals("1")){
+                    HttpUtil.sendOkHttpRequestPatchTopics( requestBody, new Callback() {
+                        @Override
+                        public void onFailure(Call call, IOException e) {
+                            Message msg2 = new Message();
+                            msg2.what = MESSAGE_ERROR;
+                            msg2.obj = "服务器异常,请检查网络";
+                            msgHandler.sendMessage(msg2);
+                        }
+
+                        @Override
+                        public void onResponse(Call call, Response response) throws IOException {
+                            JSONObject jresp = null;
+                            try {
+                                jresp = new JSONObject(response.body().string());
+                                switch (response.code()) {
+                                    case HTTP_OK:
+                                        Message msg4 = new Message();
+                                        msg4.what = response.code();
+                                        msg4.obj = "编辑成功";
+                                        msgHandler.sendMessage(msg4);
+                                        finish();
+                                        break;
+//                            422
+                                    case HTTP_USER_NULL:
+                                        if (jresp.has("errors")){
+                                            try {
+                                                JSONObject errorStr=jresp.getJSONObject("errors");
+                                                if (errorStr.has("body")) {
+                                                    Message msg3 = new Message();
+                                                    msg3.what = response.code();
+                                                    msg3.obj = "话题内容至少为3个字符";
+                                                    msgHandler.sendMessage(msg3);
+                                                }else if (errorStr.has("title")){
+                                                    Message msg3 = new Message();
+                                                    msg3.what = response.code();
+                                                    msg3.obj ="标题至少为2个字符";
+                                                    msgHandler.sendMessage(msg3);
+                                                }else if (errorStr.has("category_code")){
+                                                    Message msg3 = new Message();
+                                                    msg3.what = response.code();
+                                                    msg3.obj = "分类不能为空";
+                                                    msgHandler.sendMessage(msg3);
+                                                }
+
+                                            } catch (JSONException e) {
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                        break;
+//                    401
+                                    case HTTP_USER_ERROR:
+                                        Message msg9 = new Message();
+                                        msg9.what = DISMISS_DIALOG;
+                                        msg9.obj = loadingDraw;
+                                        msgHandler.sendMessage(msg9);
+
+                                        Authenticator authenticator = new Authenticator() {
+                                            @Override
+                                            public Request authenticate(Route route, Response response) throws IOException {
+                                                //    刷新token
+                                                return response.request().newBuilder().addHeader("Authorization",  MyApplication.globalUserInfo.tokenType +  MyApplication.globalUserInfo.token).build();
+                                            }
+                                        };
+                                        MyApplication.globalUserInfo.user.setUserPassKey(String.valueOf(authenticator));
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+
+                    });
+                    return;
+                }
             HttpUtil.sendOkHttpRequestNewTopic(NEW_TOPIC_INFO, requestBody, new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
@@ -638,7 +720,6 @@ public class TopicActivity extends AppCompatActivity implements View.OnClickList
         super.onResume();
     }
     private void editTopic(){
-        SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(this);
         if (prefs.getString("tagId",null).equals("1")){
 //            文章标题
             strTopicTitle=prefs.getString("title",null);

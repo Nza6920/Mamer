@@ -22,6 +22,7 @@ import com.example.my.mamer.adapter.recycleview.UserBaseAdapter;
 import com.example.my.mamer.bean.ReplyUser;
 import com.example.my.mamer.bean.TopicContent;
 import com.example.my.mamer.util.HttpUtil;
+import com.example.my.mamer.util.LoadingDraw;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -34,6 +35,7 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 
+import static com.example.my.mamer.config.Config.DISMISS_DIALOG;
 import static com.example.my.mamer.config.Config.HTTP_OK;
 import static com.example.my.mamer.config.Config.HTTP_USER_GET_INFORMATION;
 import static com.example.my.mamer.config.Config.HTTP_USER_NULL;
@@ -42,7 +44,7 @@ import static com.example.my.mamer.config.Config.UNLOGIN;
 import static com.example.my.mamer.config.Config.USER_SET_INFORMATION;
 
 public class UserFragment extends Fragment {
-
+    private LoadingDraw loadingDraw;
 //    用户
     private LinearLayout userMamerEnergyLayout;
     private LinearLayout userUnloginLayout;
@@ -52,24 +54,34 @@ public class UserFragment extends Fragment {
     private LinearLayout layoutIntroduction;
     private TextView tvUserIntroduction;
 
+
     private String count;
 //    话题
     private ArrayList<TopicContent> contentArrayList=new ArrayList<>();
     private TextView tvTopicsCount;
     private LinearLayout layoutTopics;
     private LinearLayout layoutTopicsItem;
-//    回复
+    private RecyclerView mTopicsRecyclerView;
+    private UserBaseAdapter mTopicsAdapter=null;
+    private RecyclerView.LayoutManager mTopicsLayoutManager=null;
+    //    回复
     private ArrayList<ReplyUser> replyArrayList =new ArrayList<>();
     private TextView tvReplysCount;
     private LinearLayout layoutReplys;
     private LinearLayout layoutReplysItem;
-//    收藏
+    private RecyclerView mReplyRecyclerView;
+    private UserBaseAdapter mReplyAdapter=null;
+    private RecyclerView.LayoutManager mReplyLayoutManager=null;
+
+    //    收藏
     //    UI
     private final Handler msgHandler=new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(Message msg) {
             switch (msg.what){
-
+                case DISMISS_DIALOG:
+                    ((LoadingDraw)msg.obj).dismiss();
+                    break;
                 case HTTP_USER_NULL:
                     Toast.makeText(getActivity(),(String)msg.obj,Toast.LENGTH_SHORT).show();
                     break;
@@ -95,6 +107,7 @@ public class UserFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        loadingDraw=new LoadingDraw(getContext());
         View view=inflater.inflate(R.layout.fragment_user,container,false);
 //        初始化控件
         userAvatar=view.findViewById(R.id.user_avatar);
@@ -112,8 +125,14 @@ public class UserFragment extends Fragment {
         tvReplysCount=view.findViewById(R.id.user_my_reply_count);
         layoutReplys=view.findViewById(R.id.user_reply_more);
 
-        initTopicsView(view);
-        initReplyView(view);
+        mTopicsLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+        mTopicsRecyclerView = view.findViewById(R.id.user_topics_recyclerview);
+        mTopicsRecyclerView.setLayoutManager(mTopicsLayoutManager);
+
+        mReplyLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+        mReplyRecyclerView = view.findViewById(R.id.user_reply_recyclerview);
+        mReplyRecyclerView.setLayoutManager(mReplyLayoutManager);
+
         return view;
 
     }
@@ -136,8 +155,16 @@ public class UserFragment extends Fragment {
             userUnloginLayout.setVisibility(View.GONE);
             userMamerEnergyLayout.setVisibility(View.VISIBLE);
 
+            initTopicsView();
+            Log.e("initreplyView:","-----------------------");
+            initReplyView();
+            Log.e("inittopicsView:","-----------------------");
             initUserInfo();
 //            请求数据，个人话题数，个人回复数，个人收藏数
+            Log.e("请求topics数据:","-----------------------");
+            getUserTopics(1);
+            Log.e("请求reply数据:","-----------------------");
+            getUserReply(1);
 
 
 
@@ -223,75 +250,65 @@ public class UserFragment extends Fragment {
         }.start();
     }
 //    初始化话题recyclerView
-    private void initTopicsView(View view){
-        if (MyApplication.globalUserInfo.token!=null) {
-            RecyclerView mRecyclerView = view.findViewById(R.id.user_topics_recyclerview);
-            RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
-            mRecyclerView.setLayoutManager(mLayoutManager);
+    private void initTopicsView(){
+        if (null==mTopicsAdapter) {
             final LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(getContext().getResources().getDisplayMetrics().widthPixels * 7 / 9, LinearLayout.LayoutParams.WRAP_CONTENT);
             params.setMargins(0, 0, getContext().getResources().getDisplayMetrics().widthPixels * 1 / 9, 0);
-            if (getContentArrayList() != null) {
-                UserBaseAdapter mAdapter = new UserBaseAdapter(getContentArrayList(), getContext(), R.layout.user_topics_item) {
-                    @Override
-                    public void onBindViewHolder(UserBaseAdapter.mViewHolder viewHolder, int i) {
-                        super.onBindViewHolder(viewHolder, i);
-                        layoutTopicsItem = (LinearLayout) viewHolder.view(R.id.user_topics_item);
-                        TextView tvTitle = (TextView) viewHolder.view(R.id.user_topics_title);
-                        TextView tvExcerpt = (TextView) viewHolder.view(R.id.user_topics_excerpt);
-                        layoutTopicsItem.setLayoutParams(params);
-                        tvTitle.setText(getContentArrayList().get(i).getTopicTitle());
-                        tvExcerpt.setText(getContentArrayList().get(i).getTopicExcerpt());
-                    }
-                };
-                getUserTopics(1, mAdapter);
-                mAdapter.setOnItemClickListener(new UserBaseAdapter.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(int position) {
-                        Toast.makeText(getContext(), "点击测试", Toast.LENGTH_SHORT).show();
-                    }
-                });
-                mRecyclerView.setAdapter(mAdapter);
-            }
+            UserBaseAdapter mAdapter = new UserBaseAdapter(getContext(), R.layout.user_topics_item) {
+                @Override
+                public void onBindViewHolder(UserBaseAdapter.mViewHolder viewHolder, int i) {
+                    super.onBindViewHolder(viewHolder, i);
+                    layoutTopicsItem = (LinearLayout) viewHolder.view(R.id.user_topics_item);
+                    TextView tvTitle = (TextView) viewHolder.view(R.id.user_topics_title);
+                    TextView tvExcerpt = (TextView) viewHolder.view(R.id.user_topics_excerpt);
+                    layoutTopicsItem.setLayoutParams(params);
+                    tvTitle.setText(getContentArrayList().get(i).getTopicTitle());
+                    tvExcerpt.setText(getContentArrayList().get(i).getTopicExcerpt());
+                }
+            };
+            this.mTopicsAdapter = mAdapter;
+//                getUserTopics(1, mAdapter);
+            mAdapter.setOnItemClickListener(new UserBaseAdapter.OnItemClickListener() {
+                @Override
+                public void onItemClick(int position) {
+                    Toast.makeText(getContext(), "点击测试", Toast.LENGTH_SHORT).show();
+                }
+            });
         }
     }
-//    回复recyclerView
-    private void initReplyView(View view) {
-        if (MyApplication.globalUserInfo.token!=null) {
-            RecyclerView mRecyclerView = view.findViewById(R.id.user_reply_recyclerview);
-            RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
-            mRecyclerView.setLayoutManager(mLayoutManager);
-
+//    回复recyclerView,没有就创建一个adapter
+    private void initReplyView() {
+        if (null==mReplyAdapter) {
             final LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(getContext().getResources().getDisplayMetrics().widthPixels * 7 / 9, LinearLayout.LayoutParams.WRAP_CONTENT);
             params.setMargins(0, 0, getContext().getResources().getDisplayMetrics().widthPixels * 1 / 9, 0);
-            if (getReplyArrayList() != null) {
-                UserBaseAdapter mAdapter = new UserBaseAdapter(getReplyArrayList(), getContext(), R.layout.user_replys_item) {
-                    @Override
-                    public void onBindViewHolder(UserBaseAdapter.mViewHolder viewHolder, int i) {
-                        super.onBindViewHolder(viewHolder, i);
-                        layoutReplysItem = (LinearLayout) viewHolder.view(R.id.user_reply_item);
-                        TextView tvTitle = (TextView) viewHolder.view(R.id.user_reply_topic_title);
-                        TextView tvExcerpt = (TextView) viewHolder.view(R.id.user_reply_content);
-                        layoutReplysItem.setLayoutParams(params);
-                        tvTitle.setText(getReplyArrayList().get(i).getTitle());
-                        tvExcerpt.setText(getReplyArrayList().get(i).getContent());
-                    }
-                };
-                Log.e("回复adapter:", mAdapter.toString());
-                getUserReply(1, mAdapter);
-                mAdapter.setOnItemClickListener(new UserBaseAdapter.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(int position) {
-                        Toast.makeText(getContext(), "点击测试reply", Toast.LENGTH_SHORT).show();
-                    }
-                });
-                mRecyclerView.setAdapter(mAdapter);
-            }
+            UserBaseAdapter mAdapter = new UserBaseAdapter(getContext(), R.layout.user_replys_item) {
+                @Override
+                public void onBindViewHolder(UserBaseAdapter.mViewHolder viewHolder, int i) {
+                    super.onBindViewHolder(viewHolder, i);
+                    layoutReplysItem = (LinearLayout) viewHolder.view(R.id.user_reply_item);
+                    TextView tvTitle = (TextView) viewHolder.view(R.id.user_reply_topic_title);
+                    TextView tvExcerpt = (TextView) viewHolder.view(R.id.user_reply_content);
+                    layoutReplysItem.setLayoutParams(params);
+                    tvTitle.setText(getReplyArrayList().get(i).getTitle());
+                    tvExcerpt.setText(getReplyArrayList().get(i).getContent());
+                }
+            };
+            Log.e("回复adapter:", mAdapter.toString());
+//                getUserReply(1, mAdapter);
+            mAdapter.setOnItemClickListener(new UserBaseAdapter.OnItemClickListener() {
+                @Override
+                public void onItemClick(int position) {
+                    Toast.makeText(getContext(), "点击测试reply", Toast.LENGTH_SHORT).show();
+                }
+            });
+            this.mReplyAdapter = mAdapter;
         }
     }
 
 //    收藏recyclerView
 //    获取用户个人话题（数+内容）
-    private void  getUserTopics(int pageCount, final UserBaseAdapter adapter){
+    private void  getUserTopics(int pageCount){
+        loadingDraw.show();
         HttpUtil.sendOkHttpGetUserTopicList("1", pageCount, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -328,10 +345,23 @@ public class UserFragment extends Fragment {
                                         topicContent.setTopicExcerpt(jsonObject.getString("excerpt"));
                                         contentArrayList.add(topicContent);
                                     }
-                                    Message msg3 = new Message();
-                                    msg3.what = USER_SET_INFORMATION;
-                                    msg3.obj=adapter;
-                                    msgHandler.sendMessage(msg3);
+                                    final Runnable setUserCount=new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            loadingDraw.dismiss();
+                                            if (contentArrayList.size()!=0&&mTopicsAdapter!=null){
+                                                Log.e("inittopicsView设置数据:","-----------------------");
+                                                mTopicsRecyclerView.setAdapter(mTopicsAdapter);
+                                                mTopicsAdapter.updateData(contentArrayList);
+                                            }
+                                        }};
+                                    new Thread(){
+                                        public void run(){
+                                            msgHandler.post(setUserCount);
+                                        }
+                                    }.start();
+
+
                                 }
                             }
                             if (jresp.has("meta")) {
@@ -363,11 +393,17 @@ public class UserFragment extends Fragment {
         });
     }
 //    获取用户个人回复(数+内容）
-    private void getUserReply(int pageCount, final UserBaseAdapter adapter){
-
+    private void getUserReply(int pageCount){
+        loadingDraw.show();
+        Log.e("loadingdraw显示:","-----------------------");
         HttpUtil.sendOkHttpGetUserReplyList("1",pageCount, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
+                Message msg1=new Message();
+                msg1.what=DISMISS_DIALOG;
+                msg1.obj=loadingDraw;
+                msgHandler.sendMessage(msg1);
+
                 Message msg2 = new Message();
                 msg2.what = MESSAGE_ERROR;
                 msg2.obj = "服务器异常,请检查网络";
@@ -376,6 +412,7 @@ public class UserFragment extends Fragment {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
+                Log.e("请求数据成功:","-----------------------");
                 JSONObject jresp = null;
                 JSONArray jsonArray=null;
                 try {
@@ -387,6 +424,8 @@ public class UserFragment extends Fragment {
                                 jsonArray=jresp.getJSONArray("data");
 //                               有评论
                                 if (jsonArray!=null){
+                                    Log.e("装入设置数据:","-----------------------");
+
                                     for (int i=0;i<jsonArray.length();i++){
                                         JSONObject jsonObject=jsonArray.getJSONObject(i);
                                         ReplyUser replyUser=new ReplyUser();
@@ -394,12 +433,29 @@ public class UserFragment extends Fragment {
                                         replyUser.setUserId(jsonObject.getString("user_id"));
                                         replyUser.setEssayId(jsonObject.getString("topic_id"));
                                         replyUser.setContent(jsonObject.getString("content"));
+                                        if (jsonObject.has("topic")){
+                                            JSONObject topicStr=jsonObject.getJSONObject("topic");
+                                            replyUser.setTitle(topicStr.getString("title"));
+                                        }
                                         replyArrayList.add(replyUser);
                                     }
-                                    Message msg3 = new Message();
-                                    msg3.what = USER_SET_INFORMATION;
-                                    msg3.obj=adapter;
-                                    msgHandler.sendMessage(msg3);
+                                    final Runnable setUserReplyCount=new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            loadingDraw.dismiss();
+                                            if ((replyArrayList.size()!=0)&&mReplyAdapter!=null){
+                                                Log.e("initreplyView设置数据:","-----------------------");
+                                                Log.e("initreplyView:","-"+replyArrayList+"-"+mReplyAdapter.toString()+"---------------------");
+                                                mReplyRecyclerView.setAdapter(mReplyAdapter);
+                                                mReplyAdapter.updateData(replyArrayList);
+                                            }
+                                        }};
+                                    new Thread(){
+                                        public void run(){
+                                            msgHandler.post(setUserReplyCount);
+                                        }
+                                    }.start();
+
 
                                 }
                                 if (jresp.has("meta")) {

@@ -3,6 +3,7 @@ package com.example.my.mamer.adapter.recycleview;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,7 +12,7 @@ import java.util.ArrayList;
 
 public abstract class UserBaseAdapter<T> extends RecyclerView.Adapter<UserBaseAdapter.mViewHolder> {
 
-    private ArrayList<T> listData;
+    private ArrayList<T> listData=new ArrayList<>();
     private LayoutInflater layoutInflater;
     private Context context;
     protected  int mItemLayoutId;
@@ -91,5 +92,25 @@ public abstract class UserBaseAdapter<T> extends RecyclerView.Adapter<UserBaseAd
     }
 
 //    更新数据，并且清除之前的数据
+    public void updateData(ArrayList<T> list){
+        Log.e("更新数据:","-----------------------");
+        if (null==list)
+            return;
+        this.listData.clear();
+        this.listData=list;
+        notifyDataSetChanged();
+        Log.e("更新视图完成:","-----------------------");
+    }
+
+    public void addItem(T data){
+        listData.add(data);
+    }
+
+    public void addData(ArrayList<T> list){
+        if (null==list)
+            return;
+        listData.addAll(list);
+    }
+
 
 }

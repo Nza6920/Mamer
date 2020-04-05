@@ -107,7 +107,7 @@ public class HttpUtil {
     }
 //    获取用户回复列表
     public static void sendOkHttpGetUserReplyList(String userId,int page,okhttp3.Callback callback){
-        String GET_USER_REPLY_LIST="http://www.mamer.club/api/users/"+userId+"/replies?page="+page;
+        String GET_USER_REPLY_LIST="http://www.mamer.club/api/users/"+userId+"/replies?include=topic&page="+page;
         OkHttpClient client=new OkHttpClient();
         Request request=new Request.Builder().url(GET_USER_REPLY_LIST).build();
         client.newCall(request).enqueue(callback);
@@ -160,6 +160,13 @@ public class HttpUtil {
     public static void sendOkHttpGetTopicDivid(okhttp3.Callback callback){
         OkHttpClient client=new OkHttpClient();
         Request request=new Request.Builder().url(TOPIC_DIVID).build();
+        client.newCall(request).enqueue(callback);
+    }
+//    编辑帖子
+    public static void sendOkHttpRequestPatchTopics(final  RequestBody requestBody,final okhttp3.Callback callback){
+        final String EditTopic="http://www.mamer.club/api/topics/"+MyApplication.globalUserInfo.user.getUserId();
+        OkHttpClient client=new OkHttpClient();
+        Request request=new Request.Builder().patch(requestBody).addHeader("Authorization", MyApplication.globalUserInfo.tokenType+MyApplication.globalUserInfo.token ).addHeader("Content-Type",CONTENT_TYPEs).url(EditTopic).build();
         client.newCall(request).enqueue(callback);
     }
 }

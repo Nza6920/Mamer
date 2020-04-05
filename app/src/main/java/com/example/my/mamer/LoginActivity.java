@@ -169,12 +169,23 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 loadingDraw.show();
-                try {
-                    getEditString();
-                    postInformation();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                final Runnable setEditContent=new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            getEditString();
+                            postInformation();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }};
+                new Thread(){
+                    public void run(){
+                        msgHandler.post(setEditContent);
+                    }
+                }.start();
+
+
             }
         });
 
