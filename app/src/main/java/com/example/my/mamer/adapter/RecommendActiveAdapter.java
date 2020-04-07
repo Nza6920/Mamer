@@ -1,6 +1,7 @@
 package com.example.my.mamer.adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,11 +20,16 @@ import static com.example.my.mamer.MyApplication.getContext;
 
 public class RecommendActiveAdapter extends BaseAdapter {
 
-    private ArrayList<RecommendResource> data;
+    private ArrayList<RecommendResource> data =new ArrayList<>();
     private LayoutInflater layoutInflater;
     private Context context;
 
-    public RecommendActiveAdapter(ArrayList<RecommendResource> data,  Context context) {
+    public RecommendActiveAdapter(Context context) {
+        this.context = context;
+        this.layoutInflater = LayoutInflater.from(context);
+    }
+
+    public RecommendActiveAdapter(ArrayList<RecommendResource> data, Context context) {
         this.data = data;
         this.layoutInflater = LayoutInflater.from(context);
         this.context = context;
@@ -38,6 +44,9 @@ public class RecommendActiveAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
+        if (data.size()==0){
+            return 0;
+        }
         return data.size();
     }
 
@@ -65,6 +74,7 @@ public class RecommendActiveAdapter extends BaseAdapter {
         }else {
             listViewItem= (RecommendActiveAdapter.listItem) convertView.getTag();
         }
+        if (null==data) return convertView;
 //        绑定数据
         RequestOptions options=new RequestOptions()
                 .error(R.mipmap.ic_image_error)
@@ -78,5 +88,18 @@ public class RecommendActiveAdapter extends BaseAdapter {
         listViewItem.userIntroduction.setText(data.get(position).getRecommendUserIntroduction());
 
         return convertView;
+    }
+
+    //    更新数据，并且清除之前的数据
+    public void updateData(ArrayList<RecommendResource> list){
+        Log.e("RecommendResource更新数据:","-----------------------");
+
+        this.data=list;
+        notifyDataSetChanged();
+        Log.e("RecommendResource更新视图:","-----------------------");
+    }
+
+    public void clearData(){
+        this.data.clear();
     }
 }

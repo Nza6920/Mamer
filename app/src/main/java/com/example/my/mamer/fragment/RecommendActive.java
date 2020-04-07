@@ -31,7 +31,6 @@ import okhttp3.Response;
 import static com.example.my.mamer.config.Config.DISMISS_DIALOG;
 import static com.example.my.mamer.config.Config.HTTP_USER_GET_INFORMATION;
 import static com.example.my.mamer.config.Config.MESSAGE_ERROR;
-import static com.example.my.mamer.config.Config.USER_SET_INFORMATION;
 
 /**
  * 活跃用户
@@ -41,7 +40,7 @@ public class RecommendActive extends BaseLazyLoadFragment  {
     private ArrayList<RecommendResource> listData=new ArrayList<>();
     private RecommendActiveAdapter mAdapter;
     //    标志位
-    private boolean isPrepared=false;
+    private boolean isVisible=false;
 
 
     //ui
@@ -55,11 +54,6 @@ public class RecommendActive extends BaseLazyLoadFragment  {
                 case MESSAGE_ERROR:
                     Toast.makeText(getActivity(), (String) msg.obj, Toast.LENGTH_SHORT).show();
                     break;
-                case USER_SET_INFORMATION:
-                    if (mAdapter != null) {
-                        mAdapter.notifyDataSetChanged();
-                    }
-                    break;
                 default:
                     break;
             }
@@ -71,9 +65,8 @@ public class RecommendActive extends BaseLazyLoadFragment  {
     public View initView(LayoutInflater inflater, ViewGroup container) {
         View view=inflater.inflate(R.layout.fragment_recommend_view,container,false);
         listView=view.findViewById(R.id.recommend_list_view);
-        mAdapter=new RecommendActiveAdapter(getListData(),getContext());
-        Log.e("listFragment","活跃用户");
-        listView.setAdapter(mAdapter);
+        mAdapter=new RecommendActiveAdapter(getContext());
+        onLazyLoad(1);
         return view;
     }
 
@@ -117,9 +110,20 @@ public class RecommendActive extends BaseLazyLoadFragment  {
 
                                         listData.add(recommendResource);
                                     }
-                                    Message msg3 = new Message();
-                                    msg3.what = USER_SET_INFORMATION;
-                                    msgHandler.sendMessage(msg3);
+                                    final Runnable setData=new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            if (mAdapter!=null){
+                                                Log.e("listFragment","资源推荐");
+                                                listView.setAdapter(mAdapter);
+                                                mAdapter.updateData(listData);
+                                            }
+                                        }};
+                                    new Thread(){
+                                        public void run(){
+                                            msgHandler.post(setData);
+                                        }
+                                    }.start();
                                 }
                             }
                             break;
@@ -133,8 +137,6 @@ public class RecommendActive extends BaseLazyLoadFragment  {
         });
     }
 
-
-
     @Override
     public void initEvent() {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -147,10 +149,25 @@ public class RecommendActive extends BaseLazyLoadFragment  {
                     msg3.obj="登陆后体验更多";
                     msgHandler.sendMessage(msg3);
                 }
-
-
             }
         });
 
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser){
+            if (mAdapter!=null){
+                mAdapter.clearData();
+                onLazyLoad(1);
+            }
+        }
     }
 }

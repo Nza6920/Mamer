@@ -92,7 +92,7 @@ public class UserFragment extends Fragment {
                     Toast.makeText(getActivity(),"登陆以体验更多",Toast.LENGTH_SHORT).show();
                     break;
                 case MESSAGE_ERROR:
-                    Toast.makeText(getActivity(),(String)msg.obj,Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(),(String)msg.obj,Toast.LENGTH_SHORT).show();
                     break;
                 case USER_SET_INFORMATION:
                     UserBaseAdapter mAdapter= (UserBaseAdapter) msg.obj;
@@ -165,9 +165,6 @@ public class UserFragment extends Fragment {
             getUserTopics(1);
             Log.e("请求reply数据:","-----------------------");
             getUserReply(1);
-
-
-
         }
     }
 
@@ -309,7 +306,7 @@ public class UserFragment extends Fragment {
 //    获取用户个人话题（数+内容）
     private void  getUserTopics(int pageCount){
         loadingDraw.show();
-        HttpUtil.sendOkHttpGetUserTopicList("1", pageCount, new Callback() {
+        HttpUtil.sendOkHttpGetUserTopicList(MyApplication.globalUserInfo.user.getUserId(), pageCount, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 Message msg2 = new Message();
@@ -396,7 +393,7 @@ public class UserFragment extends Fragment {
     private void getUserReply(int pageCount){
         loadingDraw.show();
         Log.e("loadingdraw显示:","-----------------------");
-        HttpUtil.sendOkHttpGetUserReplyList("1",pageCount, new Callback() {
+        HttpUtil.sendOkHttpGetUserReplyList(MyApplication.globalUserInfo.user.getUserId(),pageCount, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 Message msg1=new Message();

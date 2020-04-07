@@ -20,11 +20,16 @@ import static com.example.my.mamer.MyApplication.getContext;
 
 public class NotificationAdapter extends BaseAdapter {
 
-    private ArrayList<NotificationUser> notificationData;
+    private ArrayList<NotificationUser> notificationData= new ArrayList<NotificationUser>();
     private LayoutInflater layoutInflater;
     private Context context;
 
-    public NotificationAdapter(Context context,ArrayList<NotificationUser> data){
+    public NotificationAdapter(Context context) {
+        this.context = context;
+        this.layoutInflater=LayoutInflater.from(context);
+    }
+
+    public NotificationAdapter(Context context, ArrayList<NotificationUser> data){
         Log.e("Tag","进入接收数据");
         this.context=context;
         this.notificationData=data;
@@ -33,6 +38,8 @@ public class NotificationAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
+        if (null==notificationData)
+            return 0;
         return notificationData.size();
     }
 
@@ -63,19 +70,20 @@ public class NotificationAdapter extends BaseAdapter {
             Log.e("Tag","映射完毕");
             view.setTag(listViewItem);
         }else {
-            listViewItem= (listItem) view.getTag(i);
+            listViewItem= (listItem) view.getTag();
         }
         Log.e("Tag","设置数据显示");
+        if (null==notificationData)return view;
         RequestOptions options=new RequestOptions()
                 .error(R.mipmap.ic_image_error)
                 .placeholder(R.mipmap.ic_image_error);
-        if (listViewItem.userImg != null) {
+
             Glide.with(getContext())
                     .asBitmap()
                     .load(notificationData.get(i).getUserImg())
                     .apply(options)
                     .into(listViewItem.userImg);
-        }
+
         listViewItem.tvUserName.setText(notificationData.get(i).getUserName());
         listViewItem.tvTopic.setText(notificationData.get(i).getTopicName());
         listViewItem.tvContent.setText(notificationData.get(i).getUserContent());
@@ -87,5 +95,15 @@ public class NotificationAdapter extends BaseAdapter {
         private ImageView userImg;
         private TextView tvTopic;
         private TextView tvContent;
+    }
+    //    更新数据，并且清除之前的数据
+    public void updateData(ArrayList<NotificationUser> list){
+        Log.e("NotificationUser更新数据:","-----------------------");
+        if (null==list)
+            return;
+        this.notificationData.clear();
+        this.notificationData=list;
+        notifyDataSetChanged();
+        Log.e("NotificationUser更新视图:","-----------------------");
     }
 }

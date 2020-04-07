@@ -56,7 +56,11 @@ public class TopicTeach extends BaseLazyLoadFragment {
                 Toast.makeText(getActivity(), (String) msg.obj, Toast.LENGTH_SHORT).show();
                 break;
             case USER_SET_INFORMATION:
-                mAdapter.notifyDataSetChanged();
+                if (mAdapter!=null){
+                    Log.e("listFragment","视图教程");
+                    listView.setAdapter(mAdapter);
+                    mAdapter.updateData(listData);
+                }
                 break;
             default:
                 break;
@@ -70,8 +74,6 @@ public class TopicTeach extends BaseLazyLoadFragment {
         View view=inflater.inflate(R.layout.fragment_topic_content_view,container,false);
         listView=view.findViewById(R.id.topic_content_list_view);
         mAdapter=new TopicContentAdapter(getContext(),getListData());
-        Log.e("listFragment","视图教程");
-        listView.setAdapter(mAdapter);
 
         return view;
     }
@@ -159,5 +161,17 @@ public class TopicTeach extends BaseLazyLoadFragment {
                 startActivity(intent);
             }
         });
+    }
+
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser){
+            if (mAdapter!=null){
+                mAdapter.clearData();
+                onLazyLoad(1);
+            }
+        }
     }
 }

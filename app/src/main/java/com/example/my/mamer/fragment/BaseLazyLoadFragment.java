@@ -8,6 +8,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+/**
+ * 加载视图时，不加载数据，数据加载在每个fragment内
+ */
 public abstract class BaseLazyLoadFragment extends Fragment {
 //    fragment的view加载完毕
     private boolean isViewCreated;
@@ -27,37 +30,17 @@ public abstract class BaseLazyLoadFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        isViewCreated=true;
-        onLazyLoad(1);
     }
 
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
-//        当View创建完成时，用户可见的请求，且仅当是第一次对用户可见的时候请求自动数据
-        if (isVisibleToUser){
-            isVisible=true;
-            if (isFirstLoad){
-                isCanLoadData();
-                isFirstLoad=false;
-            }
-        }else {
-            isVisible=false;
-        }
-    }
-    private void isCanLoadData(){
-        if (isViewCreated&&isVisible){
-            onLazyLoad(1);
-            isViewCreated=false;
-            isVisible=false;
-        }
+
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        isViewCreated=false;
-        isVisible=false;
 
     }
 

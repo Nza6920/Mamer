@@ -55,7 +55,9 @@ public class TopicShare extends BaseLazyLoadFragment {
                     break;
                 case USER_SET_INFORMATION:
                     if (mAdapter != null) {
-                        mAdapter.notifyDataSetChanged();
+                        Log.e("listFragment","视图share");
+                        listView.setAdapter(mAdapter);
+                        mAdapter.updateData(listData);
                     }
                     break;
                 default:
@@ -70,8 +72,6 @@ public class TopicShare extends BaseLazyLoadFragment {
         View view=inflater.inflate(R.layout.fragment_topic_content_view,container,false);
         listView=view.findViewById(R.id.topic_content_list_view);
         mAdapter=new TopicContentAdapter(getContext(),getListData());
-        Log.e("listFragment","视图share");
-        listView.setAdapter(mAdapter);
 
         return view;
     }
@@ -141,7 +141,6 @@ public class TopicShare extends BaseLazyLoadFragment {
             });
     }
 
-
 //    初始化事件接口
     @Override
     public void initEvent() {
@@ -160,5 +159,25 @@ public class TopicShare extends BaseLazyLoadFragment {
                 startActivity(intent);
             }
         });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (mAdapter!=null){
+            mAdapter.clearData();
+            onLazyLoad(1);
+        }
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser){
+            if (mAdapter!=null){
+                mAdapter.clearData();
+                onLazyLoad(1);
+            }
+        }
     }
 }

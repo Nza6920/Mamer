@@ -1,5 +1,6 @@
 package com.example.my.mamer;
 
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -8,6 +9,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -27,6 +29,7 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 
+import static com.example.my.mamer.MyApplication.getContext;
 import static com.example.my.mamer.config.Config.HTTP_USER_GET_INFORMATION;
 import static com.example.my.mamer.config.Config.MESSAGE_ERROR;
 
@@ -38,6 +41,7 @@ public class TopicReplyListActivity extends AppCompatActivity {
     private TextView tvTitle;
     private LoadingDraw loadingDraw;
     private TextView tvReplyCount;
+    private LinearLayout replyClick;
     private int current_page;
     private int total_pages;
 
@@ -56,7 +60,7 @@ public class TopicReplyListActivity extends AppCompatActivity {
         initUI();
         onDataLoad(1);
 
-        mAdapter=new TopicReplyAdapter(getApplicationContext(),listData);
+        mAdapter=new TopicReplyAdapter(getContext(),listData);
         listView.setAdapter(mAdapter);
         initEvent();
 
@@ -74,6 +78,7 @@ public class TopicReplyListActivity extends AppCompatActivity {
         tvBack=findViewById(R.id.title_tv_close);
         tvTitle=findViewById(R.id.title_tv_name);
         tvReplyCount=findViewById(R.id.topic_reply_count);
+        replyClick=findViewById(R.id.reply_bottombar);
 
         Drawable tvBackPic=ContextCompat.getDrawable(this,R.mipmap.ic_title_close);
         tvBack.setBackground(tvBackPic);
@@ -82,6 +87,13 @@ public class TopicReplyListActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 finish();
+            }
+        });
+        replyClick.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i=new Intent(TopicReplyListActivity.this,TopicReplyPublishActivity.class);
+                startActivity(i);
             }
         });
 
@@ -128,7 +140,6 @@ public class TopicReplyListActivity extends AppCompatActivity {
                                             replyUser.setUserName(topicStr.getString("title"));
                                         }
                                         listData.add(replyUser);
-
                                     }
 
                                     final Runnable setAvatarRunable=new Runnable() {

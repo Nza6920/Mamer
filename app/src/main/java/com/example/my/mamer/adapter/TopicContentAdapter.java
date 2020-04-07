@@ -1,6 +1,7 @@
 package com.example.my.mamer.adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,9 +20,14 @@ import static com.example.my.mamer.MyApplication.getContext;
 
 public class TopicContentAdapter extends BaseAdapter {
 
-    private ArrayList<TopicContent> data;
+    private ArrayList<TopicContent> data=new ArrayList<>();
     private LayoutInflater layoutInflater;
     private Context context;
+
+    public TopicContentAdapter(Context context) {
+        this.context = context;
+        this.layoutInflater=LayoutInflater.from(context);
+    }
 
     public TopicContentAdapter(Context context, ArrayList<TopicContent> data) {
         this.context=context;
@@ -41,6 +47,8 @@ public class TopicContentAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
+        if (null==data)
+            return 0;
         return data.size();
     }
 //获得某一位置的数据
@@ -56,7 +64,6 @@ public class TopicContentAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position,View convertView,  ViewGroup parent) {
-
         listItem listViewItem=null;
         if (convertView==null){
             listViewItem=new listItem();
@@ -73,6 +80,7 @@ public class TopicContentAdapter extends BaseAdapter {
         }else {
             listViewItem= (listItem) convertView.getTag();
         }
+        if (null==data) return convertView;
 //        绑定数据
             RequestOptions options=new RequestOptions()
                     .error(R.mipmap.ic_image_error)
@@ -88,4 +96,17 @@ public class TopicContentAdapter extends BaseAdapter {
         listViewItem.topicDiscussCount.setText((data.get(position)).getReplyCount());
         return convertView;
     }
+    //    更新数据，并且清除之前的数据
+    public void updateData(ArrayList<TopicContent> list){
+        Log.e("更新数据:","-----------------------");
+        if (null==list)
+            return;
+        this.data=list;
+        notifyDataSetChanged();
+        Log.e("更新视图:","-----------------------");
+    }
+    public void clearData(){
+        this.data.clear();
+    }
+
 }

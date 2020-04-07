@@ -163,8 +163,8 @@ public class HttpUtil {
         client.newCall(request).enqueue(callback);
     }
 //    编辑帖子
-    public static void sendOkHttpRequestPatchTopics(final  RequestBody requestBody,final okhttp3.Callback callback){
-        final String EditTopic="http://www.mamer.club/api/topics/"+MyApplication.globalUserInfo.user.getUserId();
+    public static void sendOkHttpRequestPatchTopics(String topicId,final  RequestBody requestBody,final okhttp3.Callback callback){
+        final String EditTopic="http://www.mamer.club/api/topics/"+topicId;
         OkHttpClient client=new OkHttpClient();
         Request request=new Request.Builder().patch(requestBody).addHeader("Authorization", MyApplication.globalUserInfo.tokenType+MyApplication.globalUserInfo.token ).addHeader("Content-Type",CONTENT_TYPEs).url(EditTopic).build();
         client.newCall(request).enqueue(callback);

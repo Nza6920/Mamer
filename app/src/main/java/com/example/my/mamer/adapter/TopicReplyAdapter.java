@@ -1,6 +1,7 @@
 package com.example.my.mamer.adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,19 +20,26 @@ import static com.example.my.mamer.MyApplication.getContext;
 
 public class TopicReplyAdapter extends BaseAdapter {
 
-    private ArrayList<ReplyUser> replyListData;
+    private ArrayList<ReplyUser> replyListData =new ArrayList<>();
 
     //    布局解析器
     private LayoutInflater layoutInflater;
     private Context context;
 
-    public TopicReplyAdapter(Context context,ArrayList<ReplyUser> data){
+    public TopicReplyAdapter(Context context) {
+        this.context = context;
+        this.layoutInflater=LayoutInflater.from(context);
+    }
+
+    public TopicReplyAdapter(Context context, ArrayList<ReplyUser> data){
         this.context=context;
         this.replyListData=data;
         this.layoutInflater=LayoutInflater.from(context);
     }
     @Override
     public int getCount() {
+        if (null==replyListData)
+            return 0;
         return replyListData.size();
     }
 
@@ -58,7 +66,8 @@ public class TopicReplyAdapter extends BaseAdapter {
         }else {
             listViewItem= (listItem) view.getTag();
         }
-
+        if (replyListData.size()==0)
+            return view;
         RequestOptions options=new RequestOptions()
                 .error(R.mipmap.ic_image_error)
                 .placeholder(R.mipmap.ic_image_error);
@@ -75,5 +84,15 @@ public class TopicReplyAdapter extends BaseAdapter {
         private ImageView imgReplyUserAvatar;
         private TextView tvUserName;
         private TextView tvUserContent;
+    }
+    //    更新数据，并且清除之前的数据
+    public void updateData(ArrayList<ReplyUser> list){
+        Log.e("ReplyUser更新数据:","-----------------------");
+        if (null==list)
+            return;
+        this.replyListData.clear();
+        this.replyListData=list;
+        notifyDataSetChanged();
+        Log.e("ReplyUser更新视图:","-----------------------");
     }
 }

@@ -221,6 +221,7 @@ public class TopicParticularsActivity extends AppCompatActivity {
 
                             Log.e("Tag","话题详情--获取具体数据");
                             TopicContent topicContent=new TopicContent();
+                            topicContent.setTopicId(jresp.getString("id"));
                             topicContent.setTopicTitle(jresp.getString("title"));
                             topicContent.setTopicConten(jresp.getString("body"));
                             topicContent.setReplyCount(jresp.getString("reply_count"));
@@ -517,6 +518,7 @@ public class TopicParticularsActivity extends AppCompatActivity {
                             editor.putString("body",listData.get(0).getTopicConten());
                             editor.putString("categoryId",listData.get(0).getCategoryId());
                             editor.putString("categoryName",listData.get(0).getCategoryName());
+                            editor.putString("topicId",listData.get(0).getTopicId());
                             editor.putString("tagId","1");
                             editor.apply();
 

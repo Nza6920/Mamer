@@ -112,9 +112,7 @@ public class TopicReplyPublishActivity extends AppCompatActivity {
         RequestBody requestBody=new FormBody.Builder()
                 .add("content1",strContent)
                 .build();
-        final Intent intent=getIntent();
-        String essayId=intent.getStringExtra("essayId");
-        HttpUtil.sendOkHttpPostReply(essayId, requestBody, new Callback() {
+        HttpUtil.sendOkHttpPostReply(MyApplication.globalTopicReply.reply.replyUser.getEssayId(), requestBody, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 Message msg1=new Message();

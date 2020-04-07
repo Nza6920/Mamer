@@ -33,7 +33,6 @@ import okhttp3.Response;
 import static com.example.my.mamer.config.Config.DISMISS_DIALOG;
 import static com.example.my.mamer.config.Config.HTTP_USER_GET_INFORMATION;
 import static com.example.my.mamer.config.Config.MESSAGE_ERROR;
-import static com.example.my.mamer.config.Config.USER_SET_INFORMATION;
 
 /**
  * 文章推荐
@@ -56,9 +55,6 @@ public class RecommendArticle extends BaseLazyLoadFragment {
                     break;
                 case MESSAGE_ERROR:
                     Toast.makeText(getActivity(), (String) msg.obj, Toast.LENGTH_SHORT).show();
-                    break;
-                case USER_SET_INFORMATION:
-                    mAdapter.notifyDataSetChanged();
                     break;
                 default:
                     break;
@@ -97,9 +93,20 @@ public class RecommendArticle extends BaseLazyLoadFragment {
 
                                     listData.add(recommendResource);
                                 }
-                                Message msg3 = new Message();
-                                msg3.what = USER_SET_INFORMATION;
-                                msgHandler.sendMessage(msg3);
+                                final Runnable setData=new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if (mAdapter!=null){
+                                            Log.e("listFragment","资源推荐");
+                                            listView.setAdapter(mAdapter);
+                                            mAdapter.updateData(listData);
+                                        }
+                                    }};
+                                new Thread(){
+                                    public void run(){
+                                        msgHandler.post(setData);
+                                    }
+                                }.start();
                             }
                             break;
                         default:
@@ -118,9 +125,8 @@ public class RecommendArticle extends BaseLazyLoadFragment {
     public View initView(LayoutInflater inflater, ViewGroup container) {
         View view=inflater.inflate(R.layout.fragment_recommend_view,container,false);
         listView=view.findViewById(R.id.recommend_list_view);
-        mAdapter=new RecommendArticleAdapter(getListData(),getContext());
-        Log.e("listFragment","资源推荐");
-        listView.setAdapter(mAdapter);
+        this.mAdapter=new RecommendArticleAdapter(getContext());
+
         return view;
     }
 
@@ -154,5 +160,22 @@ public class RecommendArticle extends BaseLazyLoadFragment {
         Intent intent=new Intent(Intent.ACTION_VIEW);
         intent.setData(Uri.parse(str));
         startActivity(intent);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        onLazyLoad(1);
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser){
+            if (mAdapter!=null){
+                mAdapter.clearData();
+                onLazyLoad(1);
+            }
+        }
     }
 }

@@ -90,8 +90,8 @@ public class UserEditorInformationActivity extends AppCompatActivity {
                 break;
             case HTTP_OK:
                 Toast.makeText(UserEditorInformationActivity.this,(String)msg.obj,Toast.LENGTH_SHORT).show();
-
                 break;
+
             default:
                 break;
         }
@@ -328,7 +328,7 @@ public class UserEditorInformationActivity extends AppCompatActivity {
                                     JSONObject  errorStr=jresp.getJSONObject("errors");
                                     if (errorStr.has("name")){
                                         Message msg5=new Message();
-                                        msg5.what=response.code();
+                                        msg5.what=HTTP_USER_NULL;
                                         msg5.obj=errorStr.getString("name");
                                         msgHandler.sendMessage(msg5);
                                     }

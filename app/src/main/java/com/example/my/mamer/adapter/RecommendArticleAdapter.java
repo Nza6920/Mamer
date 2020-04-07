@@ -1,6 +1,7 @@
 package com.example.my.mamer.adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,9 +15,14 @@ import java.util.ArrayList;
 
 public class RecommendArticleAdapter extends BaseAdapter {
 
-    private ArrayList<RecommendResource> data;
+    private ArrayList<RecommendResource> data= new ArrayList<>();
     private LayoutInflater layoutInflater;
     private Context context;
+
+    public RecommendArticleAdapter(Context context) {
+        this.layoutInflater = LayoutInflater.from(context);
+        this.context = context;
+    }
 
     public RecommendArticleAdapter(ArrayList<RecommendResource> data, Context context) {
         this.data = data;
@@ -56,8 +62,19 @@ public class RecommendArticleAdapter extends BaseAdapter {
             listViewItem= (RecommendArticleAdapter.listItem) convertView.getTag();
         }
 //        绑定数据
-
-        listViewItem.linkName.setText((data.get(position)).getTitle());
+        if (null==data) return convertView;
+        listViewItem.linkName.setText(data.get(position).getTitle());
         return convertView;
+    }
+
+    //    更新数据，并且清除之前的数据
+    public void updateData(ArrayList<RecommendResource> list){
+        this.data=list;
+        notifyDataSetChanged();
+        Log.e("RecommendResource更新视图:","-----------------------");
+    }
+
+    public void clearData(){
+        data.clear();
     }
 }

@@ -107,6 +107,7 @@ public class TopicActivity extends AppCompatActivity implements View.OnClickList
     private TextView tvKeyboardDown;
 
     private SharedPreferences prefs;
+    private String editTopicId;
     ArrayList arrayList=new ArrayList();
     HashMap<String,String> map=new HashMap<>();
     LoadingDraw loadingDraw;
@@ -122,6 +123,9 @@ public class TopicActivity extends AppCompatActivity implements View.OnClickList
                     tvFlag.setText("#"+msg.obj+"#");
                     break;
                 case MESSAGE_ERROR:
+                    Toast.makeText(TopicActivity.this,(String)msg.obj,Toast.LENGTH_LONG).show();
+                    break;
+                case HTTP_USER_NULL:
                     Toast.makeText(TopicActivity.this,(String)msg.obj,Toast.LENGTH_LONG).show();
                     break;
                 case DISMISS_DIALOG:
@@ -422,7 +426,6 @@ public class TopicActivity extends AppCompatActivity implements View.OnClickList
     //    提交图片
     private void postNewTopicPics(String imagesPaths, final int requestCode, final int resultCode){
 
-
         MultipartBody.Builder builder = new MultipartBody.Builder().setType(MultipartBody.FORM);
         File file = new File(imagesPaths);
         builder.addFormDataPart("image", file.getName(), RequestBody.create(MEDIA_TYPE_IMAGE, file))
@@ -562,7 +565,7 @@ public class TopicActivity extends AppCompatActivity implements View.OnClickList
             RequestBody requestBody = RequestBody.create(JSON, jsonStr);
 
             if (prefs.getString("tagId",null).equals("1")){
-                    HttpUtil.sendOkHttpRequestPatchTopics( requestBody, new Callback() {
+                    HttpUtil.sendOkHttpRequestPatchTopics(editTopicId,requestBody, new Callback() {
                         @Override
                         public void onFailure(Call call, IOException e) {
                             Message msg2 = new Message();
@@ -576,10 +579,11 @@ public class TopicActivity extends AppCompatActivity implements View.OnClickList
                             JSONObject jresp = null;
                             try {
                                 jresp = new JSONObject(response.body().string());
+//                                200
                                 switch (response.code()) {
-                                    case HTTP_OK:
+                                    case HTTP_USER_GET_INFORMATION:
                                         Message msg4 = new Message();
-                                        msg4.what = response.code();
+                                        msg4.what = HTTP_OK;
                                         msg4.obj = "编辑成功";
                                         msgHandler.sendMessage(msg4);
                                         finish();
@@ -591,17 +595,17 @@ public class TopicActivity extends AppCompatActivity implements View.OnClickList
                                                 JSONObject errorStr=jresp.getJSONObject("errors");
                                                 if (errorStr.has("body")) {
                                                     Message msg3 = new Message();
-                                                    msg3.what = response.code();
+                                                    msg3.what = HTTP_USER_NULL;
                                                     msg3.obj = "话题内容至少为3个字符";
                                                     msgHandler.sendMessage(msg3);
                                                 }else if (errorStr.has("title")){
                                                     Message msg3 = new Message();
-                                                    msg3.what = response.code();
+                                                    msg3.what = HTTP_USER_NULL;
                                                     msg3.obj ="标题至少为2个字符";
                                                     msgHandler.sendMessage(msg3);
                                                 }else if (errorStr.has("category_code")){
                                                     Message msg3 = new Message();
-                                                    msg3.what = response.code();
+                                                    msg3.what = HTTP_USER_NULL;
                                                     msg3.obj = "分类不能为空";
                                                     msgHandler.sendMessage(msg3);
                                                 }
@@ -668,17 +672,17 @@ public class TopicActivity extends AppCompatActivity implements View.OnClickList
                                         JSONObject errorStr=jresp.getJSONObject("errors");
                                         if (errorStr.has("body")) {
                                             Message msg3 = new Message();
-                                            msg3.what = response.code();
+                                            msg3.what = HTTP_USER_NULL;
                                             msg3.obj = "话题内容至少为3个字符";
                                             msgHandler.sendMessage(msg3);
                                         }else if (errorStr.has("title")){
                                             Message msg3 = new Message();
-                                            msg3.what = response.code();
+                                            msg3.what = HTTP_USER_NULL;
                                             msg3.obj ="标题至少为2个字符";
                                             msgHandler.sendMessage(msg3);
                                         }else if (errorStr.has("category_code")){
                                             Message msg3 = new Message();
-                                            msg3.what = response.code();
+                                            msg3.what = HTTP_USER_NULL;
                                             msg3.obj = "分类不能为空";
                                             msgHandler.sendMessage(msg3);
                                         }
@@ -728,6 +732,7 @@ public class TopicActivity extends AppCompatActivity implements View.OnClickList
 //            标签
             flagStr=prefs.getString("categoryName",null);
             map.put(prefs.getString("categoryName",null),prefs.getString("categoryId",null));
+            this.editTopicId=prefs.getString("topicId",null);
             final Runnable setEditContent=new Runnable() {
                 @Override
                 public void run() {
@@ -736,8 +741,6 @@ public class TopicActivity extends AppCompatActivity implements View.OnClickList
                     tvFlag.setText("#"+flagStr+"#");
                     layoutFlag.setVisibility(View.GONE);
                     layoutFlagT.setVisibility(View.VISIBLE);
-
-
                 }};
             new Thread(){
                 public void run(){

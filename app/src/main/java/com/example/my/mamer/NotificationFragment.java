@@ -1,7 +1,9 @@
 package com.example.my.mamer;
 
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,7 +16,6 @@ import android.widget.Toast;
 
 import com.example.my.mamer.adapter.NotificationAdapter;
 import com.example.my.mamer.bean.NotificationUser;
-import com.example.my.mamer.fragment.BaseLazyLoadFragment;
 import com.example.my.mamer.util.HttpUtil;
 import com.example.my.mamer.util.LoadingDraw;
 
@@ -32,12 +33,11 @@ import okhttp3.Response;
 import static com.example.my.mamer.config.Config.DISMISS_DIALOG;
 import static com.example.my.mamer.config.Config.HTTP_USER_GET_INFORMATION;
 import static com.example.my.mamer.config.Config.MESSAGE_ERROR;
-import static com.example.my.mamer.config.Config.USER_SET_INFORMATION;
 
-public class NotificationFragment extends BaseLazyLoadFragment {
+public class NotificationFragment extends Fragment {
     private ArrayList<NotificationUser> notificationUsers=new ArrayList<>();
     private ListView listView;
-    private NotificationAdapter mAdapter;
+    private NotificationAdapter mAdapter = null;
     private LoadingDraw loadingDraw;
     private TextView tvNotificationInfo;
     private TextView tvNotificationRead;
@@ -68,11 +68,7 @@ public class NotificationFragment extends BaseLazyLoadFragment {
                     ((LoadingDraw)msg.obj).dismiss();
                     break;
                 case MESSAGE_ERROR:
-                    Toast.makeText(getActivity(),(String)msg.obj,Toast.LENGTH_SHORT).show();
-                    break;
-                case USER_SET_INFORMATION:
-                    mAdapter.notifyDataSetChanged();
-                    Log.e("Tag","数据刷新完成");
+                    Toast.makeText(getContext(),(String)msg.obj,Toast.LENGTH_SHORT).show();
                     break;
                     default:
                         break;
@@ -82,7 +78,7 @@ public class NotificationFragment extends BaseLazyLoadFragment {
     });
 
     @Override
-    public View initView(LayoutInflater inflater, ViewGroup container) {
+    public View onCreateView(LayoutInflater inflater,ViewGroup container,Bundle savedInstanceState) {
         loadingDraw=new LoadingDraw(getContext());
         final View view=inflater.inflate(R.layout.fragment_notification,container,false);
         tvNotificationInfo=view.findViewById(R.id.notification_info);
@@ -91,43 +87,11 @@ public class NotificationFragment extends BaseLazyLoadFragment {
         layoutUnlogin=view.findViewById(R.id.notification_unlogin);
         layoutText=view.findViewById(R.id.notification_text);
         layoutContent=view.findViewById(R.id.notification_content);
-
-        if (MyApplication.globalUserInfo.token!=null){
-            Message msg1 = new Message();
-            msg1.what = DISMISS_DIALOG;
-            msg1.obj=loadingDraw;
-            msgHandler.sendMessage(msg1);
-
-            final Runnable setRunable=new Runnable() {
-                @Override
-                public void run() {
-                    layoutUnlogin.setVisibility(View.GONE);
-                    layoutText.setVisibility(View.VISIBLE);
-                    layoutContent.setVisibility(View.VISIBLE);
-                    listView=view.findViewById(R.id.notification_list);
-                    mAdapter=new NotificationAdapter(getContext(),getNotificationUsers());
-                    listView.setAdapter(mAdapter);
-                }};
-            new Thread(){
-                public void run(){
-                    msgHandler.post(setRunable);
-                }
-            }.start();
-
-        }else {
-            Message msg1 = new Message();
-            msg1.what = DISMISS_DIALOG;
-            msg1.obj=loadingDraw;
-            msgHandler.sendMessage(msg1);
-
-
-        }
-
+        listView=view.findViewById(R.id.notification_list);
+        this.mAdapter=new NotificationAdapter(getContext());
 
         return view;
     }
-
-
 
     public ArrayList<NotificationUser> getNotificationUsers() {
         return notificationUsers;
@@ -137,7 +101,6 @@ public class NotificationFragment extends BaseLazyLoadFragment {
         this.notificationUsers = notificationUsers;
     }
 
-    @Override
     public void onLazyLoad(int page) {
         if (MyApplication.globalUserInfo.token!=null){
             loadingDraw.show();
@@ -157,6 +120,11 @@ public class NotificationFragment extends BaseLazyLoadFragment {
 
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
+                    Message msg1 = new Message();
+                    msg1.what = DISMISS_DIALOG;
+                    msg1.obj=loadingDraw;
+                    msgHandler.sendMessage(msg1);
+
                     JSONObject jresp = null;
                     JSONArray jsonArray=null;
 
@@ -165,11 +133,6 @@ public class NotificationFragment extends BaseLazyLoadFragment {
 
                         switch (response.code()){
                             case HTTP_USER_GET_INFORMATION:
-                                Message msg1 = new Message();
-                                msg1.what = DISMISS_DIALOG;
-                                msg1.obj=loadingDraw;
-                                msgHandler.sendMessage(msg1);
-
                                 if (jresp.has("data")){
                                     jsonArray=jresp.getJSONArray("data");
                                     if (jsonArray==null){
@@ -191,23 +154,36 @@ public class NotificationFragment extends BaseLazyLoadFragment {
                                             }
                                             notificationUsers.add(notificationUser);
                                         }
-                                        Message msg3 = new Message();
-                                        msg3.what = USER_SET_INFORMATION;
-                                        msgHandler.sendMessage(msg3);
+                                        final Runnable setData=new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                if (notificationUsers.size()!=0&&mAdapter!=null){
+                                                    Log.e("Active设置数据:","-----------------------");
+                                                    listView.setAdapter(mAdapter);
+                                                    mAdapter.updateData(notificationUsers);
+                                                }
+                                            }};
+                                        new Thread(){
+                                            public void run(){
+                                                msgHandler.post(setData);
+                                            }
+                                        }.start();
                                     }
-
                                 }
-
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                 }
             });
+            Message msg1 = new Message();
+            msg1.what = DISMISS_DIALOG;
+            msg1.obj=loadingDraw;
+            msgHandler.sendMessage(msg1);
         }
 
     }
-    @Override
+
     public void initEvent() {
         tvNotificationRead.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -255,5 +231,26 @@ public class NotificationFragment extends BaseLazyLoadFragment {
 
             }
         });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (MyApplication.globalUserInfo.token!=null){
+            initAdapterView();
+            onLazyLoad(1);
+        }
+    }
+
+    private void initAdapterView(){
+            Message msg1 = new Message();
+            msg1.what = DISMISS_DIALOG;
+            msg1.obj=loadingDraw;
+            msgHandler.sendMessage(msg1);
+
+            layoutUnlogin.setVisibility(View.GONE);
+            layoutText.setVisibility(View.VISIBLE);
+            layoutContent.setVisibility(View.VISIBLE);
+
     }
 }
