@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.chinalwb.are.android.inner.Html;
 import com.example.my.mamer.adapter.recycleview.UserBaseAdapter;
 import com.example.my.mamer.bean.ReplyUser;
 import com.example.my.mamer.bean.TopicContent;
@@ -287,7 +288,7 @@ public class UserFragment extends Fragment {
                     TextView tvExcerpt = (TextView) viewHolder.view(R.id.user_reply_content);
                     layoutReplysItem.setLayoutParams(params);
                     tvTitle.setText(getReplyArrayList().get(i).getTitle());
-                    tvExcerpt.setText(getReplyArrayList().get(i).getContent());
+                    tvExcerpt.setText(Html.fromHtml(getReplyArrayList().get(i).getContent(),Html.FROM_HTML_MODE_COMPACT));
                 }
             };
             Log.e("回复adapter:", mAdapter.toString());
@@ -416,13 +417,11 @@ public class UserFragment extends Fragment {
                     jresp=new JSONObject(response.body().string());
                     switch (response.code()){
                         case HTTP_USER_GET_INFORMATION:
-
                             if (jresp.has("data")){
                                 jsonArray=jresp.getJSONArray("data");
 //                               有评论
                                 if (jsonArray!=null){
                                     Log.e("装入设置数据:","-----------------------");
-
                                     for (int i=0;i<jsonArray.length();i++){
                                         JSONObject jsonObject=jsonArray.getJSONObject(i);
                                         ReplyUser replyUser=new ReplyUser();

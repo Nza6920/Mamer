@@ -12,49 +12,84 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/title_bar"
         android:paddingLeft="15dp"
-        android:background="#14000000"/>
+        android:background="#afefeded"/>
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/topic_reply_count"
-        android:layout_above="@+id/reply_bottombar">
+        android:layout_above="@+id/to_reply">
         <ListView
             android:id="@+id/topic_reply_list"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"/>
     </FrameLayout>
-    <LinearLayout
-        android:id="@+id/reply_bottombar"
-        android:layout_width="match_parent"
-        android:layout_height="30dp"
-        android:layout_alignParentBottom="true"
-        android:orientation="horizontal"
-        android:background="@drawable/register_phone_num_tab"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginBottom="10dp">
-        <TextView
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:gravity="center"
-            android:background="@mipmap/ic_reply_comment"/>
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="我要评论"
-            android:layout_marginLeft="5dp"
-            android:gravity="center_vertical"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:text="发布"
-            android:textSize="18sp"
-            android:textColor="#12A3E9"
-            android:gravity="center"
-            android:layout_marginRight="5dp"/>
 
+    <LinearLayout
+        android:id="@+id/to_reply"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:layout_alignParentBottom="true"
+        android:background="#fff"
+        android:orientation="vertical">
+        <LinearLayout
+            android:id="@+id/to_reply_content_"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="bottom|end">
+            <TextView
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:background="@mipmap/ic_send"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/reply_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:orientation="vertical">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="13sp"
+                    android:text="评论给"/>
+                <TextView
+                    android:id="@+id/reply_topic_user_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="3dp"
+                    android:textStyle="bold"/>
+            </LinearLayout>
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:layout_gravity="center_vertical"
+                android:layout_margin="5dp"
+                android:focusable="true"
+                android:focusableInTouchMode="true">
+                <EditText
+                    android:id="@+id/to_reply_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="15sp"
+                    android:textColor="#000000"
+                    android:background="#fff"
+                    android:layout_marginRight="20dp"
+                    />
+            </ScrollView>
+
+            <TextView
+                android:id="@+id/to_reply_send"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:background="@mipmap/ic_send"
+                android:layout_gravity="bottom|end"/>
+        </LinearLayout>
 
     </LinearLayout>
 

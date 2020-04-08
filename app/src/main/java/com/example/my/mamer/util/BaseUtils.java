@@ -1,8 +1,14 @@
 package com.example.my.mamer.util;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
+import android.support.v4.content.ContextCompat;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 
+import com.chinalwb.are.AREditText;
 import com.example.my.mamer.MyApplication;
+import com.example.my.mamer.R;
 
 public class BaseUtils {
     private  static  BaseUtils utils;
@@ -32,5 +38,32 @@ public class BaseUtils {
     public int sp2px(float spValue){
         final float fontSize=context.getResources().getDisplayMetrics().density;
         return (int) (spValue*fontSize+0.5f);
+    }
+
+    //    解析html
+    public static void contentUtil(Context context, AREditText mEditText, String contentStr){
+//        从String加载文档
+        mEditText.setFocusable(false);
+        mEditText.setFocusableInTouchMode(false);
+        Drawable edit=ContextCompat.getDrawable(context,R.drawable.backgraoud_color);
+        mEditText.setBackground(edit);
+        mEditText.fromHtml(contentStr);
+    }
+
+//    显示键盘
+    public static void keyboardUpUtil(Context context,View view){
+        view.requestFocus();
+        InputMethodManager inputMethodManager= (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (inputMethodManager!=null){
+            inputMethodManager.showSoftInput(view,InputMethodManager.SHOW_IMPLICIT);
+        }
+
+    }
+//    隐藏键盘
+    public static void keyboardDownUtil(Context context,View view){
+        InputMethodManager inputMethodManager= (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (inputMethodManager!=null){
+            inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(),InputMethodManager.HIDE_IMPLICIT_ONLY);
+        }
     }
 }

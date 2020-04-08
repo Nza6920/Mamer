@@ -43,7 +43,8 @@
             android:layout_marginLeft="15dp"
             android:layout_marginRight="15dp"
             android:layout_below="@+id/author"
-            android:background="@drawable/divid_line">
+            android:background="@drawable/divid_line"
+            android:paddingBottom="10dp">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -119,7 +120,7 @@
                                 android:textSize="15sp"
                                 android:textColor="#444"
                                 android:layout_marginTop="5dp"/>
-                            <TextView
+                            <com.chinalwb.are.AREditText
                                 android:id="@+id/reply_content"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"

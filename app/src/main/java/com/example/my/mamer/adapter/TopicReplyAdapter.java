@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.chinalwb.are.android.inner.Html;
 import com.example.my.mamer.R;
 import com.example.my.mamer.bean.ReplyUser;
 
@@ -77,7 +78,11 @@ public class TopicReplyAdapter extends BaseAdapter {
                 .apply(options)
                 .into(listViewItem.imgReplyUserAvatar);
         listViewItem.tvUserName.setText(replyListData.get(i).getUserName());
-        listViewItem.tvUserContent.setText(replyListData.get(i).getContent());
+//        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
+            listViewItem.tvUserContent.setText(Html.fromHtml(replyListData.get(i).getContent(),Html.FROM_HTML_MODE_COMPACT));
+//        }else {
+//            listViewItem.tvUserContent.setText(Html.fromHtml(replyListData.get(i).getContent()));
+//        }
         return view;
     }
     class listItem{
@@ -90,8 +95,8 @@ public class TopicReplyAdapter extends BaseAdapter {
         Log.e("ReplyUser更新数据:","-----------------------");
         if (null==list)
             return;
-        this.replyListData.clear();
-        this.replyListData=list;
+        replyListData.clear();
+        replyListData=list;
         notifyDataSetChanged();
         Log.e("ReplyUser更新视图:","-----------------------");
     }

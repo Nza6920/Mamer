@@ -66,7 +66,9 @@ public class RecommendActive extends BaseLazyLoadFragment  {
         View view=inflater.inflate(R.layout.fragment_recommend_view,container,false);
         listView=view.findViewById(R.id.recommend_list_view);
         mAdapter=new RecommendActiveAdapter(getContext());
-        onLazyLoad(1);
+        if (isVisible){
+            onLazyLoad(1);
+        }
         return view;
     }
 
@@ -157,10 +159,6 @@ public class RecommendActive extends BaseLazyLoadFragment  {
     @Override
     public void onResume() {
         super.onResume();
-        if (mAdapter!=null){
-            mAdapter.clearData();
-            onLazyLoad(1);
-        }
     }
 
     @Override
@@ -168,8 +166,11 @@ public class RecommendActive extends BaseLazyLoadFragment  {
         super.setUserVisibleHint(isVisibleToUser);
         if (isVisibleToUser){
             if (mAdapter!=null){
+                isVisible=false;
                 mAdapter.clearData();
                 onLazyLoad(1);
+            }else {
+                isVisible=true;
             }
         }
     }

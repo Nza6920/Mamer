@@ -55,10 +55,10 @@ public class Config {
     public final static int USER_SET_INFORMATION=5;
     public final static int UNLOGIN=10;
     public final static int USER_REPLY_COUNT=1;
-    public final static int USER_TOPIC_COUNT=3;
+    public final static int KEYBOARD_UP=3;
     public final static int USER_TOPIC_EDIT=12;
     public final static int USER_TOPIC_DEL=14;
-    public final static int USER_TOPIC_UPDATE=11;
+    public final static int KEYBOARD_DOWN=11;
     public final static int SHOW_DIALOG=17;
 
 //    拍摄

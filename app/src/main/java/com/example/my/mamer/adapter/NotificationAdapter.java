@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.chinalwb.are.android.inner.Html;
 import com.example.my.mamer.R;
 import com.example.my.mamer.bean.NotificationUser;
 
@@ -86,7 +87,7 @@ public class NotificationAdapter extends BaseAdapter {
 
         listViewItem.tvUserName.setText(notificationData.get(i).getUserName());
         listViewItem.tvTopic.setText(notificationData.get(i).getTopicName());
-        listViewItem.tvContent.setText(notificationData.get(i).getUserContent());
+        listViewItem.tvContent.setText(Html.fromHtml(notificationData.get(i).getUserContent(),Html.FROM_HTML_MODE_COMPACT));
         Log.e("Tag","设置数据填充完成");
         return view;
     }

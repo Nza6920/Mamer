@@ -24,6 +24,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.chinalwb.are.AREditText;
 import com.example.my.mamer.bean.ReplyUser;
 import com.example.my.mamer.bean.TopicContent;
+import com.example.my.mamer.util.BaseUtils;
 import com.example.my.mamer.util.HttpUtil;
 import com.example.my.mamer.util.LoadingDraw;
 import com.example.my.mamer.util.PopupItemStyle.PopupStyle;
@@ -60,7 +61,7 @@ public class TopicParticularsActivity extends AppCompatActivity {
     private TextView tvCreatedTime;
 //    文章
     private TextView tvEssayTitle;
-    private TextView tvEssayContent;
+    private AREditText mEditTextArticle;
 //    当前用户
     private TopicManagePopup topicManagePopup;
     private AlertDialog.Builder delDialogBuilder;
@@ -72,9 +73,9 @@ public class TopicParticularsActivity extends AppCompatActivity {
     private LinearLayout layoutCommentList;
     private ImageView imgAvatar;
     private TextView tvReplyUserName;
-    private TextView tvReplyContent;
     private TextView tvReplyTime;
     private TextView tvReplyCount;
+    private AREditText mEditTextReply;
 
 
     public final Handler msgHandler=new Handler(new Handler.Callback() {
@@ -127,12 +128,12 @@ public class TopicParticularsActivity extends AppCompatActivity {
         tvAuthorName=findViewById(R.id.topic_particulars_author_name);
         tvCreatedTime=findViewById(R.id.topic_particulars_time);
         tvEssayTitle=findViewById(R.id.topic_particulars_title);
-        tvEssayContent=findViewById(R.id.topic_particulars_content);
+        mEditTextArticle=findViewById(R.id.topic_particulars_content);
+        mEditTextReply=findViewById(R.id.reply_content);
         layoutComment=findViewById(R.id.reply_comment);
         layoutCommentList=findViewById(R.id.reply_comment_list);
         imgAvatar=findViewById(R.id.reply_user_avatar);
         tvReplyUserName=findViewById(R.id.reply_name);
-        tvReplyContent=findViewById(R.id.reply_content);
         tvReplyTime=findViewById(R.id.reply_time);
         tvReplyCount=findViewById(R.id.reply_count);
 //        填充
@@ -185,6 +186,7 @@ public class TopicParticularsActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Log.e("tag",MyApplication.globalTopicReply.reply.replyUser.getEssayId());
                 Intent intent=new Intent(TopicParticularsActivity.this,TopicReplyListActivity.class);
+                intent.putExtra("topicUserName",listData.get(0).getTopicAuthorName());
                 startActivity(intent);
             }
         });
@@ -261,7 +263,7 @@ public class TopicParticularsActivity extends AppCompatActivity {
                                     Log.e("Tag","话题详情--标题");
                                     tvCreatedTime.setText("编辑于"+listData.get(0).getCreateTime());
                                     Log.e("Tag","话题详情--创建时间");
-                                    contentUtil(listData.get(0).getTopicConten());
+                                    BaseUtils.contentUtil(getContext(),mEditTextArticle,listData.get(0).getTopicConten());
                                     tvTitle.setText(listData.get(0).getCategoryName());
 
                                 }};
@@ -322,7 +324,6 @@ public class TopicParticularsActivity extends AppCompatActivity {
                                     final Runnable setAvatarRunable=new Runnable() {
                                         @Override
                                         public void run() {
-
                                             layoutCommentList.setVisibility(View.VISIBLE);
                                             tvReplyTime.setVisibility(View.VISIBLE);
                                             RequestOptions options=new RequestOptions()
@@ -334,7 +335,7 @@ public class TopicParticularsActivity extends AppCompatActivity {
                                                     .apply(options)
                                                     .into(imgAvatar);
                                             tvReplyUserName.setText(replyUser.getUserName());
-                                            tvReplyContent.setText(replyUser.getContent());
+                                            BaseUtils.contentUtil(getContext(),mEditTextReply,replyUser.getContent());
                                             tvReplyTime.setText(replyUser.getTime());
 
 
@@ -374,16 +375,7 @@ public class TopicParticularsActivity extends AppCompatActivity {
 
 
     }
-//    解析html
-    private void contentUtil(String contentStr){
-//        从String加载文档
-        AREditText mEditText=findViewById(R.id.topic_particulars_content);
-        mEditText.setFocusable(false);
-        mEditText.setFocusableInTouchMode(false);
-        Drawable edit=ContextCompat.getDrawable(this,R.drawable.backgraoud_color);
-        mEditText.setBackground(edit);
-        mEditText.fromHtml(contentStr);
-    }
+
 //    删除提醒
     private void delAlert(){
         delDialogBuilder=new AlertDialog.Builder(this)
@@ -472,7 +464,6 @@ public class TopicParticularsActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        getTopicReply();
     }
 //    popupwindow
     private void getmm(final String tag){
