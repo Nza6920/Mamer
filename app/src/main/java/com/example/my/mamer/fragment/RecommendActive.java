@@ -157,7 +157,10 @@ public class RecommendActive extends BaseLazyLoadFragment  {
     @Override
     public void onResume() {
         super.onResume();
-
+        if (mAdapter!=null){
+            mAdapter.clearData();
+            onLazyLoad(1);
+        }
     }
 
     @Override

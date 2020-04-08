@@ -162,11 +162,6 @@ public class RecommendArticle extends BaseLazyLoadFragment {
         startActivity(intent);
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        onLazyLoad(1);
-    }
 
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
