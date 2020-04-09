@@ -108,7 +108,12 @@ public class RecommendActive extends BaseLazyLoadFragment  {
                                         recommendResource.setRecommendUserId(jsonObject.getString("id"));
                                         recommendResource.setRecommendUserName(jsonObject.getString("name"));
                                         recommendResource.setRecommendUserAvatar(jsonObject.getString("avatar"));
-                                        recommendResource.setRecommendUserIntroduction(jsonObject.getString("introduction"));
+                                        String m=jsonObject.getString("introduction");
+                                        if (m.equals("null")){
+                                            recommendResource.setRecommendUserIntroduction("");
+                                        }else {
+                                            recommendResource.setRecommendUserIntroduction(jsonObject.getString("introduction"));
+                                        }
 
                                         listData.add(recommendResource);
                                     }
@@ -116,7 +121,7 @@ public class RecommendActive extends BaseLazyLoadFragment  {
                                         @Override
                                         public void run() {
                                             if (mAdapter!=null){
-                                                Log.e("listFragment","资源推荐");
+                                                Log.e("listFragment","活跃用户推荐");
                                                 listView.setAdapter(mAdapter);
                                                 mAdapter.updateData(listData);
                                             }
