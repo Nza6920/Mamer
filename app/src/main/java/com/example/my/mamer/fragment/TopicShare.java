@@ -19,6 +19,7 @@ import com.example.my.mamer.adapter.TopicContentAdapter;
 import com.example.my.mamer.bean.TopicContent;
 import com.example.my.mamer.util.HttpUtil;
 import com.example.my.mamer.util.LoadingDraw;
+import com.example.my.mamer.util.StringToDate;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -115,7 +116,7 @@ public class TopicShare extends BaseLazyLoadFragment {
                                         topicContent.setTopicId(jsonObject.getString("id"));
                                         topicContent.setTopicTitle(jsonObject.getString("title"));
                                         topicContent.setCategoryId(jsonObject.getString("category_id"));
-                                        topicContent.setCreateTime(jsonObject.getString("created_at"));
+                                        topicContent.setCreateTime(StringToDate.stringToShort(jsonObject.getString("created_at")));
                                         topicContent.setReplyCount(jsonObject.getString("reply_count"));
                                         if(jsonObject.has("user")){
                                             JSONObject userInfo=jsonObject.getJSONObject("user");

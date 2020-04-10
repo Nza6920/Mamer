@@ -8,8 +8,10 @@
 
     <Button
         android:id="@+id/topic_top_bar_classify"
-        android:layout_width="50dp"
-        android:layout_height="60dp"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:maxWidth="50dp"
+        android:maxHeight="50dp"
         android:layout_alignParentLeft="true"
         android:layout_marginLeft="10dp"
         android:layout_centerVertical="true"
@@ -20,12 +22,13 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:text="话题"
-        android:textSize="20sp"
         android:textColor="#000"/>
     <Button
         android:id="@+id/topic_top_bar_new"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:maxWidth="50dp"
+        android:maxHeight="50dp"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:layout_marginRight="10dp"

@@ -20,6 +20,7 @@ import com.example.my.mamer.adapter.UserSelfTopicAdapter;
 import com.example.my.mamer.bean.TopicContent;
 import com.example.my.mamer.util.HttpUtil;
 import com.example.my.mamer.util.LoadingDraw;
+import com.example.my.mamer.util.StringToDate;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -158,7 +159,7 @@ public class UserSelfTopicListActivity extends AppCompatActivity {
                                         topicContent.setTopicAuthorId(jsonObject.getString("user_id"));
                                         topicContent.setCategoryId(jsonObject.getString("category_id"));
                                         topicContent.setReplyCount(jsonObject.getString("reply_count"));
-                                        topicContent.setUpdateTime(jsonObject.getString("updated_at"));
+                                        topicContent.setUpdateTime(StringToDate.stringToShort(jsonObject.getString("created_at")));
                                         listData.add(topicContent);
                                     }
 

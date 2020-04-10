@@ -47,6 +47,7 @@ public class UserSelfReplyActivity extends AppCompatActivity {
     private TextView tvBack;
     private TextView tvTitle;
     private LoadingDraw loadingDraw;
+    private Boolean tDel=false;
 
     private final Handler msgHandler=new Handler(new Handler.Callback() {
         @Override
@@ -104,7 +105,7 @@ public class UserSelfReplyActivity extends AppCompatActivity {
             }
         });
         tvTitle.setText("我的回复");
-        tvTitle.setTextSize(25);
+        tvTitle.setTextSize(18);
     }
 
 //    回复列表数据
@@ -127,7 +128,6 @@ public class UserSelfReplyActivity extends AppCompatActivity {
                     jresp=new JSONObject(response.body().string());
                     switch (response.code()){
                         case HTTP_USER_GET_INFORMATION:
-
                             if (jresp.has("data")){
                                 jsonArray=jresp.getJSONArray("data");
 //                               有评论
@@ -138,16 +138,14 @@ public class UserSelfReplyActivity extends AppCompatActivity {
                                         replyUser.setReplyId(jsonObject.getString("id"));
                                         replyUser.setEssayId(jsonObject.getString("topic_id"));
                                         replyUser.setContent(jsonObject.getString("content"));
-                                        if (jsonObject.has("user")){
-                                            JSONObject userStr=jsonObject.getJSONObject("user");
-                                            replyUser.setUserImg(userStr.getString("avatar"));
-                                        }
                                         if (jsonObject.has("topic")){
                                             JSONObject topicStr=jsonObject.getJSONObject("topic");
                                             replyUser.setUserName(topicStr.getString("title"));
                                         }
+                                        replyUser.setTagReplyRole("localUser");
                                         listData.add(replyUser);
                                     }
+
                                     final Runnable setAvatarRunable=new Runnable() {
                                         @Override
                                         public void run() {
@@ -181,9 +179,10 @@ public class UserSelfReplyActivity extends AppCompatActivity {
                         .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                view.setVisibility(View.GONE);
                                 delReply( listData.get(position).getEssayId(), listData.get(position).getReplyId());
-
+                                if (tDel){
+                                    view.setVisibility(View.GONE);
+                                }
                             }
                         })
                         .setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -215,8 +214,7 @@ public class UserSelfReplyActivity extends AppCompatActivity {
                     JSONObject jresp=new JSONObject(response.body().string());
                     switch (response.code()){
                         case HTTP_DEL_REPLY_OK:
-
-
+                            tDel=true;
                             Message msg4=new Message();
                             msg4.what=MESSAGE_ERROR;
                             msg4.obj="删除成功";

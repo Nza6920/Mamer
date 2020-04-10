@@ -12,6 +12,7 @@ public class ReplyUser {
     private String emil;
     private String time;
     private String count;
+    private String tagReplyRole;
 
 
     public ReplyUser(){}
@@ -110,5 +111,13 @@ public class ReplyUser {
 
     public void setCount(String count) {
         this.count = count;
+    }
+
+    public String getTagReplyRole() {
+        return tagReplyRole;
+    }
+
+    public void setTagReplyRole(String tagReplyRole) {
+        this.tagReplyRole = tagReplyRole;
     }
 }

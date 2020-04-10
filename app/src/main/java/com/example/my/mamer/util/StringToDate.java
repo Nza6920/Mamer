@@ -13,4 +13,10 @@ public class StringToDate  extends Date{
         Date date=format.parse(strTime);
         return date;
     }
+
+    public static  String stringToShort(String srtLongTime){
+        String str=srtLongTime.substring(0,10);
+        return str;
+
+    }
 }

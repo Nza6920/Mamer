@@ -28,6 +28,7 @@ import com.example.my.mamer.util.BaseUtils;
 import com.example.my.mamer.util.HttpUtil;
 import com.example.my.mamer.util.LoadingDraw;
 import com.example.my.mamer.util.PopupItemStyle.PopupStyle;
+import com.example.my.mamer.util.StringToDate;
 import com.example.my.mamer.util.TopicManagePopup;
 
 import org.json.JSONArray;
@@ -227,7 +228,7 @@ public class TopicParticularsActivity extends AppCompatActivity {
                             topicContent.setTopicTitle(jresp.getString("title"));
                             topicContent.setTopicConten(jresp.getString("body"));
                             topicContent.setReplyCount(jresp.getString("reply_count"));
-                            topicContent.setCreateTime(jresp.getString("created_at"));
+                            topicContent.setCreateTime(StringToDate.stringToShort(jresp.getString("updated_at")));
                             if (jresp.has("user")){
                                 Log.e("Tag","话题详情--获取作者数据");
                                 JSONObject user=jresp.getJSONObject("user");
@@ -261,7 +262,7 @@ public class TopicParticularsActivity extends AppCompatActivity {
                                     Log.e("Tag","话题详情--姓名");
                                     tvEssayTitle.setText(listData.get(0).getTopicTitle());
                                     Log.e("Tag","话题详情--标题");
-                                    tvCreatedTime.setText("编辑于"+listData.get(0).getCreateTime());
+                                    tvCreatedTime.setText("更新于"+listData.get(0).getCreateTime());
                                     Log.e("Tag","话题详情--创建时间");
                                     BaseUtils.contentUtil(getContext(),mEditTextArticle,listData.get(0).getTopicConten());
                                     tvTitle.setText(listData.get(0).getCategoryName());

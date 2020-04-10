@@ -249,6 +249,7 @@ public class TopicReplyListActivity extends AppCompatActivity {
                                             JSONObject topicStr=jsonObject.getJSONObject("topic");
                                             replyUser.setUserName(topicStr.getString("title"));
                                         }
+                                        replyUser.setTagReplyRole("");
                                         listData.add(replyUser);
                                     }
 
