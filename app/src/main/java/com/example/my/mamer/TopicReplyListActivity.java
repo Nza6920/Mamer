@@ -1,11 +1,13 @@
 package com.example.my.mamer;
 
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
@@ -242,6 +244,7 @@ public class TopicReplyListActivity extends AppCompatActivity {
                                         replyUser.setContent(jsonObject.getString("content"));
                                         if (jsonObject.has("user")){
                                             JSONObject userStr=jsonObject.getJSONObject("user");
+                                            replyUser.setUserId(userStr.getString("id"));
                                             replyUser.setUserImg(userStr.getString("avatar"));
                                             replyUser.setUserName(userStr.getString("name"));
                                         }
@@ -300,6 +303,13 @@ public class TopicReplyListActivity extends AppCompatActivity {
             @Override
             public void onItemClick(final AdapterView<?> adapterView, final View view, final int position, long l) {
 
+                Intent intent=new Intent(TopicReplyListActivity.this,ToUserActivity.class);
+                intent.putExtra("userId",listData.get(position).getUserId());
+                intent.putExtra("userAvatar",listData.get(position).getUserImg());
+                intent.putExtra("userName",listData.get(position).getUserName());
+                intent.putExtra("userIntro",listData.get(position).getUserInfo());
+                Log.e("intent:", String.valueOf(intent));
+                startActivity(intent);
             }
         });
     }

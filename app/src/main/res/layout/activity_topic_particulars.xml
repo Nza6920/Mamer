@@ -88,7 +88,7 @@
                             android:layout_height="wrap_content"
                             android:layout_centerVertical="true"
                             android:text="评论"
-                            android:textSize="20sp" />
+                            android:textSize="18sp" />
                         <TextView
                             android:id="@+id/reply_count"
                             android:layout_width="wrap_content"
@@ -102,31 +102,32 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:layout_marginTop="10dp"
-                        android:visibility="gone">
+                        android:layout_marginTop="8dp"
+                        android:visibility="visible">
                         <ImageView
                             android:id="@+id/reply_user_avatar"
-                            android:layout_width="50dp"
-                            android:layout_height="50dp" />
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"/>
                         <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
-                            android:layout_marginLeft="5dp">
+                            android:layout_marginLeft="8dp">
                             <TextView
                                 android:id="@+id/reply_name"
                                 android:layout_width="wrap_content"
-                                android:layout_height="20dp"
-                                android:textSize="15sp"
-                                android:textColor="#444"
-                                android:layout_marginTop="5dp"/>
+                                android:layout_height="wrap_content"
+                                android:textSize="16sp"
+                                android:lines="1"
+                                android:enabled="true"
+                                android:textColor="#444"/>
                             <com.chinalwb.are.AREditText
                                 android:id="@+id/reply_content"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textSize="15sp"
+                                android:textSize="16sp"
                                 android:textColor="#000"
-                                android:layout_marginTop="10dp"/>
+                                android:layout_marginTop="8dp"/>
                         </LinearLayout>
                     </LinearLayout>
                     <TextView

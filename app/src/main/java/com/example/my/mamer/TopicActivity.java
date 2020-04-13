@@ -23,7 +23,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -92,14 +92,14 @@ public class TopicActivity extends AppCompatActivity implements View.OnClickList
     private EditText editTitle;
     private String strTopicTitle;
 //    标签
-    private LinearLayout layoutFlag;
-    private LinearLayout layoutFlagT;
+    private RelativeLayout layoutFlag;
+    private RelativeLayout layoutFlagT;
     private TextView tvFlag;
     private Object flagStr;
     private TextView tvFlagClose;
 //    底部工具栏
     private IARE_Toolbar mToolbar;
-    private LinearLayout layoutBottom;
+    private RelativeLayout layoutBottom;
 //    富文本
     private AREditText mEditText;
     private String editText;

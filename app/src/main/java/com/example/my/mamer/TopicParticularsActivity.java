@@ -315,7 +315,7 @@ public class TopicParticularsActivity extends AppCompatActivity {
                                     replyUser.setReplyId(jsonObject.getString("id"));
                                     replyUser.setEssayId(jsonObject.getString("topic_id"));
                                     replyUser.setContent(jsonObject.getString("content"));
-                                    replyUser.setTime(jsonObject.getString("updated_at"));
+                                    replyUser.setTime(StringToDate.stringToShort(jsonObject.getString("updated_at")));
                                     if (jsonObject.has("user")){
                                         JSONObject userStr=jsonObject.getJSONObject("user");
                                         replyUser.setUserId(userStr.getString("id"));

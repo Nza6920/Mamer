@@ -7,4 +7,5 @@
     <string name="title_activity_topics_new_topic_base">TopicsNewTopicBaseActivity</string>
     <string name="title_activity_topic_reply">TopicReplyActivity</string>
     <string name="title_activity_topic_particulars_test">TopicParticularsTestActivity</string>
+    <string name="title_activity_to_user">ToUserActivity</string>
 </resources>

@@ -204,8 +204,8 @@ private void initEvent(){
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
 //                暂存数据
                 SharedPreferences.Editor editor=PreferenceManager.getDefaultSharedPreferences(UserSelfTopicListActivity.this).edit();
-                editor.putString("id",listData.get(position).getTopicId());
-                editor.putString("userId",listData.get(position).getTopicAuthorId());
+                editor.putString("id",listData.get((int) id).getTopicId());
+                editor.putString("userId",listData.get((int) id).getTopicAuthorId());
                 editor.putString("categoryId",listData.get(position).getCategoryId());
                 editor.putString("tagId","2");
                 editor.apply();

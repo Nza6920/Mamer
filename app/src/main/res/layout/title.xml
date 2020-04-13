@@ -4,22 +4,21 @@
     android:id="@+id/title_bar"
     android:layout_width="match_parent"
     android:layout_height="?attr/actionBarSize"
-    android:layout_marginTop="10dp">
+    android:layout_marginTop="8dp">
 
     <TextView
         android:id="@+id/title_tv_close"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
         android:layout_alignParentLeft="true"
         android:layout_marginLeft="10dp"
-        android:textSize="20sp"
+        android:textSize="16sp"
         android:layout_centerVertical="true"
         android:enabled="true"/>
     <TextView
         android:id="@+id/title_tv_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="18sp"
         android:layout_centerInParent="true"
         android:layout_centerVertical="true"/>
 
@@ -32,6 +31,6 @@
         android:layout_marginRight="10dp"
         android:background="#00000000"
         android:textAllCaps="true"
-        android:textSize="20sp" />
+        android:textSize="16sp" />
 
 </RelativeLayout>

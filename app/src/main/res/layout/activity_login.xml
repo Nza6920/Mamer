@@ -9,7 +9,7 @@
     <include layout="@layout/title"/>
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_marginLeft="50dp"
         android:layout_marginRight="50dp"
         android:orientation="vertical">
@@ -19,28 +19,26 @@
             android:layout_height="wrap_content"
             android:text="密码登录"
             android:textColor="#000"
-            android:textSize="25sp"
+            android:textSize="24sp"
             android:gravity="center"/>
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="mamer遇见未知"
-            android:textSize="15sp"
+            android:textSize="16sp"
             android:textColor="#717171"
             android:gravity="center"/>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginTop="30dp">
-
+            android:layout_height="56dp"
+            android:layout_marginTop="8dp">
             <EditText
-                android:layout_width="wrap_content"
-                android:layout_height="50dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
                 android:layout_gravity="center_vertical"
                 android:background="@mipmap/ic_register_username"
                 android:enabled="false" />
-
             <EditText
                 android:id="@+id/login_username"
                 android:layout_width="match_parent"
@@ -51,18 +49,15 @@
                 android:textSize="16sp"
                 android:paddingLeft="10dp"
                  />
-
         </LinearLayout>
-
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginTop="20dp">
+            android:layout_height="56dp">
 
             <EditText
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
                 android:layout_gravity="center_vertical"
                 android:background="@mipmap/ic_register_password"
                 android:clickable="false"
@@ -74,26 +69,72 @@
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:layout_gravity="center_vertical"
-                android:paddingTop="5dp"
-                android:paddingBottom="5dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
                 android:textSize="16sp"
                 android:inputType="textPassword"
                 android:paddingLeft="10dp"
                 android:maxLength="16"/>
         </LinearLayout>
 
-
-
         <Button
             android:id="@+id/login_btn"
             android:layout_width="match_parent"
-            android:layout_height="45dp"
+            android:layout_height="40dp"
             android:text="登录"
             android:textColor="#fff"
             android:textSize="16sp"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="16dp"
             android:background="@drawable/register_phone_num_btn"
             android:enabled="false"/>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp">
+            <TextView
+                android:id="@+id/other_login_message"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="免密码登录"
+                android:textSize="16sp"
+                android:layout_alignParentLeft="true"/>
+            <TextView
+                android:id="@+id/login_help"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:text="帮助"
+                android:layout_alignParentRight="true"/>
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="bottom">
+            <TextView
+                android:id="@+id/other_login_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="其他登录方式"
+                android:gravity="center"
+                />
+            <RelativeLayout
+                android:id="@+id/other_login"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="24dp"
+                android:layout_below="@+id/other_login_name">
+                <TextView
+                    android:id="@+id/other_login_flag"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_centerInParent="true"
+                    android:background="@drawable/vchat2"/>
+
+            </RelativeLayout>
+        </RelativeLayout>
     </LinearLayout>
+
+
 
 </LinearLayout>

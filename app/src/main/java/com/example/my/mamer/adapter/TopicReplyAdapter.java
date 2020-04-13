@@ -60,6 +60,7 @@ public class TopicReplyAdapter extends BaseAdapter {
         if(view==null){
             view=layoutInflater.inflate(R.layout.topic_reply_item,null);
             listViewItem=new listItem();
+            listViewItem.imgReplyUserAvatar=view.findViewById(R.id.reply_user_img);
             listViewItem.tvUserName=view.findViewById(R.id.reply_user_name);
             listViewItem.tvUserContent=view.findViewById(R.id.reply_user_content);
             view.setTag(listViewItem);
@@ -68,7 +69,7 @@ public class TopicReplyAdapter extends BaseAdapter {
         }
         if (replyListData.size()==0)
             return view;
-        if (replyListData.get(i).getTagReplyRole().equals("")){
+        if (!replyListData.get(i).getTagReplyRole().equals("localUser")){
             RequestOptions options=new RequestOptions()
                     .error(R.mipmap.ic_image_error)
                     .placeholder(R.mipmap.ic_image_error);

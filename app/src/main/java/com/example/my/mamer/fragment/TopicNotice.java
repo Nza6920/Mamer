@@ -95,6 +95,7 @@ public class TopicNotice extends BaseLazyLoadFragment {
         HttpUtil.sendOkHttpGetTopicList("user,category",4 ,"recent", page, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
                 Log.e("sendOkHttpGetTopicList","获取话题列表失败");
                 Message msg2 = new Message();
                 msg2.what = MESSAGE_ERROR;

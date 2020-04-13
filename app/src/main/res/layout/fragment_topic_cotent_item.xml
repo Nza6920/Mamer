@@ -13,8 +13,8 @@
         android:layout_marginTop="10dp">
         <ImageView
             android:id="@+id/topic_content_author_pic"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
             android:layout_marginTop="8dp"
             android:layout_marginLeft="8dp"/>
         <LinearLayout
@@ -37,7 +37,8 @@
                     android:id="@+id/topic_content_author_name_pic"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:layout_centerVertical="true"
+                    android:layout_centerInParent="true"
+                    android:layout_alignParentLeft="true"
                     android:background="@mipmap/ic_user_information_name"/>
                 <TextView
                     android:id="@+id/topic_content_author_name"
@@ -46,14 +47,14 @@
                     android:text="作者 "
                     android:textSize="16sp"
                     android:textColor="#000"
-                    android:layout_centerVertical="true"
+                    android:layout_centerInParent="true"
                     android:layout_toRightOf="@+id/topic_content_author_name_pic"/>
                 <TextView
                     android:id="@+id/topic_content_time_pic"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_marginLeft="5dp"
-                    android:layout_centerVertical="true"
+                    android:layout_centerInParent="true"
                     android:background="@mipmap/ic_topic_time"
                     android:layout_toRightOf="@+id/topic_content_author_name" />
                 <TextView
@@ -63,7 +64,7 @@
                     android:text="发布时间 "
                     android:textSize="16sp"
                     android:textColor="#000"
-                    android:layout_centerVertical="true"
+                    android:layout_centerInParent="true"
                     android:layout_toRightOf="@+id/topic_content_time_pic"/>
 
                 <TextView
@@ -73,8 +74,8 @@
                     android:text="讨论人数 "
                     android:textSize="16sp"
                     android:textColor="#000"
-                    android:layout_centerVertical="true"
-                    android:layout_alignParentEnd="true"
+                    android:layout_centerInParent="true"
+                    android:layout_alignParentRight="true"
                     android:layout_marginRight="10dp"/>
             </RelativeLayout>
         </LinearLayout>

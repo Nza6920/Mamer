@@ -302,7 +302,6 @@ public class UserFragment extends Fragment {
             this.mReplyAdapter = mAdapter;
         }
     }
-
 //    收藏recyclerView
 //    获取用户个人话题（数+内容）
     private void  getUserTopics(int pageCount){
