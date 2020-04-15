@@ -260,9 +260,6 @@ public class LoginActivity extends AppCompatActivity {
                                     msgHandler.sendMessage(msg5);
                                 }
                             }
-
-
-
                             break;
 //                            401
                         case HTTP_USER_ERROR:
@@ -303,6 +300,8 @@ public class LoginActivity extends AppCompatActivity {
         MyApplication.globalUserInfo.token=jresp.getString("access_token");
         MyApplication.globalUserInfo.tokenType=jresp.getString("token_type");
 
+
+
         HttpUtil.sendOkHttpRequestGet(USER_INFORMATION, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -323,7 +322,12 @@ public class LoginActivity extends AppCompatActivity {
                             MyApplication.globalUserInfo.user.setUserName(jresp.getString("name"));
                             MyApplication.globalUserInfo.user.setUserEmail(jresp.getString("email"));
                             MyApplication.globalUserInfo.user.setUserImg(jresp.getString("avatar"));
-                            MyApplication.globalUserInfo.user.setUserIntroduction(jresp.getString("introduction"));
+                            String introduction=jresp.getString("introduction");
+                            if (introduction==null){
+                                MyApplication.globalUserInfo.user.setUserIntroduction("");
+                            }else {
+                                MyApplication.globalUserInfo.user.setUserIntroduction(introduction);
+                            }
 //                            是否绑定
                             MyApplication.globalUserInfo.user.setBoundPhone(jresp.getBoolean("bound_phone"));
 //                            是否验证邮箱

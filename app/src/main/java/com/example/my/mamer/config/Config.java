@@ -37,6 +37,9 @@ public class Config {
     public static final String NOTIFICATION_STATE="http://www.mamer.club/api/user/notifications/stats";
     public static final String NOTIFICATION_READ="http://www.mamer.club/api/user/read/notifications";
     public static final String TOPIC_DIVID="http://www.mamer.club/api/categories";
+    public static final String ATTENTION="http://www.mamer.club/api/users/followers";
+
+
 
     //    http返回码
     public final static int HTTP_OK=201;
@@ -48,15 +51,15 @@ public class Config {
     public final static int HTTP_OVERNUM=500;
     public final static int HTTP_OVERTIME=429;
     public final static int HTTP_NOT_FOUND=404;
+    public final static int HTTP_MORE_REQUEST=429;
 
 //    循环消息常量
     public final static int DISMISS_DIALOG=7;
     public final static int MESSAGE_ERROR=9;
     public final static int USER_SET_INFORMATION=5;
     public final static int UNLOGIN=10;
-    public final static int USER_REPLY_COUNT=1;
+    public final static int SET_TEXTVIEW=1;
     public final static int KEYBOARD_UP=3;
-    public final static int USER_TOPIC_EDIT=12;
     public final static int USER_TOPIC_DEL=14;
     public final static int KEYBOARD_DOWN=11;
     public final static int SHOW_DIALOG=17;

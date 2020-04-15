@@ -129,10 +129,16 @@ public class UserFragment extends Fragment {
         mTopicsLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         mTopicsRecyclerView = view.findViewById(R.id.user_topics_recyclerview);
         mTopicsRecyclerView.setLayoutManager(mTopicsLayoutManager);
+        initTopicsView();
+        Log.e("inittopicsView:","-----------------------");
+        mTopicsRecyclerView.setAdapter(mTopicsAdapter);
 
         mReplyLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         mReplyRecyclerView = view.findViewById(R.id.user_reply_recyclerview);
         mReplyRecyclerView.setLayoutManager(mReplyLayoutManager);
+        initReplyView();
+        Log.e("initreplyView:","-----------------------");
+        mReplyRecyclerView.setAdapter(mReplyAdapter);
 
         return view;
 
@@ -156,12 +162,11 @@ public class UserFragment extends Fragment {
             userUnloginLayout.setVisibility(View.GONE);
             userMamerEnergyLayout.setVisibility(View.VISIBLE);
 
-            initTopicsView();
-            Log.e("initreplyView:","-----------------------");
-            initReplyView();
-            Log.e("inittopicsView:","-----------------------");
             initUserInfo();
 //            请求数据，个人话题数，个人回复数，个人收藏数
+            contentArrayList.clear();
+            replyArrayList.clear();
+
             Log.e("请求topics数据:","-----------------------");
             getUserTopics(1);
             Log.e("请求reply数据:","-----------------------");
@@ -215,9 +220,6 @@ public class UserFragment extends Fragment {
                 }
             }
         });
-
-
-
     }
 
     private  void initUserInfo(){
@@ -265,7 +267,6 @@ public class UserFragment extends Fragment {
                 }
             };
             this.mTopicsAdapter = mAdapter;
-//                getUserTopics(1, mAdapter);
             mAdapter.setOnItemClickListener(new UserBaseAdapter.OnItemClickListener() {
                 @Override
                 public void onItemClick(int position) {
@@ -291,6 +292,7 @@ public class UserFragment extends Fragment {
                     tvExcerpt.setText(Html.fromHtml(getReplyArrayList().get(i).getContent(),Html.FROM_HTML_MODE_COMPACT));
                 }
             };
+            this.mReplyAdapter = mAdapter;
             Log.e("回复adapter:", mAdapter.toString());
 //                getUserReply(1, mAdapter);
             mAdapter.setOnItemClickListener(new UserBaseAdapter.OnItemClickListener() {
@@ -299,7 +301,7 @@ public class UserFragment extends Fragment {
                     Toast.makeText(getContext(), "点击测试reply", Toast.LENGTH_SHORT).show();
                 }
             });
-            this.mReplyAdapter = mAdapter;
+
         }
     }
 //    收藏recyclerView
@@ -346,9 +348,9 @@ public class UserFragment extends Fragment {
                                         @Override
                                         public void run() {
                                             loadingDraw.dismiss();
-                                            if (contentArrayList.size()!=0&&mTopicsAdapter!=null){
+                                            if ((contentArrayList.size()!=0)&&(mTopicsAdapter!=null)){
                                                 Log.e("inittopicsView设置数据:","-----------------------");
-                                                mTopicsRecyclerView.setAdapter(mTopicsAdapter);
+                                                mTopicsAdapter.clear();
                                                 mTopicsAdapter.updateData(contentArrayList);
                                             }
                                         }};
@@ -441,7 +443,7 @@ public class UserFragment extends Fragment {
                                             if ((replyArrayList.size()!=0)&&mReplyAdapter!=null){
                                                 Log.e("initreplyView设置数据:","-----------------------");
                                                 Log.e("initreplyView:","-"+replyArrayList+"-"+mReplyAdapter.toString()+"---------------------");
-                                                mReplyRecyclerView.setAdapter(mReplyAdapter);
+                                                mReplyAdapter.clear();
                                                 mReplyAdapter.updateData(replyArrayList);
                                             }
                                         }};
@@ -496,4 +498,5 @@ public class UserFragment extends Fragment {
     public void setReplyArrayList(ArrayList<ReplyUser> replyArrayList) {
         this.replyArrayList = replyArrayList;
     }
+
 }

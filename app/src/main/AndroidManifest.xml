@@ -57,7 +57,6 @@
         <activity
             android:name=".TopicParticularsActivity"
             android:launchMode="singleTask" />
-        <activity android:name=".TopicReplyPublishActivity" />
         <activity android:name=".UserSelfReplyActivity" />
         <activity android:name=".ShowReplyUserActivity" />
         <activity

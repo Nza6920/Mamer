@@ -43,6 +43,10 @@ public class TopicTeach extends BaseLazyLoadFragment {
     private TopicContentAdapter mAdapter;
     //    标志位
     private boolean isPrepared=false;
+//    完成评论后刷新
+    private SharedPreferences prefs;
+
+    private SharedPreferences.Editor editor;
 
 
     //ui
@@ -75,6 +79,10 @@ public class TopicTeach extends BaseLazyLoadFragment {
         View view=inflater.inflate(R.layout.fragment_topic_content_view,container,false);
         listView=view.findViewById(R.id.topic_content_list_view);
         mAdapter=new TopicContentAdapter(getContext(),getListData());
+
+        editor=PreferenceManager.getDefaultSharedPreferences(getContext()).edit();
+        editor.putBoolean("topicReplyListToTopicParticulars",false);
+        editor.apply();
 
         return view;
     }
@@ -143,7 +151,6 @@ public class TopicTeach extends BaseLazyLoadFragment {
         });
     }
 
-
     //    初始化事件接口
     @Override
     public void initEvent() {
@@ -151,19 +158,16 @@ public class TopicTeach extends BaseLazyLoadFragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
 //                跳转到话题详情
-                SharedPreferences.Editor editor=PreferenceManager.getDefaultSharedPreferences(getContext()).edit();
-                editor.putString("id",listData.get(position).getTopicId());
-                editor.putString("userId",listData.get(position).getTopicAuthorId());
-                editor.putString("categoryId",listData.get(position).getCategoryId());
-                editor.putString("tagId","1");
-                editor.apply();
 
                 Intent intent=new Intent(getContext(),TopicParticularsActivity.class);
+                intent.putExtra("id",listData.get(position).getTopicId());
+                intent.putExtra("userId",listData.get(position).getTopicAuthorId());
+                intent.putExtra("categoryId",listData.get(position).getCategoryId());
+                intent.putExtra("tagId","1");
                 startActivity(intent);
             }
         });
     }
-
 
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
@@ -173,6 +177,16 @@ public class TopicTeach extends BaseLazyLoadFragment {
                 mAdapter.clearData();
                 onLazyLoad(1);
             }
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        prefs= PreferenceManager.getDefaultSharedPreferences(getContext());
+        if (prefs.getBoolean("topicReplyListToTopicParticulars",false)){
+            mAdapter.clearData();
+            onLazyLoad(1);
         }
     }
 }

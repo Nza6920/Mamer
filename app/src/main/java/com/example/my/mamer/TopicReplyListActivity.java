@@ -1,11 +1,15 @@
 package com.example.my.mamer;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -37,6 +41,7 @@ import okhttp3.Response;
 
 import static com.example.my.mamer.MyApplication.getContext;
 import static com.example.my.mamer.config.Config.DISMISS_DIALOG;
+import static com.example.my.mamer.config.Config.HTTP_DEL_REPLY_OK;
 import static com.example.my.mamer.config.Config.HTTP_OK;
 import static com.example.my.mamer.config.Config.HTTP_USER_ERROR;
 import static com.example.my.mamer.config.Config.HTTP_USER_GET_INFORMATION;
@@ -61,6 +66,11 @@ public class TopicReplyListActivity extends AppCompatActivity {
     private LinearLayout tvReplyContent_;
     private TextView tvTopicUserName;
     private LinearLayout layoutReply;
+    private Intent intent=null;
+    private AlertDialog.Builder delDialogBuilder;
+    private SharedPreferences.Editor editor;
+    private TextView tvDel;
+    private String userId;
     private int current_page;
     private int total_pages;
 
@@ -78,7 +88,7 @@ public class TopicReplyListActivity extends AppCompatActivity {
                     Toast.makeText(getContext(),(String)msg.obj,Toast.LENGTH_SHORT).show();
                     break;
                 case USER_SET_INFORMATION:
-                    String username=getIntent().getStringExtra("topicUserName");
+                    String username=intent.getStringExtra("topicUserName");
                     if (username!=null){
                         tvTopicUserName.setText(username+"(作者)");
                     }
@@ -96,12 +106,17 @@ public class TopicReplyListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_topic_reply_list);
         loadingDraw=new LoadingDraw(this);
+        intent=getIntent();
         initUI();
         onDataLoad(1);
 
         mAdapter=new TopicReplyAdapter(getContext(),listData);
         listView.setAdapter(mAdapter);
         initEvent();
+
+        editor=PreferenceManager.getDefaultSharedPreferences(getContext()).edit();
+        editor.putBoolean("topicReplyListToTopicParticulars",false);
+        editor.apply();
 
     }
     public ArrayList<ReplyUser> getListData() {
@@ -123,6 +138,7 @@ public class TopicReplyListActivity extends AppCompatActivity {
         tvReplyContent_=findViewById(R.id.to_reply_content_);
         tvTopicUserName=findViewById(R.id.reply_topic_user_name);
         layoutReply=findViewById(R.id.reply_layout);
+
 
         Drawable tvBackPic=ContextCompat.getDrawable(this,R.mipmap.ic_title_close);
         tvBack.setBackground(tvBackPic);
@@ -208,8 +224,6 @@ public class TopicReplyListActivity extends AppCompatActivity {
                 finish();
             }
         });
-
-
     }
 
 //    获取回复列表
@@ -302,14 +316,50 @@ public class TopicReplyListActivity extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(final AdapterView<?> adapterView, final View view, final int position, long l) {
+//               已登录：点击头像查看用户/点击内容进行删除|未登录不能进行操作
+                if (MyApplication.globalUserInfo.token!=null){
+//                点击头像
+                    view.findViewById(R.id.reply_user_avatar_layout).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            if (MyApplication.globalUserInfo.user.getUserId()!=listData.get(position).getUserId()){
+//                        非当前用户评论的可以查看头像
+                                Intent intent=new Intent(TopicReplyListActivity.this,ToUserActivity.class);
+                                intent.putExtra("userId",listData.get(position).getUserId());
+                                intent.putExtra("userAvatar",listData.get(position).getUserImg());
+                                intent.putExtra("userName",listData.get(position).getUserName());
+                                intent.putExtra("userIntro",listData.get(position).getUserInfo());
+                                Log.e("intent:", String.valueOf(intent));
+                                startActivity(intent);
+                            }
 
-                Intent intent=new Intent(TopicReplyListActivity.this,ToUserActivity.class);
-                intent.putExtra("userId",listData.get(position).getUserId());
-                intent.putExtra("userAvatar",listData.get(position).getUserImg());
-                intent.putExtra("userName",listData.get(position).getUserName());
-                intent.putExtra("userIntro",listData.get(position).getUserInfo());
-                Log.e("intent:", String.valueOf(intent));
-                startActivity(intent);
+                        }
+                    });
+//                点击内容
+                    view.findViewById(R.id.reply_user_layout).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+//                    当前用户的帖子，点击整个contentview可以删除任意一条评论（包括自己的）||或者当前用户评论的，可以删除
+                            if ((MyApplication.globalUserInfo.user.getUserId()==intent.getStringExtra("topicUserId"))||(MyApplication.globalUserInfo.user.getUserId()==listData.get(position).getUserId())){
+//                        删除前进行提示
+                                delDialogBuilder=new AlertDialog.Builder(TopicReplyListActivity.this)
+                                        .setMessage("删除后无法恢复")
+                                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                delReply( listData.get(position).getEssayId(),listData.get(position).getReplyId());
+                                            }
+                                        })
+                                        .setNegativeButton("取消",new DialogInterface.OnClickListener(){
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                            }
+                                        });
+                                delDialogBuilder.show();
+                            }
+                        }
+                    });
+                }
             }
         });
     }
@@ -348,49 +398,101 @@ public class TopicReplyListActivity extends AppCompatActivity {
 
                         Message msg2 = new Message();
                         msg2.what = MESSAGE_ERROR;
-                        msg2.obj = "回复成功";
+                        msg2.obj = "评论成功";
                         msgHandler.sendMessage(msg2);
 
+                        editor.putBoolean("topicReplyListToTopicParticulars",true);
+                        editor.apply();
                         finish();
                         break;
+//                        401
                     case HTTP_USER_ERROR:
-                        Message msg4=new Message();
-                        msg4.what=DISMISS_DIALOG;
-                        msg4.obj=loadingDraw;
-                        msgHandler.sendMessage(msg4);
-
-                        HttpUtil.sendOkHttpRefreshToken(REFRESH_TOKEN, new Callback() {
-                            @Override
-                            public void onFailure(Call call, IOException e) {
-                                Message msg1 = new Message();
-                                msg1.what = MESSAGE_ERROR;
-                                msg1.obj = "登录已失效，请重新登录";
-                                msgHandler.sendMessage(msg1);
-
-                                finish();
-                            }
-
-                            @Override
-                            public void onResponse(Call call, Response response) throws IOException {
-                                try {
-                                    JSONObject jrep= new JSONObject(response.body().string());
-
-                                    MyApplication.globalUserInfo.token=jrep.getString("access_token");
-                                    MyApplication.globalUserInfo.tokenType=jrep.getString("token_type");
-
-                                    Message msg1 = new Message();
-                                    msg1.what = MESSAGE_ERROR;
-                                    msg1.obj = "已刷新，请重试";
-                                    msgHandler.sendMessage(msg1);
-
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        });
+                        refreshKey();
+                       break;
+                       default:
+                           break;
 
                 }
             }
         });
     }
+    //    删除回复
+    private void delReply(String essayId, String replyId){
+        HttpUtil.sendOkHttpDelReply(essayId, replyId, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Message msg2=new Message();
+                msg2.what = MESSAGE_ERROR;
+                msg2.obj = "服务器异常,请检查网络";
+                msgHandler.sendMessage(msg2);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String responseStr = response.body().string();
+                if (responseStr.isEmpty()) {
+                    try {
+                        JSONObject jresp = new JSONObject(responseStr);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+                switch (response.code()) {
+                    case HTTP_DEL_REPLY_OK:
+                        Message msg4 = new Message();
+                        msg4.what = MESSAGE_ERROR;
+                        msg4.obj = "删除成功";
+                        msgHandler.sendMessage(msg4);
+
+                        onDataLoad(1);
+                        break;
+                    case HTTP_USER_ERROR:
+                        refreshKey();
+                        break;
+                    default:
+                        break;
+                }
+            }
+        });
+    }
+//    刷新
+    public  void  refreshKey(){
+        HttpUtil.sendOkHttpRefreshToken(REFRESH_TOKEN, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Message msg1 = new Message();
+                msg1.what = MESSAGE_ERROR;
+                msg1.obj = "登录已失效，请重新登录";
+                msgHandler.sendMessage(msg1);
+
+                Intent intent1 = new Intent(TopicReplyListActivity.this, LoginActivity.class);
+                startActivity(intent1);
+                finish();
+            }
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                try {
+                    JSONObject jrep= new JSONObject(response.body().string());
+                    String key=jrep.getString("access_token");
+                    String type=jrep.getString("token_type");
+                    MyApplication.globalUserInfo.token=key;
+                    MyApplication.globalUserInfo.tokenType=type;
+                    SharedPreferences.Editor editor=PreferenceManager.getDefaultSharedPreferences(getContext()).edit();
+                    editor.putString("key",key);
+                    editor.putString("type",type);
+                    editor.apply();
+
+                    Message msg1 = new Message();
+                    msg1.what = MESSAGE_ERROR;
+                    msg1.obj = "已刷新，请重试";
+                    msgHandler.sendMessage(msg1);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+    }
+
+
 }

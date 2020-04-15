@@ -22,6 +22,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.chinalwb.are.AREditText;
+import com.chinalwb.are.android.inner.Html;
 import com.example.my.mamer.bean.ReplyUser;
 import com.example.my.mamer.bean.TopicContent;
 import com.example.my.mamer.util.BaseUtils;
@@ -76,7 +77,10 @@ public class TopicParticularsActivity extends AppCompatActivity {
     private TextView tvReplyUserName;
     private TextView tvReplyTime;
     private TextView tvReplyCount;
-    private AREditText mEditTextReply;
+    private TextView tvComment;
+//    完成评论后，刷新
+    private SharedPreferences prefs;
+    private SharedPreferences.Editor editor;
 
 
     public final Handler msgHandler=new Handler(new Handler.Callback() {
@@ -106,15 +110,20 @@ public class TopicParticularsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        final SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(this);
+        Intent intentStr=getIntent();
         ReplyUser replyUser=new ReplyUser();
         MyApplication.globalTopicReply.reply.replyUser=replyUser;
-        MyApplication.globalTopicReply.reply.replyUser.setEssayId(prefs.getString("id",null));
-        MyApplication.globalTopicReply.reply.replyUser.setUserId(prefs.getString("userId",null));
-        MyApplication.globalTopicReply.reply.tagId=prefs.getString("tagId",null);
+        MyApplication.globalTopicReply.reply.replyUser.setEssayId(intentStr.getStringExtra("id"));
+        MyApplication.globalTopicReply.reply.replyUser.setUserId(intentStr.getStringExtra("userId"));
+        MyApplication.globalTopicReply.reply.tagId=intentStr.getStringExtra("tagId");
+
+        editor=PreferenceManager.getDefaultSharedPreferences(getContext()).edit();
+        editor.putBoolean("topicReplyListToTopicParticulars",false);
+        editor.apply();
 
         setContentView(R.layout.activity_topic_particulars);
         loadingDraw=new LoadingDraw(this);
+
         getTopicParticulas();
         getTopicReply();
         init();
@@ -130,7 +139,7 @@ public class TopicParticularsActivity extends AppCompatActivity {
         tvCreatedTime=findViewById(R.id.topic_particulars_time);
         tvEssayTitle=findViewById(R.id.topic_particulars_title);
         mEditTextArticle=findViewById(R.id.topic_particulars_content);
-        mEditTextReply=findViewById(R.id.reply_content);
+        tvComment=findViewById(R.id.reply_content);
         layoutComment=findViewById(R.id.reply_comment);
         layoutCommentList=findViewById(R.id.reply_comment_list);
         imgAvatar=findViewById(R.id.reply_user_avatar);
@@ -186,17 +195,26 @@ public class TopicParticularsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Log.e("tag",MyApplication.globalTopicReply.reply.replyUser.getEssayId());
-                Intent intent=new Intent(TopicParticularsActivity.this,TopicReplyListActivity.class);
-                intent.putExtra("topicUserName",listData.get(0).getTopicAuthorName());
-                startActivity(intent);
+                if (listData==null){
+                    Message msg1=new Message();
+                    msg1.what=MESSAGE_ERROR;
+                    msg1.obj="等待数据加载";
+                    msgHandler.sendMessage(msg1);
+                }else {
+                    Intent intent=new Intent(TopicParticularsActivity.this,TopicReplyListActivity.class);
+                    intent.putExtra("topicUserName",listData.get(0).getTopicAuthorName());
+                    intent.putExtra("topicUserId",listData.get(0).getTopicAuthorId());
+                    startActivity(intent);
+                }
+
             }
         });
 
     }
-//  获得话题详情
+//    获得话题详情
     private void getTopicParticulas(){
         String essayId=MyApplication.globalTopicReply.reply.replyUser.getEssayId();
-//        loadingDraw.show();
+        loadingDraw.show();
         HttpUtil.sendOkHttpGetTopicParticulars(essayId,new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -213,15 +231,15 @@ public class TopicParticularsActivity extends AppCompatActivity {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
+                Message msg3=new Message();
+                msg3.what=DISMISS_DIALOG;
+                msg3.obj=loadingDraw;
+                msgHandler.sendMessage(msg3);
+
                 try {
                     JSONObject jresp=new JSONObject(response.body().string());
                     switch (response.code()){
                         case HTTP_USER_GET_INFORMATION:
-                            Message msg3=new Message();
-                            msg3.what=DISMISS_DIALOG;
-                            msg3.obj=loadingDraw;
-                            msgHandler.sendMessage(msg3);
-
                             Log.e("Tag","话题详情--获取具体数据");
                             TopicContent topicContent=new TopicContent();
                             topicContent.setTopicId(jresp.getString("id"));
@@ -287,19 +305,27 @@ public class TopicParticularsActivity extends AppCompatActivity {
     }
 //    获取评论
     private void getTopicReply(){
-
+        loadingDraw.show();
         HttpUtil.sendOkHttpGetTopicReplyList(MyApplication.globalTopicReply.reply.replyUser.getEssayId(),1, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
+                Message msg1=new Message();
+                msg1.what=DISMISS_DIALOG;
+                msg1.obj=loadingDraw;
+                msgHandler.sendMessage(msg1);
 
                 Message msg2 = new Message();
                 msg2.what = MESSAGE_ERROR;
                 msg2.obj = "服务器异常,请检查网络";
                 msgHandler.sendMessage(msg2);
             }
-
             @Override
             public void onResponse(Call call, Response response) throws IOException {
+                Message msg1=new Message();
+                msg1.what=DISMISS_DIALOG;
+                msg1.obj=loadingDraw;
+                msgHandler.sendMessage(msg1);
+
                 JSONObject jresp = null;
                 JSONArray jsonArray=null;
                 try {
@@ -336,7 +362,8 @@ public class TopicParticularsActivity extends AppCompatActivity {
                                                     .apply(options)
                                                     .into(imgAvatar);
                                             tvReplyUserName.setText(replyUser.getUserName());
-                                            BaseUtils.contentUtil(getContext(),mEditTextReply,replyUser.getContent());
+                                            tvComment.setText(" ");
+                                            tvComment.setText(Html.fromHtml(replyUser.getContent(),Html.FROM_HTML_MODE_COMPACT));
                                             tvReplyTime.setText(replyUser.getTime());
 
 
@@ -347,8 +374,6 @@ public class TopicParticularsActivity extends AppCompatActivity {
                                         }
                                     }.start();
                                 }
-
-
                             }
                             if (jresp.has("meta")){
                                 jresp=jresp.getJSONObject("meta");
@@ -417,37 +442,26 @@ public class TopicParticularsActivity extends AppCompatActivity {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
+                Message msg1=new Message();
+                msg1.what=DISMISS_DIALOG;
+                msg1.obj=loadingDraw;
+                msgHandler.sendMessage(msg1);
+
                 Log.e("话题删除","del:"+response.code());
                     switch (response.code()){
                         case HTTP_USER_GET_INFORMATION:
-                            Message msg1=new Message();
-                            msg1.what=DISMISS_DIALOG;
-                            msg1.obj=loadingDraw;
-                            msgHandler.sendMessage(msg1);
-
                             Message msg3=new Message();
                             msg3.what=MESSAGE_ERROR;
                             msg3.obj="删除成功";
                             msgHandler.sendMessage(msg3);
-
                             finish();
                             break;
                         case HTTP_OVERTIME:
-                            Message msg4=new Message();
-                            msg4.what=DISMISS_DIALOG;
-                            msg4.obj=loadingDraw;
-                            msgHandler.sendMessage(msg4);
-
                             Message msg2=new Message();
                             msg2.what=MESSAGE_ERROR;
-                            msg2.obj="出错啦,请稍后再试";
+                            msg2.obj="请求超时,请稍后再试";
                             msgHandler.sendMessage(msg2);
                         case HTTP_NOT_FOUND:
-                            Message msg6=new Message();
-                            msg6.what=DISMISS_DIALOG;
-                            msg6.obj=loadingDraw;
-                            msgHandler.sendMessage(msg6);
-
                             Message msg5=new Message();
                             msg5.what=MESSAGE_ERROR;
                             msg5.obj="出错啦，请稍后再试";
@@ -541,4 +555,12 @@ public class TopicParticularsActivity extends AppCompatActivity {
         }) ;
     }
 
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        prefs= PreferenceManager.getDefaultSharedPreferences(this);
+        if (prefs.getBoolean("topicReplyListToTopicParticulars",false)){
+            getTopicReply();
+        }
+    }
 }

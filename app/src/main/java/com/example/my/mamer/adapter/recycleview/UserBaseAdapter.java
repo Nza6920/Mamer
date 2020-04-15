@@ -67,7 +67,8 @@ public abstract class UserBaseAdapter<T> extends RecyclerView.Adapter<UserBaseAd
 //    获取item的数量
     @Override
     public int getItemCount() {
-        return listData.size();
+        Log.e("数据源：",listData.size()+"");
+        return this.listData.size();
     }
 
 //    view为recycler子项最外层布局（user_topics_item.xml）
@@ -93,24 +94,19 @@ public abstract class UserBaseAdapter<T> extends RecyclerView.Adapter<UserBaseAd
 
 //    更新数据，并且清除之前的数据
     public void updateData(ArrayList<T> list){
-        Log.e("更新数据:","-----------------------");
+
+        Log.e("更新数据:","-----------------------"+list.hashCode());
+        Log.e("更新数据:","-----------------------"+this.listData.hashCode());
         if (null==list)
             return;
-        this.listData.clear();
-        this.listData=list;
+        this.listData.addAll(list);
         notifyDataSetChanged();
-        Log.e("更新视图完成:","-----------------------");
+        Log.e("更新视图完成:","-----------------------"+this.listData.hashCode());
     }
 
-    public void addItem(T data){
-        listData.add(data);
+    public void clear(){
+        Log.e("清除数据adapter:","-----------------------");
+        this.listData.clear();
     }
-
-    public void addData(ArrayList<T> list){
-        if (null==list)
-            return;
-        listData.addAll(list);
-    }
-
 
 }

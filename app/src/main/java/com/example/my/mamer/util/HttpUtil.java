@@ -9,6 +9,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 
+import static com.example.my.mamer.config.Config.ATTENTION;
 import static com.example.my.mamer.config.Config.CONTENT_TYPEs;
 import static com.example.my.mamer.config.Config.NOTIFICATION_LIST;
 import static com.example.my.mamer.config.Config.NOTIFICATION_READ;
@@ -114,7 +115,7 @@ public class HttpUtil {
     }
 //    删除回复
     public static void sendOkHttpDelReply(String essayId,String replyId,okhttp3.Callback callback){
-        String DEL_REPLY="http://mamer.club/api/topics/"+essayId+"/replies/"+replyId;
+        String DEL_REPLY="http://www.mamer.club/api/topics/"+essayId+"/replies/"+replyId;
         OkHttpClient client=new OkHttpClient();
         Request request=new Request.Builder().delete().addHeader("Authorization",MyApplication.globalUserInfo.tokenType+MyApplication.globalUserInfo.token).url(DEL_REPLY).build();
         client.newCall(request).enqueue(callback);
@@ -167,6 +168,25 @@ public class HttpUtil {
         final String EditTopic="http://www.mamer.club/api/topics/"+topicId;
         OkHttpClient client=new OkHttpClient();
         Request request=new Request.Builder().patch(requestBody).addHeader("Authorization", MyApplication.globalUserInfo.tokenType+MyApplication.globalUserInfo.token ).addHeader("Content-Type",CONTENT_TYPEs).url(EditTopic).build();
+        client.newCall(request).enqueue(callback);
+    }
+//    获取当前用户是否关注
+    public  static void sendOkHttpGetAttention(String userId,okhttp3.Callback callback){
+        String attention="http://www.mamer.club/api/users/followers?id="+userId;
+        OkHttpClient client=new OkHttpClient();
+        Request request=new Request.Builder().get().addHeader("Authorization",MyApplication.globalUserInfo.tokenType+MyApplication.globalUserInfo.token).url(attention).build();
+        client.newCall(request).enqueue(callback);
+    }
+//    关注某人
+    public static void sendOkHttpPostAddattention(RequestBody requestBody,okhttp3.Callback callback){
+        OkHttpClient client=new OkHttpClient();
+        Request request=new Request.Builder().post(requestBody).addHeader("Authorization",MyApplication.globalUserInfo.tokenType+MyApplication.globalUserInfo.token).url(ATTENTION).build();
+        client.newCall(request).enqueue(callback);
+    }
+//    取消关注
+    public static void sendOkHttpDelAttention(RequestBody requestBody,okhttp3.Callback callback){
+        OkHttpClient client=new OkHttpClient();
+        Request request=new Request.Builder().delete(requestBody).addHeader("Authorization", MyApplication.globalUserInfo.tokenType+MyApplication.globalUserInfo.token).url(ATTENTION).build();
         client.newCall(request).enqueue(callback);
     }
 }

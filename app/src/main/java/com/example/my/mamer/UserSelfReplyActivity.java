@@ -1,13 +1,11 @@
 package com.example.my.mamer;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -47,7 +45,8 @@ public class UserSelfReplyActivity extends AppCompatActivity {
     private TextView tvBack;
     private TextView tvTitle;
     private LoadingDraw loadingDraw;
-    private Boolean tDel=false;
+    private TextView tvDel;
+    private Boolean delFlag=false;
 
     private final Handler msgHandler=new Handler(new Handler.Callback() {
         @Override
@@ -73,9 +72,9 @@ public class UserSelfReplyActivity extends AppCompatActivity {
         setContentView(R.layout.activity_user_self_reply_list);
         loadingDraw=new LoadingDraw(this);
         initUI();
-        onDataLoad(1);
-        mAdapter=new TopicReplyAdapter(getApplicationContext(),getListData());
+        mAdapter=new TopicReplyAdapter(this);
         listView.setAdapter(mAdapter);
+        onDataLoad(1);
         initEvent();
 
     }
@@ -92,6 +91,8 @@ public class UserSelfReplyActivity extends AppCompatActivity {
         listView=findViewById(R.id.user_self_reply_list);
         tvBack=findViewById(R.id.title_tv_close);
         tvTitle=findViewById(R.id.title_tv_name);
+
+
 
         Drawable tvBackPic=ContextCompat.getDrawable(this,R.mipmap.ic_title_back);
         tvBack.setBackground(tvBackPic);
@@ -149,7 +150,8 @@ public class UserSelfReplyActivity extends AppCompatActivity {
                                     final Runnable setAvatarRunable=new Runnable() {
                                         @Override
                                         public void run() {
-                                            mAdapter.notifyDataSetChanged();
+                                            mAdapter.clearData();
+                                            mAdapter.updateData(listData);
                                         }};
                                     new Thread(){
                                         public void run(){
@@ -173,35 +175,22 @@ public class UserSelfReplyActivity extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(final AdapterView<?> adapterView, final View view, final int position, long l) {
-                AlertDialog.Builder builder=new AlertDialog.Builder(UserSelfReplyActivity.this);
-                builder.setIcon(R.mipmap.ic_popup_topic_manage_del)
-                        .setMessage("确定删除吗？")
-                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                delReply( listData.get(position).getEssayId(), listData.get(position).getReplyId());
-                                if (tDel){
-                                    view.setVisibility(View.GONE);
-                                }
-                            }
-                        })
-                        .setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-//不做处理
-                            }
-                        });
-                builder.show();
+                view.findViewById(R.id.reply_user_del).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        delReply( listData.get(position).getEssayId(),listData.get(position).getReplyId(),adapterView,view);
+
+                    }
+                });
             }
         });
     }
 //    删除回复
-    private void delReply(String essayId,String replyId){
+    private void delReply(String essayId, String replyId, final AdapterView adapterView, final View view){
 
         HttpUtil.sendOkHttpDelReply(essayId, replyId, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-
                 Message msg2=new Message();
                 msg2.what = MESSAGE_ERROR;
                 msg2.obj = "服务器异常,请检查网络";
@@ -210,18 +199,26 @@ public class UserSelfReplyActivity extends AppCompatActivity {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                try {
-                    JSONObject jresp=new JSONObject(response.body().string());
-                    switch (response.code()){
+                String responseStr=response.body().string();
+                if (responseStr.isEmpty()) {
+                    try {
+                        JSONObject jresp=new JSONObject(responseStr);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+                Log.e("response:",response.code()+"");
+                switch (response.code()){
                         case HTTP_DEL_REPLY_OK:
-                            tDel=true;
                             Message msg4=new Message();
                             msg4.what=MESSAGE_ERROR;
                             msg4.obj="删除成功";
                             msgHandler.sendMessage(msg4);
+
+                            listData.clear();
+                            onDataLoad(1);
                             break;
                         case HTTP_USER_ERROR:
-
                             HttpUtil.sendOkHttpRefreshToken(REFRESH_TOKEN, new Callback() {
                                 @Override
                                 public void onFailure(Call call, IOException e) {
@@ -257,9 +254,7 @@ public class UserSelfReplyActivity extends AppCompatActivity {
                         default:
                                 break;
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+
             }
         });
     }

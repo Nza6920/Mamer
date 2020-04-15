@@ -63,6 +63,7 @@ public class TopicReplyAdapter extends BaseAdapter {
             listViewItem.imgReplyUserAvatar=view.findViewById(R.id.reply_user_img);
             listViewItem.tvUserName=view.findViewById(R.id.reply_user_name);
             listViewItem.tvUserContent=view.findViewById(R.id.reply_user_content);
+            listViewItem.tvDel=view.findViewById(R.id.reply_user_del);
             view.setTag(listViewItem);
         }else {
             listViewItem= (listItem) view.getTag();
@@ -78,6 +79,9 @@ public class TopicReplyAdapter extends BaseAdapter {
                     .load(replyListData.get(i).getUserImg())
                     .apply(options)
                     .into(listViewItem.imgReplyUserAvatar);
+        }else {
+            listViewItem.imgReplyUserAvatar.setVisibility(View.GONE);
+            listViewItem.tvDel.setVisibility(View.VISIBLE);
         }
         listViewItem.tvUserName.setText(replyListData.get(i).getUserName());
 //        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
@@ -91,15 +95,18 @@ public class TopicReplyAdapter extends BaseAdapter {
         private ImageView imgReplyUserAvatar;
         private TextView tvUserName;
         private TextView tvUserContent;
+        private TextView tvDel;
     }
     //    更新数据，并且清除之前的数据
     public void updateData(ArrayList<ReplyUser> list){
         Log.e("ReplyUser更新数据:","-----------------------");
         if (null==list)
             return;
-        replyListData.clear();
-        replyListData=list;
+        this.replyListData.addAll(list);
         notifyDataSetChanged();
         Log.e("ReplyUser更新视图:","-----------------------");
+    }
+    public void clearData(){
+        this.replyListData.clear();
     }
 }

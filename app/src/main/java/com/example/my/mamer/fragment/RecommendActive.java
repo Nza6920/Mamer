@@ -1,5 +1,6 @@
 package com.example.my.mamer.fragment;
 
+import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -10,8 +11,8 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.example.my.mamer.MyApplication;
 import com.example.my.mamer.R;
+import com.example.my.mamer.ToUserActivity;
 import com.example.my.mamer.adapter.RecommendActiveAdapter;
 import com.example.my.mamer.bean.RecommendResource;
 import com.example.my.mamer.util.HttpUtil;
@@ -149,13 +150,13 @@ public class RecommendActive extends BaseLazyLoadFragment  {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (MyApplication.globalUserInfo.token==null){
-//                                    跳转到用户详情
-                    Message msg3 = new Message();
-                    msg3.what = MESSAGE_ERROR;
-                    msg3.obj="登陆后体验更多";
-                    msgHandler.sendMessage(msg3);
-                }
+                Intent intent=new Intent(getContext(),ToUserActivity.class);
+                intent.putExtra("userId",listData.get(position).getRecommendUserId());
+                intent.putExtra("userAvatar",listData.get(position).getRecommendUserAvatar());
+                intent.putExtra("userName",listData.get(position).getRecommendUserName());
+                intent.putExtra("userIntro",listData.get(position).getRecommendUserIntroduction());
+                Log.e("intent:", String.valueOf(intent));
+                startActivity(intent);
             }
         });
 

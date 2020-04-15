@@ -30,11 +30,15 @@ import java.util.ArrayList;
 
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.FormBody;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import static com.example.my.mamer.config.Config.HTTP_DEL_REPLY_OK;
 import static com.example.my.mamer.config.Config.HTTP_NOT_FOUND;
 import static com.example.my.mamer.config.Config.HTTP_USER_GET_INFORMATION;
 import static com.example.my.mamer.config.Config.MESSAGE_ERROR;
+import static com.example.my.mamer.config.Config.SET_TEXTVIEW;
 import static com.example.my.mamer.config.Config.USER_SET_INFORMATION;
 
 public class ToUserActivity extends AppCompatActivity {
@@ -51,6 +55,8 @@ public class ToUserActivity extends AppCompatActivity {
     private ToUserTopicAdapter mAdapter =null;
     private String userId;
     private LinearLayout layoutAttention;
+    private boolean attentionFlag=false;
+
 
 
 
@@ -65,6 +71,13 @@ public class ToUserActivity extends AppCompatActivity {
                     mAdapter.clearData();
                     mAdapter.updateData(listData);
                     break;
+                case SET_TEXTVIEW:
+
+                    if ((Boolean)msg.obj) {
+                        tvAttention.setText("已关注");
+                    }else {
+                        tvAttention.setText("关注");
+                    }
                 default:
                     break;
 
@@ -83,6 +96,7 @@ public class ToUserActivity extends AppCompatActivity {
         intent=getIntent();
         userId=intent.getStringExtra("userId");
         onDataLoad(1);
+        getAttention(userId);
 
     }
 
@@ -128,22 +142,25 @@ public class ToUserActivity extends AppCompatActivity {
         layoutAttention.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    Log.e("attention:layout",attentionFlag+"");
                     if (MyApplication.globalUserInfo.token==null){
+                        Log.e("attention:layout",attentionFlag+"未登录");
                         Message msg2 = new Message();
                         msg2.what = MESSAGE_ERROR;
                         msg2.obj = "登录以体验更多";
                         msgHandler.sendMessage(msg2);
+                    }
+
+                    if (attentionFlag){
+                        Log.e("attention:layout",attentionFlag+"已关注");
+                        delAttention();
                     }else {
-                        getAttention();
+                        Log.e("attention:layout",attentionFlag+"未关注");
+                        addAttention();
                     }
 
                 }
             });
-
-    }
-
-//    获取是否关注
-    private void getAttention(){
 
     }
 
@@ -211,6 +228,110 @@ public class ToUserActivity extends AppCompatActivity {
             }
         });
     }
+// getAttention
+    private void getAttention(String userId){
+        HttpUtil.sendOkHttpGetAttention(userId, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Message msg2 = new Message();
+                msg2.what = MESSAGE_ERROR;
+                msg2.obj = "服务器异常,请检查网络";
+                msgHandler.sendMessage(msg2);
+            }
 
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                JSONObject jresp = null;
+                JSONArray jsonArray=null;
+                try {
+                    jresp = new JSONObject(response.body().string());
+                    switch (response.code()){
+                        case HTTP_DEL_REPLY_OK:
+                            attentionFlag=jresp.getBoolean("followed");
+                            Message msg3 = new Message();
+                            msg3.what = SET_TEXTVIEW;
+                            msg3.obj=attentionFlag;
+                            msgHandler.sendMessage(msg3);
+                            break;
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
 
+    }
+//    关注用户
+    private void addAttention(){
+        RequestBody requestBody=new FormBody.Builder()
+                .add("id", userId)
+                .build();
+        HttpUtil.sendOkHttpPostAddattention(requestBody, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Message msg2 = new Message();
+                msg2.what = MESSAGE_ERROR;
+                msg2.obj = "服务器异常,请检查网络";
+                msgHandler.sendMessage(msg2);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                try {
+                    JSONObject jresp=new JSONObject(response.body().string());
+                    switch (response.code()){
+                        case HTTP_DEL_REPLY_OK:
+                            attentionFlag=true;
+                            Log.e("attention:",attentionFlag+"");
+                            Message msg3 = new Message();
+                            msg3.what = SET_TEXTVIEW;
+                            msg3.obj=attentionFlag;
+                            msgHandler.sendMessage(msg3);
+                            break;
+                            default:
+                                break;
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+        }
+        });
+    }
+//    取消关注
+    private void delAttention(){
+        RequestBody requestBody=new FormBody.Builder()
+                .add("id", userId)
+                .build();
+        HttpUtil.sendOkHttpDelAttention(requestBody, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Message msg2 = new Message();
+                msg2.what = MESSAGE_ERROR;
+                msg2.obj = "服务器异常,请检查网络";
+                msgHandler.sendMessage(msg2);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                try {
+                    JSONObject jresp=new JSONObject(response.body().string());
+                    switch (response.code()){
+                        case HTTP_DEL_REPLY_OK:
+                            attentionFlag=false;
+                            Log.e("attention:",attentionFlag+"");
+                            Message msg3 = new Message();
+                            msg3.what = SET_TEXTVIEW;
+                            msg3.obj=attentionFlag;
+                            msgHandler.sendMessage(msg3);
+
+                            break;
+                        default:
+                            break;
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
 }

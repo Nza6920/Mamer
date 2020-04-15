@@ -28,10 +28,11 @@
                 android:layout_height="wrap_content"
                 android:textColor="#000"
                 android:lines="2"
-                android:enabled="true"/>
+                android:enabled="true"
+                android:layout_marginLeft="5dp"/>
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="24dp"
                 android:layout_marginLeft="5dp">
                 <TextView
                     android:id="@+id/topic_content_author_name_pic"
