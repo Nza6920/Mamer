@@ -84,6 +84,7 @@ public class TopicNotice extends BaseLazyLoadFragment {
         listView.setAdapter(mAdapter);
         editor=PreferenceManager.getDefaultSharedPreferences(getContext()).edit();
         editor.putBoolean("topicReplyListToTopicParticulars",false);
+        editor.putBoolean("topicEditToTopicParticulars",false);
         editor.apply();
 
         return view;
@@ -179,6 +180,10 @@ public class TopicNotice extends BaseLazyLoadFragment {
         super.onStart();
         prefs= PreferenceManager.getDefaultSharedPreferences(getContext());
         if (prefs.getBoolean("topicReplyListToTopicParticulars",false)){
+            mAdapter.clearData();
+            onLazyLoad(1);
+        }
+        if (prefs.getBoolean("topicEditToTopicParticulars",false)){
             mAdapter.clearData();
             onLazyLoad(1);
         }

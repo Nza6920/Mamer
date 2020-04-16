@@ -145,7 +145,6 @@
                             android:id="@+id/user_attention_"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="1"
                             android:textColor="#1278B4"
                             android:textSize="18sp" />
 
@@ -153,7 +152,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="关注我的"
-                            android:textSize="13sp" />
+                            android:textSize="13sp"
+                            android:layout_marginLeft="2dp"/>
                     </LinearLayout>
 
                     <LinearLayout
@@ -168,7 +168,6 @@
                             android:id="@+id/user_to_attention_"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="1"
                             android:textColor="#1278B4"
                             android:textSize="18sp" />
 
@@ -176,7 +175,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="我关注的"
-                            android:textSize="13sp" />
+                            android:textSize="13sp"
+                            android:layout_marginLeft="2dp"/>
                     </LinearLayout>
 
 

@@ -67,6 +67,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.Route;
 
+import static com.example.my.mamer.MyApplication.getContext;
 import static com.example.my.mamer.config.Config.DISMISS_DIALOG;
 import static com.example.my.mamer.config.Config.HTTP_OK;
 import static com.example.my.mamer.config.Config.HTTP_USER_ERROR;
@@ -111,6 +112,7 @@ public class TopicActivity extends AppCompatActivity implements View.OnClickList
     ArrayList arrayList=new ArrayList();
     HashMap<String,String> map=new HashMap<>();
     LoadingDraw loadingDraw;
+    private SharedPreferences.Editor editor;
 
     private final Handler msgHandler=new Handler(new Handler.Callback() {
         @Override
@@ -148,9 +150,12 @@ public class TopicActivity extends AppCompatActivity implements View.OnClickList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         prefs= PreferenceManager.getDefaultSharedPreferences(this);
-
         setContentView(R.layout.activity_topic);
         loadingDraw=new LoadingDraw(this);
+
+        editor=PreferenceManager.getDefaultSharedPreferences(getContext()).edit();
+        editor.putBoolean("topicEditToTopicParticulars",false);
+        editor.apply();
 //        编辑话题
         editTopic();
         initTitle();
@@ -197,6 +202,7 @@ public class TopicActivity extends AppCompatActivity implements View.OnClickList
         btnNext.setTextColor(getResources().getColor(R.color.colorPop));
         btnNext.setOnClickListener(this);
         layoutFlag.setOnClickListener(this);
+        layoutFlagT.setOnClickListener(this);
         tvFlagClose.setOnClickListener(this);
         tvKeyboardDown.setOnClickListener(this);
 
@@ -288,6 +294,12 @@ public class TopicActivity extends AppCompatActivity implements View.OnClickList
                     getTopicDivid();
                 }
 //                选择标签弹出dialog,选择后显示#xxxx#
+                break;
+            case R.id.layout_topic_flag:
+                if (arrayList.size()==0){
+                    loadingDraw.show();
+                    getTopicDivid();
+                }
                 break;
             case R.id.topic_flag_t_close:
                 Message msg1 = new Message();
@@ -586,6 +598,9 @@ public class TopicActivity extends AppCompatActivity implements View.OnClickList
                                         msg4.what = HTTP_OK;
                                         msg4.obj = "编辑成功";
                                         msgHandler.sendMessage(msg4);
+
+                                        editor.putBoolean("topicEditToTopicParticulars",true);
+                                        editor.apply();
                                         finish();
                                         break;
 //                            422

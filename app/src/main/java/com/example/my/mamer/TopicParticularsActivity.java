@@ -155,7 +155,7 @@ public class TopicParticularsActivity extends AppCompatActivity {
 
 //        判断用户是否登陆，
         if (MyApplication.globalUserInfo.token!=null){
-            if (MyApplication.globalTopicReply.reply.replyUser.getUserId()==MyApplication.globalUserInfo.user.getUserId()){
+            if (MyApplication.globalTopicReply.reply.replyUser.getUserId().equals(MyApplication.globalUserInfo.user.getUserId())){
                 //            登陆，作者本人访问可删除和编辑帖子，以及评论
                 //        管理点击事件
                 tvBtnNext.setOnClickListener(new View.OnClickListener() {
@@ -194,7 +194,6 @@ public class TopicParticularsActivity extends AppCompatActivity {
         layoutComment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.e("tag",MyApplication.globalTopicReply.reply.replyUser.getEssayId());
                 if (listData==null){
                     Message msg1=new Message();
                     msg1.what=MESSAGE_ERROR;
@@ -213,6 +212,7 @@ public class TopicParticularsActivity extends AppCompatActivity {
     }
 //    获得话题详情
     private void getTopicParticulas(){
+        listData.clear();
         String essayId=MyApplication.globalTopicReply.reply.replyUser.getEssayId();
         loadingDraw.show();
         HttpUtil.sendOkHttpGetTopicParticulars(essayId,new Callback() {
@@ -555,6 +555,9 @@ public class TopicParticularsActivity extends AppCompatActivity {
         prefs= PreferenceManager.getDefaultSharedPreferences(this);
         if (prefs.getBoolean("topicReplyListToTopicParticulars",false)){
             getTopicReply();
+        }
+        if (prefs.getBoolean("topicEditToTopicParticulars",false)){
+            getTopicParticulas();
         }
     }
 }

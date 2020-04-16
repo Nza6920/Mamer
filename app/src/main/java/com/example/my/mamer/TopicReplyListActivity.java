@@ -210,12 +210,15 @@ public class TopicReplyListActivity extends AppCompatActivity {
             tvReplySend.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (getReplyContent()!=null){
+                    strReplyContent=tvReplyContent.getText().toString().trim();
+                    Log.e("strReplyContent",strReplyContent);
+                    if (strReplyContent.length()>3){
+                        Log.e("strReplyContent",strReplyContent);
                         postReply();
                     }else {
                         Message message=new Message();
                         message.what=MESSAGE_ERROR;
-                        message.obj="内容不能为空噢";
+                        message.obj="回复不能小于3个字";
                         msgHandler.sendMessage(message);
                     }
                 }
@@ -385,14 +388,10 @@ public class TopicReplyListActivity extends AppCompatActivity {
         });
     }
 
-    private String  getReplyContent(){
-        strReplyContent=tvReplyContent.getText().toString().trim();
-        return strReplyContent;
-    }
     //    发布回复
     private void postReply(){
         RequestBody requestBody=new FormBody.Builder()
-                .add("content1", getReplyContent())
+                .add("content1", strReplyContent)
                 .build();
         HttpUtil.sendOkHttpPostReply(MyApplication.globalTopicReply.reply.replyUser.getEssayId(), requestBody, new Callback() {
             @Override

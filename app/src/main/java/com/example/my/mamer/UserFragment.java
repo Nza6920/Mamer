@@ -54,9 +54,9 @@ public class UserFragment extends Fragment {
     private LinearLayout layoutToUserMine;
     private LinearLayout layoutIntroduction;
     private TextView tvUserIntroduction;
-
-
-    private String count;
+//    关注
+    private TextView tvFans;
+    private TextView tvAttention;
 //    话题
     private ArrayList<TopicContent> contentArrayList=new ArrayList<>();
     private TextView tvTopicsCount;
@@ -120,6 +120,8 @@ public class UserFragment extends Fragment {
         userMamerEnergyLayout=view.findViewById(R.id.user_mamer_energy_layout);
         userUnloginLayout=view.findViewById(R.id.user_un_login_layout);
 
+        tvFans=view.findViewById(R.id.user_attention_);
+        tvAttention=view.findViewById(R.id.user_to_attention_);
 
         tvTopicsCount=view.findViewById(R.id.user_my_topic_count);
         layoutTopics=view.findViewById(R.id.user_topics_more);
@@ -163,14 +165,16 @@ public class UserFragment extends Fragment {
             userMamerEnergyLayout.setVisibility(View.VISIBLE);
 
             initUserInfo();
+
+
 //            请求数据，个人话题数，个人回复数，个人收藏数
             contentArrayList.clear();
             replyArrayList.clear();
-
             Log.e("请求topics数据:","-----------------------");
             getUserTopics(1);
             Log.e("请求reply数据:","-----------------------");
             getUserReply(1);
+            attention(1);
         }
     }
 
@@ -236,7 +240,7 @@ public class UserFragment extends Fragment {
                         .into(userAvatar);
                tvUserName.setText(MyApplication.globalUserInfo.user.getUserName());
                if (MyApplication.globalUserInfo.user.getUserIntroduction().equals("")){
-                   layoutIntroduction.setVisibility(View.GONE);
+                   tvUserIntroduction.setText("还没有个人简介哦");
                }else {
                    tvUserIntroduction.setText(MyApplication.globalUserInfo.user.getUserIntroduction()
                    );
@@ -452,18 +456,73 @@ public class UserFragment extends Fragment {
                                             msgHandler.post(setUserReplyCount);
                                         }
                                     }.start();
-
-
                                 }
+                            }
+                            if (jresp.has("meta")) {
+                                jresp=jresp.getJSONObject("meta");
+                                if (jresp.has("pagination")){
+                                    jresp=jresp.getJSONObject("pagination");
+                                    final String  count=jresp.getString("count");
+                                    final Runnable setUserReplyCount=new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            tvReplysCount.setText(count);
+                                        }};
+                                    new Thread(){
+                                        public void run(){
+                                            msgHandler.post(setUserReplyCount);
+                                        }
+                                    }.start();
+                                }
+                            }
+                            break;
+                            default:
+                                break;
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+//    获取关注数（关注我的|我关注的）
+    private void attention(int pageCount){
+        loadingDraw.show();
+        HttpUtil.sendOkHttpGetFans(MyApplication.globalUserInfo.user.getUserId(), pageCount, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Message msg1=new Message();
+                msg1.what=DISMISS_DIALOG;
+                msg1.obj=loadingDraw;
+                msgHandler.sendMessage(msg1);
+
+                Message msg2 = new Message();
+                msg2.what = MESSAGE_ERROR;
+                msg2.obj = "服务器异常,请检查网络";
+                msgHandler.sendMessage(msg2);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                Message msg1=new Message();
+                msg1.what=DISMISS_DIALOG;
+                msg1.obj=loadingDraw;
+                msgHandler.sendMessage(msg1);
+
+                JSONObject jresp = null;
+                try {
+                    jresp=new JSONObject(response.body().string());
+                    switch (response.code()) {
+                        case HTTP_USER_GET_INFORMATION:
                                 if (jresp.has("meta")) {
                                     jresp=jresp.getJSONObject("meta");
                                     if (jresp.has("pagination")){
                                         jresp=jresp.getJSONObject("pagination");
-                                        count=jresp.getString("count");
+                                        final String  count=jresp.getString("count");
                                         final Runnable setUserReplyCount=new Runnable() {
                                             @Override
                                             public void run() {
-                                                tvReplysCount.setText(count);
+                                                tvFans.setText(count);
                                             }};
                                         new Thread(){
                                             public void run(){
@@ -471,18 +530,71 @@ public class UserFragment extends Fragment {
                                             }
                                         }.start();
                                     }
-
-                                }
                             }
+                            break;
+                            default:
+                                break;
                     }
-
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
         });
-    }
+        HttpUtil.sendOkHttpGetAttention(MyApplication.globalUserInfo.user.getUserId(), pageCount, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Message msg1=new Message();
+                msg1.what=DISMISS_DIALOG;
+                msg1.obj=loadingDraw;
+                msgHandler.sendMessage(msg1);
 
+                Message msg2 = new Message();
+                msg2.what = MESSAGE_ERROR;
+                msg2.obj = "服务器异常,请检查网络";
+                msgHandler.sendMessage(msg2);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                Message msg1=new Message();
+                msg1.what=DISMISS_DIALOG;
+                msg1.obj=loadingDraw;
+                msgHandler.sendMessage(msg1);
+
+                JSONObject jresp = null;
+                try {
+                    jresp=new JSONObject(response.body().string());
+                    switch (response.code()) {
+                        case HTTP_USER_GET_INFORMATION:
+                                if (jresp.has("meta")) {
+                                    jresp=jresp.getJSONObject("meta");
+                                    if (jresp.has("pagination")){
+                                        jresp=jresp.getJSONObject("pagination");
+                                       final String  count=jresp.getString("count");
+                                        final Runnable setUserReplyCount=new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                tvAttention.setText(count);
+                                            }};
+                                        new Thread(){
+                                            public void run(){
+                                                msgHandler.post(setUserReplyCount);
+                                            }
+                                        }.start();
+                                    }
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
+    }
     public ArrayList<TopicContent> getContentArrayList() {
         return contentArrayList;
     }

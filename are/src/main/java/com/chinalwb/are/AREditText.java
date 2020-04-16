@@ -397,9 +397,11 @@ public class AREditText extends AppCompatEditText {
         Html.ImageGetter imageGetter = new AreImageGetter(mContext, this);
         Html.TagHandler tagHandler = new AreTagHandler();
         Spanned spanned = Html.fromHtml(html, Html.FROM_HTML_SEPARATOR_LINE_BREAK_PARAGRAPH, imageGetter, tagHandler);
+
+
         stopMonitor();
-//        this.getEditableText().append(spanned);
-        this.getText().append(spanned);
+        this.setText(spanned);
+//        this.getText().append(spanned);
         startMonitor();
     }
 

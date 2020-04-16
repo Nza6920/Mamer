@@ -83,6 +83,7 @@ public class TopicShare extends BaseLazyLoadFragment {
 
         editor=PreferenceManager.getDefaultSharedPreferences(getContext()).edit();
         editor.putBoolean("topicReplyListToTopicParticulars",false);
+        editor.putBoolean("topicEditToTopicParticulars",false);
         editor.apply();
 
         return view;
@@ -185,6 +186,10 @@ public class TopicShare extends BaseLazyLoadFragment {
         if (prefs.getBoolean("topicReplyListToTopicParticulars",false)){
             mAdapter.clearData();
             Log.e("分享onStart：","++++++++++++++++++++");
+            onLazyLoad(1);
+        }
+        if (prefs.getBoolean("topicEditToTopicParticulars",false)){
+            mAdapter.clearData();
             onLazyLoad(1);
         }
     }

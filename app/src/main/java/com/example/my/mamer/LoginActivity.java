@@ -294,6 +294,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
     }
+
     private void loginSuccess(JSONObject jresp) throws JSONException {
         User user=new User();
         MyApplication.globalUserInfo.user=user;
@@ -323,7 +324,7 @@ public class LoginActivity extends AppCompatActivity {
                             MyApplication.globalUserInfo.user.setUserEmail(jresp.getString("email"));
                             MyApplication.globalUserInfo.user.setUserImg(jresp.getString("avatar"));
                             String introduction=jresp.getString("introduction");
-                            if (introduction==null){
+                            if (introduction.equals("null")){
                                 MyApplication.globalUserInfo.user.setUserIntroduction("");
                             }else {
                                 MyApplication.globalUserInfo.user.setUserIntroduction(introduction);

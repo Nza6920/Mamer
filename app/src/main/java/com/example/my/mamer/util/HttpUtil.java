@@ -189,4 +189,18 @@ public class HttpUtil {
         Request request=new Request.Builder().delete(requestBody).addHeader("Authorization", MyApplication.globalUserInfo.tokenType+MyApplication.globalUserInfo.token).url(ATTENTION).build();
         client.newCall(request).enqueue(callback);
     }
+//    获取粉丝列表
+    public static void sendOkHttpGetFans(String userId,int pageCount,okhttp3.Callback callback){
+        String attention="http://www.mamer.club/api/users/"+userId+"/followers?page="+pageCount;
+        OkHttpClient client=new OkHttpClient();
+        Request request=new Request.Builder().url(attention).build();
+        client.newCall(request).enqueue(callback);
+    }
+//    获取关注列表
+    public static void sendOkHttpGetAttention(String userId,int pageCount,okhttp3.Callback callback){
+        String attention="http://www.mamer.club/api/users/"+userId+"/followings?page="+pageCount;
+        OkHttpClient client=new OkHttpClient();
+        Request request=new Request.Builder().url(attention).build();
+        client.newCall(request).enqueue(callback);
+    }
 }
