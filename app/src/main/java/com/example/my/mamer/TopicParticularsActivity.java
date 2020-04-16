@@ -88,7 +88,7 @@ public class TopicParticularsActivity extends AppCompatActivity {
         public boolean handleMessage(Message msg) {
                 switch (msg.what){
                     case DISMISS_DIALOG:
-                        ((LoadingDraw)msg.obj).dismiss();
+                       loadingDraw.dismiss();
                         break;
                     case MESSAGE_ERROR:
                         Toast.makeText(TopicParticularsActivity.this,(String)msg.obj,Toast.LENGTH_SHORT).show();
@@ -109,6 +109,8 @@ public class TopicParticularsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_topic_particulars);
+        loadingDraw=new LoadingDraw(this);
 
         Intent intentStr=getIntent();
         ReplyUser replyUser=new ReplyUser();
@@ -121,12 +123,10 @@ public class TopicParticularsActivity extends AppCompatActivity {
         editor.putBoolean("topicReplyListToTopicParticulars",false);
         editor.apply();
 
-        setContentView(R.layout.activity_topic_particulars);
-        loadingDraw=new LoadingDraw(this);
-
+        init();
         getTopicParticulas();
         getTopicReply();
-        init();
+
 
     }
 
@@ -155,7 +155,7 @@ public class TopicParticularsActivity extends AppCompatActivity {
 
 //        判断用户是否登陆，
         if (MyApplication.globalUserInfo.token!=null){
-            if (MyApplication.globalTopicReply.reply.replyUser.getUserId().equals(MyApplication.globalUserInfo.user.getUserId())){
+            if (MyApplication.globalTopicReply.reply.replyUser.getUserId()==MyApplication.globalUserInfo.user.getUserId()){
                 //            登陆，作者本人访问可删除和编辑帖子，以及评论
                 //        管理点击事件
                 tvBtnNext.setOnClickListener(new View.OnClickListener() {
@@ -218,10 +218,9 @@ public class TopicParticularsActivity extends AppCompatActivity {
         HttpUtil.sendOkHttpGetTopicParticulars(essayId,new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                Message msg1=new Message();
-                msg1.what=DISMISS_DIALOG;
-                msg1.obj=loadingDraw;
-                msgHandler.sendMessage(msg1);
+                Message msg=new Message();
+                msg.what=DISMISS_DIALOG;
+                msgHandler.sendMessage(msg);
 
                 Message msg2 = new Message();
                 msg2.what = MESSAGE_ERROR;
@@ -231,10 +230,9 @@ public class TopicParticularsActivity extends AppCompatActivity {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                Message msg3=new Message();
-                msg3.what=DISMISS_DIALOG;
-                msg3.obj=loadingDraw;
-                msgHandler.sendMessage(msg3);
+                Message msg=new Message();
+                msg.what=DISMISS_DIALOG;
+                msgHandler.sendMessage(msg);
 
                 try {
                     JSONObject jresp=new JSONObject(response.body().string());
@@ -309,10 +307,9 @@ public class TopicParticularsActivity extends AppCompatActivity {
         HttpUtil.sendOkHttpGetTopicReplyList(MyApplication.globalTopicReply.reply.replyUser.getEssayId(),1, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                Message msg1=new Message();
-                msg1.what=DISMISS_DIALOG;
-                msg1.obj=loadingDraw;
-                msgHandler.sendMessage(msg1);
+                Message msg=new Message();
+                msg.what=DISMISS_DIALOG;
+                msgHandler.sendMessage(msg);
 
                 Message msg2 = new Message();
                 msg2.what = MESSAGE_ERROR;
@@ -321,10 +318,9 @@ public class TopicParticularsActivity extends AppCompatActivity {
             }
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                Message msg1=new Message();
-                msg1.what=DISMISS_DIALOG;
-                msg1.obj=loadingDraw;
-                msgHandler.sendMessage(msg1);
+                Message msg=new Message();
+                msg.what=DISMISS_DIALOG;
+                msgHandler.sendMessage(msg);
 
                 JSONObject jresp = null;
                 JSONArray jsonArray=null;
@@ -429,10 +425,9 @@ public class TopicParticularsActivity extends AppCompatActivity {
         HttpUtil.sendOkHttpDelTopic(essayId, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                Message msg1=new Message();
-                msg1.what=DISMISS_DIALOG;
-                msg1.obj=loadingDraw;
-                msgHandler.sendMessage(msg1);
+                Message msg=new Message();
+                msg.what=DISMISS_DIALOG;
+                msgHandler.sendMessage(msg);
 
                 Message msg2 = new Message();
                 msg2.what = MESSAGE_ERROR;
@@ -442,10 +437,9 @@ public class TopicParticularsActivity extends AppCompatActivity {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                Message msg1=new Message();
-                msg1.what=DISMISS_DIALOG;
-                msg1.obj=loadingDraw;
-                msgHandler.sendMessage(msg1);
+                Message msg=new Message();
+                msg.what=DISMISS_DIALOG;
+                msgHandler.sendMessage(msg);
 
                 Log.e("话题删除","del:"+response.code());
                     switch (response.code()){

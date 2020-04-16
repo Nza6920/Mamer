@@ -1,7 +1,6 @@
 package com.example.my.mamer.adapter;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -97,16 +96,21 @@ public class TopicContentAdapter extends BaseAdapter {
         return convertView;
     }
     //    更新数据，并且清除之前的数据
-    public void updateData(ArrayList<TopicContent> list){
-        Log.e("更新数据:","-----------------------");
-        if (null==list)
-            return;
-        this.data=list;
-        notifyDataSetChanged();
-        Log.e("更新视图:","-----------------------");
-    }
+//    public void updateData(ArrayList<TopicContent> list){
+//        Log.e("更新数据:","-----------------------");
+//        if (null==list)
+//            return;
+//        this.data=list;
+//        notifyDataSetChanged();
+//        Log.e("更新视图:","-----------------------");
+//    }
     public void clearData(){
         this.data.clear();
+    }
+
+    public void updateAdd(ArrayList<TopicContent> list){
+        this.data.addAll(list);
+        notifyDataSetChanged();
     }
 
 }

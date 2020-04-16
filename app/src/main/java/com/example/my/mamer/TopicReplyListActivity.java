@@ -93,6 +93,9 @@ public class TopicReplyListActivity extends AppCompatActivity {
                         tvTopicUserName.setText(username+"(作者)");
                     }
                     break;
+                case DISMISS_DIALOG:
+                    loadingDraw.dismiss();
+                    break;
                     default:
                         break;
 
@@ -228,9 +231,13 @@ public class TopicReplyListActivity extends AppCompatActivity {
 
 //    获取回复列表
     private void onDataLoad(int page){
+        loadingDraw.show();
         HttpUtil.sendOkHttpGetTopicReplyList(MyApplication.globalTopicReply.reply.replyUser.getEssayId(),page, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
+                Message msg = new Message();
+                msg.what = DISMISS_DIALOG;
+                msgHandler.sendMessage(msg);
 
                 Message msg2 = new Message();
                 msg2.what = MESSAGE_ERROR;
@@ -239,6 +246,10 @@ public class TopicReplyListActivity extends AppCompatActivity {
             }
             @Override
             public void onResponse(Call call, Response response) throws IOException {
+                Message msg = new Message();
+                msg.what = DISMISS_DIALOG;
+                msgHandler.sendMessage(msg);
+
                 JSONObject jresp = null;
                 JSONArray jsonArray=null;
                 try {
@@ -359,6 +370,11 @@ public class TopicReplyListActivity extends AppCompatActivity {
                             }
                         }
                     });
+                }else {
+                    Message msg = new Message();
+                    msg.what = MESSAGE_ERROR;
+                    msg.obj = "登录以体验更多";
+                    msgHandler.sendMessage(msg);
                 }
             }
         });

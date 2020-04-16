@@ -63,8 +63,8 @@ public class TopicTeach extends BaseLazyLoadFragment {
             case USER_SET_INFORMATION:
                 if (mAdapter!=null){
                     Log.e("listFragment","视图教程");
-                    listView.setAdapter(mAdapter);
-                    mAdapter.updateData(listData);
+                    mAdapter.clearData();
+                    mAdapter.updateAdd(listData);
                 }
                 break;
             default:
@@ -78,8 +78,8 @@ public class TopicTeach extends BaseLazyLoadFragment {
     public View initView(LayoutInflater inflater, ViewGroup container) {
         View view=inflater.inflate(R.layout.fragment_topic_content_view,container,false);
         listView=view.findViewById(R.id.topic_content_list_view);
-        mAdapter=new TopicContentAdapter(getContext(),getListData());
-
+        mAdapter=new TopicContentAdapter(getContext());
+        listView.setAdapter(mAdapter);
         editor=PreferenceManager.getDefaultSharedPreferences(getContext()).edit();
         editor.putBoolean("topicReplyListToTopicParticulars",false);
         editor.apply();
@@ -87,17 +87,11 @@ public class TopicTeach extends BaseLazyLoadFragment {
         return view;
     }
 
-    public ArrayList<TopicContent> getListData() {
-        return listData;
-    }
-
-    public void setListData(ArrayList<TopicContent> listData) {
-        this.listData = listData;
-    }
-
     //    数据加载接口
     @Override
     public void onLazyLoad(int page) {
+        mAdapter.clearData();
+        listData.clear();
         HttpUtil.sendOkHttpGetTopicList("user,category",2,"recent", page, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -158,7 +152,6 @@ public class TopicTeach extends BaseLazyLoadFragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
 //                跳转到话题详情
-
                 Intent intent=new Intent(getContext(),TopicParticularsActivity.class);
                 intent.putExtra("id",listData.get(position).getTopicId());
                 intent.putExtra("userId",listData.get(position).getTopicAuthorId());
@@ -174,7 +167,6 @@ public class TopicTeach extends BaseLazyLoadFragment {
         super.setUserVisibleHint(isVisibleToUser);
         if (isVisibleToUser){
             if (mAdapter!=null){
-                mAdapter.clearData();
                 onLazyLoad(1);
             }
         }

@@ -174,7 +174,7 @@ public class HttpUtil {
     public  static void sendOkHttpGetAttention(String userId,okhttp3.Callback callback){
         String attention="http://www.mamer.club/api/users/followers?id="+userId;
         OkHttpClient client=new OkHttpClient();
-        Request request=new Request.Builder().get().addHeader("Authorization",MyApplication.globalUserInfo.tokenType+MyApplication.globalUserInfo.token).url(attention).build();
+        Request request=new Request.Builder().addHeader("Authorization",MyApplication.globalUserInfo.tokenType+MyApplication.globalUserInfo.token).url(attention).build();
         client.newCall(request).enqueue(callback);
     }
 //    关注某人

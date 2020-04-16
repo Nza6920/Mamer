@@ -35,6 +35,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 import static com.example.my.mamer.config.Config.HTTP_DEL_REPLY_OK;
+import static com.example.my.mamer.config.Config.HTTP_MORE_REQUEST;
 import static com.example.my.mamer.config.Config.HTTP_NOT_FOUND;
 import static com.example.my.mamer.config.Config.HTTP_USER_GET_INFORMATION;
 import static com.example.my.mamer.config.Config.MESSAGE_ERROR;
@@ -72,7 +73,6 @@ public class ToUserActivity extends AppCompatActivity {
                     mAdapter.updateData(listData);
                     break;
                 case SET_TEXTVIEW:
-
                     if ((Boolean)msg.obj) {
                         tvAttention.setText("已关注");
                     }else {
@@ -246,13 +246,21 @@ public class ToUserActivity extends AppCompatActivity {
                 try {
                     jresp = new JSONObject(response.body().string());
                     switch (response.code()){
-                        case HTTP_DEL_REPLY_OK:
+                        case HTTP_USER_GET_INFORMATION:
                             attentionFlag=jresp.getBoolean("followed");
                             Message msg3 = new Message();
                             msg3.what = SET_TEXTVIEW;
                             msg3.obj=attentionFlag;
                             msgHandler.sendMessage(msg3);
                             break;
+                        case HTTP_MORE_REQUEST:
+                            Message msg1 = new Message();
+                            msg1.what = MESSAGE_ERROR;
+                            msg1.obj="请求过多，稍后再试";
+                            msgHandler.sendMessage(msg1);
+                            break;
+                            default:
+                                break;
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -263,6 +271,7 @@ public class ToUserActivity extends AppCompatActivity {
     }
 //    关注用户
     private void addAttention(){
+        Log.e("ADDuserId:",userId);
         RequestBody requestBody=new FormBody.Builder()
                 .add("id", userId)
                 .build();
@@ -277,28 +286,38 @@ public class ToUserActivity extends AppCompatActivity {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
+                JSONObject jresp = null;
+                String jsonStr = response.body().string();
                 try {
-                    JSONObject jresp=new JSONObject(response.body().string());
-                    switch (response.code()){
-                        case HTTP_DEL_REPLY_OK:
-                            attentionFlag=true;
-                            Log.e("attention:",attentionFlag+"");
-                            Message msg3 = new Message();
-                            msg3.what = SET_TEXTVIEW;
-                            msg3.obj=attentionFlag;
-                            msgHandler.sendMessage(msg3);
-                            break;
-                            default:
-                                break;
+                    if (jsonStr != null) {
+                        jresp = new JSONObject(jsonStr);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-        }
+                switch (response.code()) {
+                    case HTTP_DEL_REPLY_OK:
+                        attentionFlag = true;
+                        Log.e("attention:", attentionFlag + "");
+                        Message msg3 = new Message();
+                        msg3.what = SET_TEXTVIEW;
+                        msg3.obj = attentionFlag;
+                        msgHandler.sendMessage(msg3);
+
+                        Message msg1 = new Message();
+                        msg1.what = MESSAGE_ERROR;
+                        msg1.obj = "关注成功";
+                        msgHandler.sendMessage(msg1);
+                        break;
+                    default:
+                        break;
+                }
+            }
         });
     }
 //    取消关注
     private void delAttention(){
+        Log.e("DELuserId:",userId);
         RequestBody requestBody=new FormBody.Builder()
                 .add("id", userId)
                 .build();
@@ -313,25 +332,27 @@ public class ToUserActivity extends AppCompatActivity {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
+                JSONObject jresp = null;
+
                 try {
-                    JSONObject jresp=new JSONObject(response.body().string());
-                    switch (response.code()){
+                    jresp=new JSONObject(response.body().string());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                switch (response.code()) {
                         case HTTP_DEL_REPLY_OK:
-                            attentionFlag=false;
-                            Log.e("attention:",attentionFlag+"");
+                            attentionFlag = false;
+                            Log.e("attention:", attentionFlag + "");
                             Message msg3 = new Message();
                             msg3.what = SET_TEXTVIEW;
-                            msg3.obj=attentionFlag;
+                            msg3.obj = attentionFlag;
                             msgHandler.sendMessage(msg3);
 
                             break;
                         default:
                             break;
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
                 }
-            }
         });
     }
 }

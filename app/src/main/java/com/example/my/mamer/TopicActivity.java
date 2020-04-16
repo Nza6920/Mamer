@@ -723,6 +723,7 @@ public class TopicActivity extends AppCompatActivity implements View.OnClickList
     protected void onResume() {
         super.onResume();
     }
+
     private void editTopic(){
         if (prefs.getString("tagId",null).equals("1")){
 //            文章标题

@@ -42,6 +42,10 @@ public class TopicShare extends BaseLazyLoadFragment {
     private ListView listView;
     private ArrayList<TopicContent> listData=new ArrayList<>();
     private TopicContentAdapter mAdapter;
+    //    完成评论后刷新
+    private SharedPreferences prefs;
+
+    private SharedPreferences.Editor editor;
 
     //ui
     private final Handler msgHandler=new Handler(new Handler.Callback() {
@@ -57,8 +61,8 @@ public class TopicShare extends BaseLazyLoadFragment {
                 case USER_SET_INFORMATION:
                     if (mAdapter != null) {
                         Log.e("listFragment","视图share");
-                        listView.setAdapter(mAdapter);
-                        mAdapter.updateData(listData);
+                        mAdapter.clearData();
+                        mAdapter.updateAdd(listData);
                     }
                     break;
                 default:
@@ -72,22 +76,25 @@ public class TopicShare extends BaseLazyLoadFragment {
     public View initView(LayoutInflater inflater, ViewGroup container) {
         View view=inflater.inflate(R.layout.fragment_topic_content_view,container,false);
         listView=view.findViewById(R.id.topic_content_list_view);
-        mAdapter=new TopicContentAdapter(getContext(),getListData());
+        mAdapter=new TopicContentAdapter(getContext());
+        listView.setAdapter(mAdapter);
+        if (mAdapter!=null){
+            onLazyLoad(1);
+        }
+        editor=PreferenceManager.getDefaultSharedPreferences(getContext()).edit();
+        editor.putBoolean("topicReplyListToTopicParticulars",false);
+        editor.apply();
 
         return view;
-    }
-
-    public ArrayList<TopicContent> getListData() {
-        return listData;
-    }
-
-    public void setListData(ArrayList<TopicContent> listData) {
-        this.listData = listData;
     }
 
     //    数据加载接口
     @Override
     public void onLazyLoad(int page) {
+//        每次进入获取数据时，清空list
+        mAdapter.clearData();
+        listData.clear();
+
         HttpUtil.sendOkHttpGetTopicList("user,category",1,"recent", page, new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
@@ -149,36 +156,34 @@ public class TopicShare extends BaseLazyLoadFragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
 //                跳转到话题详情
-                SharedPreferences.Editor editor=PreferenceManager.getDefaultSharedPreferences(getContext()).edit();
-                editor.putString("id",listData.get(position).getTopicId());
-                editor.putString("userId",listData.get(position).getTopicAuthorId());
-                editor.putString("categoryId",listData.get(position).getCategoryId());
-                editor.putString("tagId","1");
-                editor.apply();
-
                 Intent intent=new Intent(getContext(),TopicParticularsActivity.class);
+                intent.putExtra("id",listData.get(position).getTopicId());
+                intent.putExtra("userId",listData.get(position).getTopicAuthorId());
+                intent.putExtra("categoryId",listData.get(position).getCategoryId());
+                intent.putExtra("tagId","1");
                 startActivity(intent);
             }
         });
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (mAdapter!=null){
-            mAdapter.clearData();
-            onLazyLoad(1);
-        }
-    }
 
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
         if (isVisibleToUser){
             if (mAdapter!=null){
-                mAdapter.clearData();
                 onLazyLoad(1);
             }
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        prefs= PreferenceManager.getDefaultSharedPreferences(getContext());
+        if (prefs.getBoolean("topicReplyListToTopicParticulars",false)){
+            mAdapter.clearData();
+            onLazyLoad(1);
         }
     }
 }
