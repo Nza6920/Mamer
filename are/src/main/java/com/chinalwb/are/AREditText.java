@@ -196,8 +196,12 @@ public class AREditText extends AppCompatEditText {
 					Util.log("onTextChanged:: s = " + s + ", start = " + start + ", count = " + count + ", before = "
 							+ before);
 				}
-				this.startPos = start;
-				this.endPos = start + count;
+
+				if(!s.equals(" ")){
+					this.startPos = start;
+					this.endPos = start + count;
+				}
+
 			}
 
 			@Override
@@ -397,8 +401,6 @@ public class AREditText extends AppCompatEditText {
         Html.ImageGetter imageGetter = new AreImageGetter(mContext, this);
         Html.TagHandler tagHandler = new AreTagHandler();
         Spanned spanned = Html.fromHtml(html, Html.FROM_HTML_SEPARATOR_LINE_BREAK_PARAGRAPH, imageGetter, tagHandler);
-
-
         stopMonitor();
         this.setText(spanned);
 //        this.getText().append(spanned);

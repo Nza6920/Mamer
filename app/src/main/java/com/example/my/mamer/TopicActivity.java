@@ -281,7 +281,14 @@ public class TopicActivity extends AppCompatActivity implements View.OnClickList
 //                发布文章按钮，判断内容合法性，判断标签是否选择
                 if (!tvFlag.getText().equals("")){
                     try {
-                        postNewTopicInfo();
+                        if (mEditText.getText().length()>3){
+                            postNewTopicInfo();
+                        }else {
+                            Message msg1 = new Message();
+                            msg1.what = MESSAGE_ERROR;
+                            msg1.obj = "内容应大于3个字";
+                            msgHandler.sendMessage(msg1);
+                        }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
