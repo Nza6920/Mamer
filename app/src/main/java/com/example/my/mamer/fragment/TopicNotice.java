@@ -64,6 +64,8 @@ public class TopicNotice extends BaseLazyLoadFragment {
                     if (mAdapter!=null){
                         Log.e("listFragment","视图公告");
                         mAdapter.clearData();
+                        Log.e("adapter公告数据：",mAdapter.getDataCount()+"++++++++++++++++++++");
+                        Log.e("list公告数据：",listData.size()+"++++++++++++++++++++");
                         mAdapter.updateAdd(listData);
                     }
                     break;
@@ -90,7 +92,6 @@ public class TopicNotice extends BaseLazyLoadFragment {
     //    数据加载接口
     @Override
     public void onLazyLoad(int page) {
-        mAdapter.clearData();
         listData.clear();
         HttpUtil.sendOkHttpGetTopicList("user,category",4 ,"recent", page, new Callback() {
             @Override
@@ -169,9 +170,7 @@ public class TopicNotice extends BaseLazyLoadFragment {
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
         if (isVisibleToUser){
-            if (mAdapter!=null){
-                onLazyLoad(1);
-            }
+            onLazyLoad(1);
         }
     }
 

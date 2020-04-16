@@ -112,5 +112,13 @@ public class TopicContentAdapter extends BaseAdapter {
         this.data.addAll(list);
         notifyDataSetChanged();
     }
+    public int getDataCount(){
+        if (null==data){
+            return 0;
+        }
+        else {
+            return this.data.size();
+        }
+    }
 
 }

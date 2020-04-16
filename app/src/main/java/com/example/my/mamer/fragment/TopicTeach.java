@@ -64,6 +64,8 @@ public class TopicTeach extends BaseLazyLoadFragment {
                 if (mAdapter!=null){
                     Log.e("listFragment","视图教程");
                     mAdapter.clearData();
+                    Log.e("adapter教程数据：",mAdapter.getDataCount()+"++++++++++++++++++++");
+                    Log.e("list教程数据：",listData.size()+"++++++++++++++++++++");
                     mAdapter.updateAdd(listData);
                 }
                 break;
@@ -90,7 +92,6 @@ public class TopicTeach extends BaseLazyLoadFragment {
     //    数据加载接口
     @Override
     public void onLazyLoad(int page) {
-        mAdapter.clearData();
         listData.clear();
         HttpUtil.sendOkHttpGetTopicList("user,category",2,"recent", page, new Callback() {
             @Override

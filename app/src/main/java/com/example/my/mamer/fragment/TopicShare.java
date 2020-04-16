@@ -62,6 +62,8 @@ public class TopicShare extends BaseLazyLoadFragment {
                     if (mAdapter != null) {
                         Log.e("listFragment","视图share");
                         mAdapter.clearData();
+                        Log.e("adapter分享数据：",mAdapter.getDataCount()+"++++++++++++++++++++");
+                        Log.e("list分享数据：",listData.size()+"++++++++++++++++++++");
                         mAdapter.updateAdd(listData);
                     }
                     break;
@@ -78,9 +80,7 @@ public class TopicShare extends BaseLazyLoadFragment {
         listView=view.findViewById(R.id.topic_content_list_view);
         mAdapter=new TopicContentAdapter(getContext());
         listView.setAdapter(mAdapter);
-        if (mAdapter!=null){
-            onLazyLoad(1);
-        }
+
         editor=PreferenceManager.getDefaultSharedPreferences(getContext()).edit();
         editor.putBoolean("topicReplyListToTopicParticulars",false);
         editor.apply();
@@ -91,9 +91,11 @@ public class TopicShare extends BaseLazyLoadFragment {
     //    数据加载接口
     @Override
     public void onLazyLoad(int page) {
+        Log.e("加载分享数据：","++++++++++++++++++++");
 //        每次进入获取数据时，清空list
-        mAdapter.clearData();
+        Log.e("清空mAdapter分享数据：",listData.size()+"++++++++++++++++++++++++");
         listData.clear();
+        Log.e("清空list分享数据：","++++++++++++++++++++++++");
 
         HttpUtil.sendOkHttpGetTopicList("user,category",1,"recent", page, new Callback() {
                 @Override
@@ -131,7 +133,7 @@ public class TopicShare extends BaseLazyLoadFragment {
                                             topicContent.setTopicAuthorId(userInfo.getString("id"));
                                             topicContent.setTopicAuthorPic(userInfo.getString("avatar"));
                                         }
-                                        Log.i("话题列表","1:"+topicContent.getTopicAuthorPic());
+                                        Log.i("话题列表","分享:"+topicContent.getTopicAuthorPic());
                                         listData.add(topicContent);
                                     }
                                     Message msg3 = new Message();
@@ -171,9 +173,8 @@ public class TopicShare extends BaseLazyLoadFragment {
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
         if (isVisibleToUser){
-            if (mAdapter!=null){
-                onLazyLoad(1);
-            }
+            Log.e("分享setUserVisibleHint：","++++++++++++++++++++");
+            onLazyLoad(1);
         }
     }
 
@@ -183,6 +184,7 @@ public class TopicShare extends BaseLazyLoadFragment {
         prefs= PreferenceManager.getDefaultSharedPreferences(getContext());
         if (prefs.getBoolean("topicReplyListToTopicParticulars",false)){
             mAdapter.clearData();
+            Log.e("分享onStart：","++++++++++++++++++++");
             onLazyLoad(1);
         }
     }

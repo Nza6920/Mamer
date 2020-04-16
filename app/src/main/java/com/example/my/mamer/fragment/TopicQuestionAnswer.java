@@ -64,6 +64,8 @@ public class TopicQuestionAnswer extends BaseLazyLoadFragment {
                     if (mAdapter!=null){
                         Log.e("listFragment","视图问答");
                         mAdapter.clearData();
+                        Log.e("adapter问答数据：",mAdapter.getDataCount()+"++++++++++++++++++++");
+                        Log.e("list问答数据：",listData.size()+"++++++++++++++++++++");
                         mAdapter.updateAdd(listData);
                     }
                     break;
@@ -80,7 +82,6 @@ public class TopicQuestionAnswer extends BaseLazyLoadFragment {
         listView=view.findViewById(R.id.topic_content_list_view);
         mAdapter=new TopicContentAdapter(getContext());
         listView.setAdapter(mAdapter);
-        onLazyLoad(1);
         editor=PreferenceManager.getDefaultSharedPreferences(getContext()).edit();
         editor.putBoolean("topicReplyListToTopicParticulars",false);
         editor.apply();
@@ -91,7 +92,7 @@ public class TopicQuestionAnswer extends BaseLazyLoadFragment {
     //    数据加载接口
     @Override
     public void onLazyLoad(int page) {
-        mAdapter.clearData();
+        Log.e("清空list问答数据：",listData.size()+"++++++++++++++++++++++++");
         listData.clear();
         HttpUtil.sendOkHttpGetTopicList("user,category",3,"recent",page, new Callback() {
             @Override
@@ -167,9 +168,8 @@ public class TopicQuestionAnswer extends BaseLazyLoadFragment {
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
         if (isVisibleToUser){
-            if (mAdapter!=null){
-                onLazyLoad(1);
-            }
+            Log.e("问答setUserVisibleHint：","++++++++++++++++++++");
+            onLazyLoad(1);
         }
     }
 
@@ -179,6 +179,7 @@ public class TopicQuestionAnswer extends BaseLazyLoadFragment {
         prefs= PreferenceManager.getDefaultSharedPreferences(getContext());
         if (prefs.getBoolean("topicReplyListToTopicParticulars",false)){
             mAdapter.clearData();
+            Log.e("问答onStart：","++++++++++++++++++++");
             onLazyLoad(1);
         }
     }
