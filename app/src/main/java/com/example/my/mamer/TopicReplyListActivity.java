@@ -356,7 +356,7 @@ public class TopicReplyListActivity extends AppCompatActivity {
                             Log.e("NowUserId",MyApplication.globalUserInfo.user.getUserId());
                             Log.e("eeee",(true||false)+"");
 
-                            if ((MyApplication.globalUserInfo.user.getUserId()).equals(topicUserId)){
+                            if ((MyApplication.globalUserInfo.user.getUserId()).equals(topicUserId)||(MyApplication.globalUserInfo.user.getUserId()==listData.get(position).getUserId())){
 //                        删除前进行提示
                                 delDialogBuilder=new AlertDialog.Builder(TopicReplyListActivity.this)
                                         .setMessage("删除后无法恢复")
