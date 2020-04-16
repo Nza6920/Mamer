@@ -1,12 +1,10 @@
 package com.example.my.mamer;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -107,8 +105,6 @@ public class UserSelfTopicListActivity extends AppCompatActivity {
             }
         });
         tvTitle.setText("我的话题");
-        tvTitle.setTextSize(25);
-        Log.e("Tag","UI完成");
 
     }
     //    数据加载接口
@@ -203,14 +199,11 @@ private void initEvent(){
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
 //                暂存数据
-                SharedPreferences.Editor editor=PreferenceManager.getDefaultSharedPreferences(UserSelfTopicListActivity.this).edit();
-                editor.putString("id",listData.get((int) id).getTopicId());
-                editor.putString("userId",listData.get((int) id).getTopicAuthorId());
-                editor.putString("categoryId",listData.get(position).getCategoryId());
-                editor.putString("tagId","2");
-                editor.apply();
-
                 Intent intent=new Intent(UserSelfTopicListActivity.this,TopicParticularsActivity.class);
+                intent.putExtra("id",listData.get((int) id).getTopicId());
+                intent.putExtra("userId",listData.get((int) id).getTopicAuthorId());
+                intent.putExtra("categoryId",listData.get(position).getCategoryId());
+                intent.putExtra("tagId","2");
                 startActivity(intent);
             }
         });

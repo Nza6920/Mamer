@@ -351,7 +351,12 @@ public class TopicReplyListActivity extends AppCompatActivity {
                         @Override
                         public void onClick(View v) {
 //                    当前用户的帖子，点击整个contentview可以删除任意一条评论（包括自己的）||或者当前用户评论的，可以删除
-                            if ((MyApplication.globalUserInfo.user.getUserId()==intent.getStringExtra("topicUserId"))||(MyApplication.globalUserInfo.user.getUserId()==listData.get(position).getUserId())){
+                            String topicUserId=intent.getStringExtra("topicUserId");
+                            Log.e("topicUserId:",intent.getStringExtra("topicUserId"));
+                            Log.e("NowUserId",MyApplication.globalUserInfo.user.getUserId());
+                            Log.e("eeee",(true||false)+"");
+
+                            if ((MyApplication.globalUserInfo.user.getUserId()).equals(topicUserId)){
 //                        删除前进行提示
                                 delDialogBuilder=new AlertDialog.Builder(TopicReplyListActivity.this)
                                         .setMessage("删除后无法恢复")
