@@ -530,6 +530,11 @@ public class TopicActivity extends AppCompatActivity implements View.OnClickList
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
+                Message msg9 = new Message();
+                msg9.what = DISMISS_DIALOG;
+                msg9.obj = loadingDraw;
+                msgHandler.sendMessage(msg9);
+
                 JSONObject jresp=null;
                 JSONArray jsonArray=null;
                 try {
@@ -548,10 +553,7 @@ public class TopicActivity extends AppCompatActivity implements View.OnClickList
                                     arrayList.add(topicDIvid.getCategoryName());
                                     map.put(topicDIvid.getCategoryName(),topicDIvid.getCategoryId());
                                 }
-                                Message msg9 = new Message();
-                                msg9.what = DISMISS_DIALOG;
-                                msg9.obj = loadingDraw;
-                                msgHandler.sendMessage(msg9);
+
 
                                 Message msg1 = new Message();
                                 msg1.what = SHOW_DIALOG;

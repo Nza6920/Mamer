@@ -23,6 +23,7 @@ public class Config {
 //            Config.globle = new Config.Globle(user, token);
 //        }
 //    }
+    public static final String BASE_URL="http://www.mamer.club/api";
     public static final String PHONE_NUMBER="http://www.mamer.club/api/captchas";
     public static final String PIC_CODE="http://www.mamer.club/api/verificationCodes";
     public static final String REGISTER="http://www.mamer.club/api/users";

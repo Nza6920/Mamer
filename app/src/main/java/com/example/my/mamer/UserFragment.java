@@ -38,6 +38,7 @@ import okhttp3.Response;
 
 import static com.example.my.mamer.config.Config.DISMISS_DIALOG;
 import static com.example.my.mamer.config.Config.HTTP_OK;
+import static com.example.my.mamer.config.Config.HTTP_OVERTIME;
 import static com.example.my.mamer.config.Config.HTTP_USER_GET_INFORMATION;
 import static com.example.my.mamer.config.Config.HTTP_USER_NULL;
 import static com.example.my.mamer.config.Config.MESSAGE_ERROR;
@@ -74,7 +75,14 @@ public class UserFragment extends Fragment {
     private UserBaseAdapter mReplyAdapter=null;
     private RecyclerView.LayoutManager mReplyLayoutManager=null;
 
-    //    收藏
+    //    点赞
+    private ArrayList<TopicContent> likeArrayList =new ArrayList<>();
+    private TextView tvLikeCount;
+    private LinearLayout layoutLike;
+    private LinearLayout layoutLikeItem;
+    private RecyclerView mLikeRecyclerView;
+    private UserBaseAdapter mLikeAdapter=null;
+    private RecyclerView.LayoutManager mLikeLayoutManager=null;
     //    UI
     private final Handler msgHandler=new Handler(new Handler.Callback() {
         @Override
@@ -127,6 +135,8 @@ public class UserFragment extends Fragment {
         layoutTopics=view.findViewById(R.id.user_topics_more);
         tvReplysCount=view.findViewById(R.id.user_my_reply_count);
         layoutReplys=view.findViewById(R.id.user_reply_more);
+        tvLikeCount=view.findViewById(R.id.user_my_like_count);
+        layoutLike=view.findViewById(R.id.user_like_more);
 
         mTopicsLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         mTopicsRecyclerView = view.findViewById(R.id.user_topics_recyclerview);
@@ -141,6 +151,13 @@ public class UserFragment extends Fragment {
         initReplyView();
         Log.e("initreplyView:","-----------------------");
         mReplyRecyclerView.setAdapter(mReplyAdapter);
+
+        mLikeLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+        mLikeRecyclerView = view.findViewById(R.id.user_like_recyclerview);
+        mLikeRecyclerView.setLayoutManager(mLikeLayoutManager);
+        initLikeView();
+        Log.e("initreplyView:","-----------------------");
+        mLikeRecyclerView.setAdapter(mLikeAdapter);
 
         return view;
 
@@ -170,11 +187,14 @@ public class UserFragment extends Fragment {
 //            请求数据，个人话题数，个人回复数，个人收藏数
             contentArrayList.clear();
             replyArrayList.clear();
+            likeArrayList.clear();
             Log.e("请求topics数据:","-----------------------");
             getUserTopics(1);
             Log.e("请求reply数据:","-----------------------");
             getUserReply(1);
             attention(1);
+            Log.e("请求like数据:","-----------------------");
+            getUserlike(1);
         }
     }
 
@@ -220,6 +240,20 @@ public class UserFragment extends Fragment {
                     msgHandler.sendMessage(msg1);
                 }else {
                     Intent intent = new Intent(getActivity(), UserSelfReplyActivity.class);
+                    startActivity(intent);
+                }
+            }
+        });
+//        点赞更多-->点赞列表
+        layoutLike.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (MyApplication.globalUserInfo.token==null){
+                    Message msg1=new Message();
+                    msg1.what=UNLOGIN;
+                    msgHandler.sendMessage(msg1);
+                }else {
+                    Intent intent = new Intent(getActivity(), UserLikeListActivity.class);
                     startActivity(intent);
                 }
             }
@@ -274,7 +308,8 @@ public class UserFragment extends Fragment {
             mAdapter.setOnItemClickListener(new UserBaseAdapter.OnItemClickListener() {
                 @Override
                 public void onItemClick(int position) {
-                    Toast.makeText(getContext(), "点击测试", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(getActivity(), UserSelfTopicListActivity.class);
+                    startActivity(intent);
                 }
             });
         }
@@ -302,13 +337,40 @@ public class UserFragment extends Fragment {
             mAdapter.setOnItemClickListener(new UserBaseAdapter.OnItemClickListener() {
                 @Override
                 public void onItemClick(int position) {
-                    Toast.makeText(getContext(), "点击测试reply", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(getActivity(), UserSelfReplyActivity.class);
+                    startActivity(intent);
                 }
             });
-
         }
     }
-//    收藏recyclerView
+//    点赞recyclerView
+    private void initLikeView(){
+        if (null==mLikeAdapter) {
+            final LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(getContext().getResources().getDisplayMetrics().widthPixels * 7 / 9, LinearLayout.LayoutParams.WRAP_CONTENT);
+            params.setMargins(0, 0, getContext().getResources().getDisplayMetrics().widthPixels * 1 / 9, 0);
+            UserBaseAdapter mAdapter = new UserBaseAdapter(getContext(), R.layout.user_topics_item) {
+                @Override
+                public void onBindViewHolder(UserBaseAdapter.mViewHolder viewHolder, int i) {
+                    super.onBindViewHolder(viewHolder, i);
+                    layoutLikeItem = (LinearLayout) viewHolder.view(R.id.user_topics_item);
+                    TextView tvTitle = (TextView) viewHolder.view(R.id.user_topics_title);
+                    TextView tvExcerpt = (TextView) viewHolder.view(R.id.user_topics_excerpt);
+                    layoutLikeItem.setLayoutParams(params);
+                    tvTitle.setText(getLikeArrayList().get(i).getTopicTitle());
+                    tvExcerpt.setText(Html.fromHtml(getLikeArrayList().get(i).getTopicExcerpt(),Html.FROM_HTML_MODE_COMPACT));
+                }
+            };
+            this.mLikeAdapter = mAdapter;
+            Log.e("点赞adapter:", mAdapter.toString());
+//                getUserReply(1, mAdapter);
+            mAdapter.setOnItemClickListener(new UserBaseAdapter.OnItemClickListener() {
+                @Override
+                public void onItemClick(int position) {
+                    Toast.makeText(getContext(), "点击测试like", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
 //    获取用户个人话题（数+内容）
     private void  getUserTopics(int pageCount){
         loadingDraw.show();
@@ -595,6 +657,98 @@ public class UserFragment extends Fragment {
             }
         });
     }
+//    获取点赞数
+    private void getUserlike(int pageCount){
+        loadingDraw.show();
+        HttpUtil.sendOkHttpGetLike(pageCount, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Message msg1=new Message();
+                msg1.what=DISMISS_DIALOG;
+                msg1.obj=loadingDraw;
+                msgHandler.sendMessage(msg1);
+
+                Message msg2 = new Message();
+                msg2.what = MESSAGE_ERROR;
+                msg2.obj = "服务器异常,请检查网络";
+                msgHandler.sendMessage(msg2);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                Message msg1=new Message();
+                msg1.what=DISMISS_DIALOG;
+                msg1.obj=loadingDraw;
+                msgHandler.sendMessage(msg1);
+
+                JSONObject jresp = null;
+                JSONArray jsonArray=null;
+                try {
+                    jresp=new JSONObject(response.body().string());
+                    switch (response.code()){
+                        case HTTP_USER_GET_INFORMATION:
+                            if (jresp.has("data")){
+                                jsonArray=jresp.getJSONArray("data");
+                                for (int i = 0; i < jsonArray.length(); i++) {
+                                    JSONObject jrespStr=jsonArray.getJSONObject(i);
+                                    TopicContent content=new TopicContent();
+                                    content.setTopicId(jrespStr.getString("id"));
+                                    content.setTopicTitle(jrespStr.getString("title"));
+                                    content.setTopicExcerpt(jrespStr.getString("excerpt"));
+                                    likeArrayList.add(content);
+                                }
+                                final Runnable setLike=new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        loadingDraw.dismiss();
+                                        if ((likeArrayList.size()!=0)&&mLikeAdapter!=null){
+                                            Log.e("likeView设置数据:","-----------------------");
+                                            Log.e("likeView:","-"+likeArrayList+"-"+mLikeAdapter.toString()+"---------------------");
+                                            mLikeAdapter.clear();
+                                            mLikeAdapter.updateData(likeArrayList);
+                                        }
+                                    }};
+                                new Thread(){
+                                    public void run(){
+                                        msgHandler.post(setLike);
+                                    }
+                                }.start();
+                            }
+                            if (jresp.has("meta")){
+                                jresp=jresp.getJSONObject("meta");
+                                if (jresp.has("pagination")){
+                                    jresp=jresp.getJSONObject("pagination");
+                                    final String  count=jresp.getString("count");
+                                    final Runnable setUserReplyCount=new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            tvLikeCount.setText(count);
+                                        }};
+                                    new Thread(){
+                                        public void run(){
+                                            msgHandler.post(setUserReplyCount);
+                                        }
+                                    }.start();
+                                }
+                            }
+                            break;
+                        case HTTP_OVERTIME:
+                            Message message=new Message();
+                            message.what=MESSAGE_ERROR;
+                            message.obj="等待数据加载";
+                            msgHandler.sendMessage(message);
+                            break;
+                            default:
+                                break;
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
+    }
+
     public ArrayList<TopicContent> getContentArrayList() {
         return contentArrayList;
     }
@@ -611,4 +765,11 @@ public class UserFragment extends Fragment {
         this.replyArrayList = replyArrayList;
     }
 
+    public ArrayList<TopicContent> getLikeArrayList() {
+        return likeArrayList;
+    }
+
+    public void setLikeArrayList(ArrayList<TopicContent> likeArrayList) {
+        this.likeArrayList = likeArrayList;
+    }
 }

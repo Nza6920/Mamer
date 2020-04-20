@@ -10,6 +10,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 
 import static com.example.my.mamer.config.Config.ATTENTION;
+import static com.example.my.mamer.config.Config.BASE_URL;
 import static com.example.my.mamer.config.Config.CONTENT_TYPEs;
 import static com.example.my.mamer.config.Config.NOTIFICATION_LIST;
 import static com.example.my.mamer.config.Config.NOTIFICATION_READ;
@@ -79,7 +80,7 @@ public class HttpUtil {
     }
 //    获取某一话题详情
     public static void sendOkHttpGetTopicParticulars(String essayId,okhttp3.Callback callback){
-        String TOPIC_PARTICULARS="http://www.mamer.club/api/topics/"+essayId+"?include=user,category";
+        String TOPIC_PARTICULARS="http://www.mamer.club/api/topics/"+essayId+"?include=user,category,voters";
         OkHttpClient client=new OkHttpClient();
         Request request=new Request.Builder().url(TOPIC_PARTICULARS).build();
         client.newCall(request).enqueue(callback);
@@ -201,6 +202,13 @@ public class HttpUtil {
         String attention="http://www.mamer.club/api/users/"+userId+"/followings?page="+pageCount;
         OkHttpClient client=new OkHttpClient();
         Request request=new Request.Builder().url(attention).build();
+        client.newCall(request).enqueue(callback);
+    }
+//    获取当前用户点赞列表
+    public static void sendOkHttpGetLike(int pageCount,okhttp3.Callback callback){
+        String like=BASE_URL+"/user/votes?page="+pageCount;
+        OkHttpClient client=new OkHttpClient();
+        Request request=new Request.Builder().addHeader("Authorization", MyApplication.globalUserInfo.tokenType+MyApplication.globalUserInfo.token).url(like).build();
         client.newCall(request).enqueue(callback);
     }
 }

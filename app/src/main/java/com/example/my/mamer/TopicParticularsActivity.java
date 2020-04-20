@@ -50,7 +50,6 @@ import static com.example.my.mamer.config.Config.HTTP_OVERTIME;
 import static com.example.my.mamer.config.Config.HTTP_USER_GET_INFORMATION;
 import static com.example.my.mamer.config.Config.MESSAGE_ERROR;
 import static com.example.my.mamer.config.Config.UNLOGIN;
-import static com.example.my.mamer.config.Config.USER_TOPIC_DEL;
 
 public class TopicParticularsActivity extends AppCompatActivity {
 //    title
@@ -81,6 +80,11 @@ public class TopicParticularsActivity extends AppCompatActivity {
 //    完成评论后，刷新
     private SharedPreferences prefs;
     private SharedPreferences.Editor editor;
+//    点赞
+    private LinearLayout layoutLike;
+    private TextView tvLike;
+    private TextView tvLikeCount;
+    private Boolean likeTag=false;
 
 
     public final Handler msgHandler=new Handler(new Handler.Callback() {
@@ -95,9 +99,6 @@ public class TopicParticularsActivity extends AppCompatActivity {
                         break;
                     case UNLOGIN:
                         Toast.makeText(TopicParticularsActivity.this,"登录以体验更多",Toast.LENGTH_SHORT).show();
-                        break;
-                    case USER_TOPIC_DEL:
-                        delAlert();
                         break;
                     default:
                         break;
@@ -146,6 +147,9 @@ public class TopicParticularsActivity extends AppCompatActivity {
         tvReplyUserName=findViewById(R.id.reply_name);
         tvReplyTime=findViewById(R.id.reply_time);
         tvReplyCount=findViewById(R.id.reply_count);
+        layoutLike=findViewById(R.id.like_layout);
+        tvLike=findViewById(R.id.like_touch_event);
+        tvLikeCount=findViewById(R.id.like_count);
 //        填充
         Drawable tvBackPic=ContextCompat.getDrawable(this,R.mipmap.ic_title_back);
         tvBack.setBackground(tvBackPic);
@@ -208,6 +212,14 @@ public class TopicParticularsActivity extends AppCompatActivity {
 
             }
         });
+        layoutLike.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(TopicParticularsActivity.this,TopicReplyListActivity.class);
+                intent.putExtra("essayId",MyApplication.globalTopicReply.reply.replyUser.getEssayId());
+                startActivity(intent);
+            }
+        });
 
     }
 //    获得话题详情
@@ -233,9 +245,11 @@ public class TopicParticularsActivity extends AppCompatActivity {
                 Message msg=new Message();
                 msg.what=DISMISS_DIALOG;
                 msgHandler.sendMessage(msg);
+                JSONObject jresp = null;
+                JSONArray jsonArray=null;
 
                 try {
-                    JSONObject jresp=new JSONObject(response.body().string());
+                    jresp=new JSONObject(response.body().string());
                     switch (response.code()){
                         case HTTP_USER_GET_INFORMATION:
                             Log.e("Tag","话题详情--获取具体数据");
@@ -257,6 +271,13 @@ public class TopicParticularsActivity extends AppCompatActivity {
                                 JSONObject category=jresp.getJSONObject("category");
                                 topicContent.setCategoryId(category.getString("id"));
                                 topicContent.setCategoryName(category.getString("name"));
+                            }
+                            if (jresp.has("voters")){
+                                jresp=jresp.getJSONObject("voters");
+                                jsonArray=jresp.getJSONArray("data");
+                                if (jsonArray.length()!=0){
+                                    topicContent.setTopiclikeCount(jsonArray.length());
+                                }
                             }
                             listData.add(topicContent);
 //处理内容
@@ -282,7 +303,7 @@ public class TopicParticularsActivity extends AppCompatActivity {
                                     Log.e("Tag","话题详情--创建时间");
                                     BaseUtils.contentUtil(getContext(),mEditTextArticle,listData.get(0).getTopicConten());
                                     tvTitle.setText(listData.get(0).getCategoryName());
-
+                                    tvLikeCount.setText(String.valueOf(listData.get(0).getTopiclikeCount()));
                                 }};
                             new Thread(){
                                 public void run(){
@@ -397,26 +418,37 @@ public class TopicParticularsActivity extends AppCompatActivity {
 
 
     }
-
 //    删除提醒
-    private void delAlert(){
-        delDialogBuilder=new AlertDialog.Builder(this)
-                .setMessage("删除后无法恢复")
-                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                        delTopic();
+    private void delAlert(String tag){
+        switch (tag){
+            case "delTopic":
+                delDialogBuilder=new AlertDialog.Builder(this)
+                        .setMessage("删除后无法恢复")
+                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                                delTopic();
+                            }
+                        })
+                        .setNegativeButton("取消",new DialogInterface.OnClickListener(){
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                delDialogBuilder.show();
+                break;
+            case "like":
+                if (likeTag){
+//
+                }
 
-                    }
-                })
-                .setNegativeButton("取消",new DialogInterface.OnClickListener(){
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-        delDialogBuilder.show();
+                break;
+                default:
+                    break;
+        }
+
     }
 //    删除话题
     private void delTopic(){
@@ -489,6 +521,9 @@ public class TopicParticularsActivity extends AppCompatActivity {
         //        返回首页
         LinearLayout viewHome=popupStyle.getHomeView(this);
         final int idHome=viewHome.getId();
+//        取消点赞
+        LinearLayout viewDisLike=popupStyle.getLikeView(this);
+        final int idDisLike=viewDisLike.getId();
 
         switch (tag){
             case "author":
@@ -500,7 +535,9 @@ public class TopicParticularsActivity extends AppCompatActivity {
                 viewSparseArray.put(idHome,viewHome);
                 break;
             case "reader":
+                views.add(viewDisLike);
                 views.add(viewHome);
+                viewSparseArray.put(idDisLike,viewDisLike);
                 viewSparseArray.put(idHome,viewHome);
                 break;
                 default:break;
@@ -530,11 +567,21 @@ public class TopicParticularsActivity extends AppCompatActivity {
                     popupUtil.getView(idDel).setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            delAlert();
+                            delAlert("delTopic");
                             popupUtil.dismiss();
                         }
                     });
+
                 }
+                popupUtil.getView(idDisLike).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent=new Intent(TopicParticularsActivity.this,TopicLikeListActivity.class);
+                        intent.putExtra("essayId",listData.get(0).getTopicId());
+                        startActivity(intent);
+                        popupUtil.dismiss();
+                    }
+                });
                 popupUtil.getView(idHome).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {

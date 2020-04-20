@@ -197,11 +197,8 @@ public class AREditText extends AppCompatEditText {
 							+ before);
 				}
 
-				if(!s.equals(" ")){
-					this.startPos = start;
-					this.endPos = start + count;
-				}
-
+				this.startPos = start;
+				this.endPos = start + count;
 			}
 
 			@Override

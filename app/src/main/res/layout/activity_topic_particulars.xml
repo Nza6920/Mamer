@@ -71,32 +71,54 @@
                     android:textSize="15sp"
                     android:layout_marginTop="10dp"
                     android:gravity="right"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="24dp"
+                    android:layout_marginTop="15dp"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:text="评论"
+                        android:textSize="18sp" />
+                    <TextView
+                        android:id="@+id/reply_count"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="12"
+                        android:textSize="15sp"
+                        android:layout_marginLeft="5dp"/>
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"/>
+                    <LinearLayout
+                        android:id="@+id/like_layout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="24dp">
+                        <TextView
+                            android:id="@+id/like_touch_event"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_gravity="center_vertical"
+                            android:background="@mipmap/ic_popup_topic_manage_like_"/>
+                        <TextView
+                            android:id="@+id/like_count"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textSize="15sp"/>
+                    </LinearLayout>
+
+                </LinearLayout>
                 <LinearLayout
                     android:id="@+id/reply_comment"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="15dp"
                     android:orientation="vertical"
                     android:clickable="true">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_centerVertical="true"
-                            android:text="评论"
-                            android:textSize="18sp" />
-                        <TextView
-                            android:id="@+id/reply_count"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textSize="15sp"
-                            android:layout_marginLeft="5dp"/>
-                    </LinearLayout>
-
                     <LinearLayout
                         android:id="@+id/reply_comment_list"
                         android:layout_width="match_parent"

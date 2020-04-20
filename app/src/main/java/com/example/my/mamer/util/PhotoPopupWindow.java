@@ -103,7 +103,7 @@ public class PhotoPopupWindow extends PopupWindow{
         popupWindow.showAtLocation(popupView,Gravity.BOTTOM,0,50);
 
     }
-//拍照
+//选择照片
     private void takeCamera(int num,final Activity mContext) {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(mContext.getPackageManager()) != null) {

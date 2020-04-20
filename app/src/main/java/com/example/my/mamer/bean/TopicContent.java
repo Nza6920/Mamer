@@ -15,6 +15,7 @@ public class TopicContent {
     private   String topicConten;
     private  String categoryName;
     private String topicExcerpt;
+    private int topiclikeCount;
 
     public TopicContent() {
     }
@@ -121,6 +122,14 @@ public class TopicContent {
 
     public void setTopicExcerpt(String topicExcerpt) {
         this.topicExcerpt = topicExcerpt;
+    }
+
+    public int getTopiclikeCount() {
+        return topiclikeCount;
+    }
+
+    public void setTopiclikeCount(int topiclikeCount) {
+        this.topiclikeCount = topiclikeCount;
     }
 }
 

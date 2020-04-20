@@ -104,29 +104,16 @@ public class PopupStyle {
         return linearLayout;
     }
 //    点赞，取消点赞，点赞列表
-    public LinearLayout getTagsView(Context context,String tags) {
+    public LinearLayout getLikeView(Context context) {
         init(context);
         initUI(context);
 
         linearLayout.setId(IdUtils.generateViewId());
-        switch (tags){
-            case "like":
-                Drawable tvClosePic=ContextCompat.getDrawable(context,R.mipmap.ic_popup_topic_manage_like);
-                tvPic.setBackground(tvClosePic);
-                tvText.setText("取消点赞");
-                break;
-            case "dislike":
-                Drawable tvClosePic2=ContextCompat.getDrawable(context,R.mipmap.ic_popup_topic_manage_like);
-                tvPic.setBackground(tvClosePic2);
-                tvText.setText("取消点赞");
-                break;
-            case "showlikes":
-                Drawable tvClosePic3=ContextCompat.getDrawable(context,R.mipmap.ic_popup_topic_manage_like);
-                tvPic.setBackground(tvClosePic3);
-                tvText.setText("取消点赞");
-                default:
-                    break;
-        }
+
+
+        Drawable tvClosePic2=ContextCompat.getDrawable(context,R.mipmap.ic_popup_topic_manage_dislike);
+        tvPic.setBackground(tvClosePic2);
+        tvText.setText("点赞");
 
 
         linearLayout.addView(tvPic);
