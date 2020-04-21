@@ -41,6 +41,7 @@ import static com.example.my.mamer.config.Config.KEYBOARD_DOWN;
 import static com.example.my.mamer.config.Config.KEYBOARD_UP;
 import static com.example.my.mamer.config.Config.MESSAGE_ERROR;
 import static com.example.my.mamer.config.Config.REFRESH_TOKEN;
+import static com.example.my.mamer.config.Config.SET_TEXTVIEW;
 import static com.example.my.mamer.config.Config.USER_SET_INFORMATION;
 
 public class TopicLikeListActivity extends AppCompatActivity {
@@ -70,9 +71,15 @@ public class TopicLikeListActivity extends AppCompatActivity {
                     Toast.makeText(getContext(),(String)msg.obj,Toast.LENGTH_SHORT).show();
                     break;
                 case USER_SET_INFORMATION:
-                    tvLikeCount.setText((String )msg.obj);
                     mAdapter.clearData();
                     mAdapter.updateData(listData);
+                    break;
+                case SET_TEXTVIEW:
+                    if (msg.obj==null){
+                       msg.obj=0;
+                    }
+                    tvTitle.setText("共"+String.valueOf(msg.obj)+"人点赞");
+                    tvLikeCount.setText("点赞("+String.valueOf(msg.obj)+")");
                     break;
                 case DISMISS_DIALOG:
                     loadingDraw.dismiss();
@@ -108,7 +115,7 @@ public class TopicLikeListActivity extends AppCompatActivity {
 
         Drawable tvBackPic=ContextCompat.getDrawable(this,R.mipmap.ic_title_close);
         tvBack.setBackground(tvBackPic);
-        tvTitle.setText("点赞");
+
 
         tvBack.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -153,7 +160,10 @@ public class TopicLikeListActivity extends AppCompatActivity {
                             if (jresp.has("voters")){
                                 jresp=jresp.getJSONObject("voters");
                                 jsonArray=jresp.getJSONArray("data");
-                                final int count=jsonArray.length();
+                                int count=0;
+                                if (jsonArray!=null){
+                                    count=jsonArray.length();
+                                }
                                 if (count!=0){
                                     for (int i = 0; i < jsonArray.length(); i++) {
                                         JSONObject jsonObject = jsonArray.getJSONObject(i);
@@ -172,9 +182,13 @@ public class TopicLikeListActivity extends AppCompatActivity {
                                     Log.e("Tag","话题点赞--更新数据");
                                        Message msg1=new Message();
                                        msg1.what=USER_SET_INFORMATION;
-                                       msg1.obj=count;
                                        msgHandler.sendMessage(msg1);
                                 }
+                                    Message msg1=new Message();
+                                    msg1.what=SET_TEXTVIEW;
+                                    msg.obj=jsonArray.length();
+                                    msgHandler.sendMessage(msg1);
+
                             }
                             break;
                         default:

@@ -72,32 +72,37 @@
                     android:layout_marginTop="10dp"
                     android:gravity="right"/>
 
-                <LinearLayout
+                <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="24dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="15dp"
-                    android:orientation="horizontal">
-                    <TextView
+                    android:background="@drawable/divid_line"
+                    android:paddingTop="8dp">
+                    <LinearLayout
+                        android:id="@+id/reply_to_list"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:text="评论"
-                        android:textSize="18sp" />
-                    <TextView
-                        android:id="@+id/reply_count"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="12"
-                        android:textSize="15sp"
-                        android:layout_marginLeft="5dp"/>
-                    <View
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"/>
+                        android:layout_alignParentLeft="true">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:text="评论"
+                            android:textSize="18sp" />
+                        <TextView
+                            android:id="@+id/reply_count"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="12"
+                            android:textSize="15sp"
+                            android:layout_marginLeft="5dp"/>
+                    </LinearLayout>
+
                     <LinearLayout
                         android:id="@+id/like_layout"
                         android:layout_width="wrap_content"
-                        android:layout_height="24dp">
+                        android:layout_height="24dp"
+                        android:layout_alignParentRight="true">
                         <TextView
                             android:id="@+id/like_touch_event"
                             android:layout_width="24dp"
@@ -112,7 +117,7 @@
                             android:textSize="15sp"/>
                     </LinearLayout>
 
-                </LinearLayout>
+                </RelativeLayout>
                 <LinearLayout
                     android:id="@+id/reply_comment"
                     android:layout_width="match_parent"

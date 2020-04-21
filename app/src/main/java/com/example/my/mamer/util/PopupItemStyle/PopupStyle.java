@@ -113,7 +113,7 @@ public class PopupStyle {
 
         Drawable tvClosePic2=ContextCompat.getDrawable(context,R.mipmap.ic_popup_topic_manage_dislike);
         tvPic.setBackground(tvClosePic2);
-        tvText.setText("点赞");
+        tvText.setText("点赞列表");
 
 
         linearLayout.addView(tvPic);

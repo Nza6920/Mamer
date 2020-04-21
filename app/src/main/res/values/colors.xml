@@ -4,4 +4,7 @@
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#7553a1fa</color>
     <color name="colorPop">#e8267dbf</color>
+    <color name="colorTV">#1278B4</color>
+    <color name="colorDel">#727272</color>
+
 </resources>

@@ -211,4 +211,18 @@ public class HttpUtil {
         Request request=new Request.Builder().addHeader("Authorization", MyApplication.globalUserInfo.tokenType+MyApplication.globalUserInfo.token).url(like).build();
         client.newCall(request).enqueue(callback);
     }
+//    点赞
+    public static void sendOkHttpPostLike(String id,RequestBody requestBody,okhttp3.Callback callback){
+        String toLike=BASE_URL+"/topics/"+id+"/votes";
+        OkHttpClient client=new OkHttpClient();
+        Request request=new Request.Builder().post(requestBody).addHeader("Authorization",MyApplication.globalUserInfo.tokenType+MyApplication.globalUserInfo.token).url(toLike).build();
+        client.newCall(request).enqueue(callback);
+    }
+//    取消点赞
+    public static  void sendOkHttpDelLike(String id,okhttp3.Callback callback){
+        String DEL_LIKE=BASE_URL+"/topics/"+id+"/votes";
+        OkHttpClient client=new OkHttpClient();
+        Request request=new Request.Builder().delete().addHeader("Authorization",MyApplication.globalUserInfo.tokenType+MyApplication.globalUserInfo.token).url(DEL_LIKE).build();
+        client.newCall(request).enqueue(callback);
+    }
 }

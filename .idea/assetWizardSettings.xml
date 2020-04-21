@@ -23,8 +23,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="color" value="727272" />
-                                                <entry key="paddingPercent" value="10" />
+                                                <entry key="color" value="1278b4" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -80,7 +79,8 @@
                                   </option>
                                   <option name="values">
                                     <map>
-                                      <entry key="outputName" value="ic_popup_topic_manage_dislike" />
+                                      <entry key="iconShape" value="NONE" />
+                                      <entry key="outputName" value="ic_popup_topic_manage_like" />
                                     </map>
                                   </option>
                                 </PersistentState>

@@ -126,7 +126,8 @@ public class ToUserActivity extends AppCompatActivity {
                 tvClose.setBackground(tvBackPic);
                 tvTitle.setText(intent.getStringExtra("userName"));
                 tvUserName.setText(intent.getStringExtra("userName"));
-                if (null==intent.getStringExtra("userIntro")){
+                String infoStr=intent.getStringExtra("userIntro");
+                if (infoStr.equals("")){
                     tvIntroduction.setText("Ta什么也没留下");
                 }else {
                     tvIntroduction.setText(intent.getStringExtra("userIntro"));
@@ -139,17 +140,15 @@ public class ToUserActivity extends AppCompatActivity {
             }
         }.start();
 
-        layoutAttention.setOnClickListener(new View.OnClickListener() {
+        if (MyApplication.globalUserInfo.token==null){
+            layoutAttention.setVisibility(View.GONE);
+            Log.e("attention:layout",attentionFlag+"未登录");
+        }else {
+            layoutAttention.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Log.e("attention:layout",attentionFlag+"");
-                    if (MyApplication.globalUserInfo.token==null){
-                        Log.e("attention:layout",attentionFlag+"未登录");
-                        Message msg2 = new Message();
-                        msg2.what = MESSAGE_ERROR;
-                        msg2.obj = "登录以体验更多";
-                        msgHandler.sendMessage(msg2);
-                    }
+
 
                     if (attentionFlag){
                         Log.e("attention:layout",attentionFlag+"已关注");
@@ -161,6 +160,8 @@ public class ToUserActivity extends AppCompatActivity {
 
                 }
             });
+        }
+
 
     }
 
