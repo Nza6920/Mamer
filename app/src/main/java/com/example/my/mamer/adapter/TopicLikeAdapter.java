@@ -9,11 +9,15 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.chinalwb.are.android.inner.Html;
 import com.example.my.mamer.R;
 import com.example.my.mamer.bean.ReplyUser;
 
 import java.util.ArrayList;
+
+import static com.example.my.mamer.MyApplication.getContext;
 
 public class TopicLikeAdapter extends BaseAdapter {
     private ArrayList<ReplyUser> userArrayList =new ArrayList<>();
@@ -55,6 +59,7 @@ public class TopicLikeAdapter extends BaseAdapter {
         if(view==null){
             view=layoutInflater.inflate(R.layout.topic_like_item,null);
             listViewItem=new TopicLikeAdapter.listItem();
+            listViewItem.imgLikeUserAvatar=view.findViewById(R.id.like_list_avatar);
             listViewItem.tvUserName=view.findViewById(R.id.like_list_name);
             listViewItem.tvUserIntro=view.findViewById(R.id.like_list_intro);
             view.setTag(listViewItem);
@@ -62,6 +67,14 @@ public class TopicLikeAdapter extends BaseAdapter {
             listViewItem= (listItem) view.getTag();
         }
         if (userArrayList.size()==0) return view;
+        RequestOptions options=new RequestOptions()
+                .error(R.mipmap.ic_image_error)
+                .placeholder(R.mipmap.ic_image_error);
+        Glide.with(getContext())
+                .asBitmap()
+                .load(userArrayList.get(i).getUserImg())
+                .apply(options)
+                .into(listViewItem.imgLikeUserAvatar);
         listViewItem.tvUserName.setText(userArrayList.get(i).getUserName());
 //        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
         listViewItem.tvUserIntro.setText(Html.fromHtml(userArrayList.get(i).getUserInfo(),Html.FROM_HTML_MODE_COMPACT));
