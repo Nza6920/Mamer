@@ -22,13 +22,7 @@
         <activity android:name=".RegisterPhoneNumActivity" />
         <activity android:name=".RegisterPicCode" />
         <activity android:name=".RegisterActivity" />
-        <activity android:name=".TestActivity">
-
-            <!-- <intent-filter> -->
-            <!-- <action android:name="android.intent.action.MAIN" /> -->
-            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
-            <!-- </intent-filter> -->
-        </activity>
+        <activity android:name=".TestActivity"/>
         <activity android:name=".LoginActivity" />
         <activity android:name=".UserHomePageActivity" />
         <activity android:name=".UserEditorInformationActivity" />
@@ -43,13 +37,7 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <activity android:name=".BottomNavigationBarActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+        <activity android:name=".BottomNavigationBarActivity"/>
         <activity
             android:name=".TopicsNewTopicActivity"
             android:launchMode="singleTask"
@@ -63,13 +51,7 @@
         <activity
             android:name=".TopicActivity"
             android:label="@string/title_activity_topic_particulars_test"
-            android:theme="@style/AppTheme">
-
-            <!-- <intent-filter> -->
-            <!-- <action android:name="android.intent.action.MAIN" /> -->
-            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
-            <!-- </intent-filter> -->
-        </activity>
+            android:theme="@style/AppTheme"/>
         <activity android:name=".TopicReplyListActivity" />
         <activity
             android:name=".ToUserActivity"
@@ -83,7 +65,16 @@
         <activity
             android:name=".UserAttentionFansActivity"
             android:label="@string/title_activity_user_attention_fans"
-            android:theme="@style/AppTheme"></activity>
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name=".LoginVerifyActivity"
+            android:label="@string/title_activity_login_verify"
+            android:theme="@style/AppTheme">
+             <intent-filter>
+             <action android:name="android.intent.action.MAIN" />
+             <category android:name="android.intent.category.LAUNCHER" />
+             </intent-filter>
+        </activity>
     </application>
 
 </manifest>

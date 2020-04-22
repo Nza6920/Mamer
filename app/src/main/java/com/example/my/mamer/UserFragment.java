@@ -42,6 +42,7 @@ import static com.example.my.mamer.config.Config.HTTP_OVERTIME;
 import static com.example.my.mamer.config.Config.HTTP_USER_GET_INFORMATION;
 import static com.example.my.mamer.config.Config.HTTP_USER_NULL;
 import static com.example.my.mamer.config.Config.MESSAGE_ERROR;
+import static com.example.my.mamer.config.Config.REFRESH_TOKEN;
 import static com.example.my.mamer.config.Config.UNLOGIN;
 
 public class UserFragment extends Fragment {
@@ -112,6 +113,7 @@ public class UserFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
         loadingDraw=new LoadingDraw(getContext());
         View view=inflater.inflate(R.layout.fragment_user,container,false);
 //        初始化控件
@@ -754,6 +756,38 @@ public class UserFragment extends Fragment {
                     e.printStackTrace();
                 }
 
+            }
+        });
+    }
+
+
+    //    刷新
+    public  void  refreshKey(){
+        HttpUtil.sendOkHttpRefreshToken(REFRESH_TOKEN, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Message msg1 = new Message();
+                msg1.what = MESSAGE_ERROR;
+                msg1.obj = "登录已失效，请重新登录";
+                msgHandler.sendMessage(msg1);
+
+            }
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                try {
+                    JSONObject jrep= new JSONObject(response.body().string());
+                    String key=jrep.getString("access_token");
+                    String type=jrep.getString("token_type");
+                    MyApplication.globalUserInfo.token=key;
+                    MyApplication.globalUserInfo.tokenType=type;
+
+                    Message msg1 = new Message();
+                    msg1.what = MESSAGE_ERROR;
+                    msg1.obj = "已刷新，请重试";
+                    msgHandler.sendMessage(msg1);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         });
     }

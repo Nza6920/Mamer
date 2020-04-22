@@ -1,10 +1,12 @@
 package com.example.my.mamer;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
@@ -25,6 +27,7 @@ import com.example.my.mamer.util.HttpUtil;
 import com.example.my.mamer.util.LoadingDraw;
 import com.example.my.mamer.util.NCopyPaste;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -35,6 +38,7 @@ import okhttp3.Callback;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import static com.example.my.mamer.MyApplication.getContext;
 import static com.example.my.mamer.config.Config.DISMISS_DIALOG;
 import static com.example.my.mamer.config.Config.HTTP_OK;
 import static com.example.my.mamer.config.Config.HTTP_OVERTIME;
@@ -61,6 +65,10 @@ public class LoginActivity extends AppCompatActivity {
     private String pas;
 //    登录按钮
     private Button btnLogin;
+    private SharedPreferences.Editor editor;
+    private SharedPreferences prefs;
+    private String prefsName;
+    private String prefsPas;
 //ui
     private final Handler msgHandler=new Handler(new Handler.Callback() {
     @Override
@@ -93,8 +101,14 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         loadingDraw=new LoadingDraw(this);
+
+        prefs= PreferenceManager.getDefaultSharedPreferences(getContext());
+        prefsName=prefs.getString("username","");
+        prefsPas=prefs.getString("password","");
+
         init();
     }
+
     private void init(){
         tvClose=findViewById(R.id.title_tv_close);
         tvBtnNext=findViewById(R.id.title_btn_next);
@@ -169,21 +183,13 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 loadingDraw.show();
-                final Runnable setEditContent=new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            getEditString();
-                            postInformation();
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }};
-                new Thread(){
-                    public void run(){
-                        msgHandler.post(setEditContent);
-                    }
-                }.start();
+                if (prefs.getBoolean("loginFlag",false)){
+                    postInformation(prefsName,prefsPas);
+
+                }else {
+                    getEditString();
+                    postInformation(uName,pas);
+                }
 
 
             }
@@ -203,12 +209,19 @@ public class LoginActivity extends AppCompatActivity {
         pas=etPas.getText().toString().trim();
     }
 //    post
-    private void postInformation() throws JSONException {
+    private void postInformation(String name,String password)  {
         loadingDraw.show();
         JSONObject jsonParam=new JSONObject();
-        jsonParam.put("username",uName);
-        jsonParam.put("password",pas);
+        try {
+            jsonParam.put("username",name);
+            jsonParam.put("password",password);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
         String jsonStr=jsonParam.toString();
+
+
 
         RequestBody requestBody=RequestBody.create(JSON,jsonStr);
         HttpUtil.sendOkHttpRequest(LOGIN, requestBody, new Callback() {
@@ -227,16 +240,31 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
+                JSONObject jresp=null;
                 try {
-                    JSONObject jresp=new JSONObject(response.body().string());
+                     jresp=new JSONObject(response.body().string());
                     switch (response.code()){
                         case HTTP_OK:
                             Message msg3=new Message();
                             msg3.what=DISMISS_DIALOG;
                             msg3.obj=loadingDraw;
                             msgHandler.sendMessage(msg3);
-//登陆成功
-                            loginSuccess(jresp);
+
+                            String key=jresp.getString("access_token");
+                            String type=jresp.getString("token_type");
+
+                            MyApplication.globalUserInfo.token=key;
+                            MyApplication.globalUserInfo.tokenType=type;
+
+                            editor=PreferenceManager.getDefaultSharedPreferences(getContext()).edit();
+                            editor.putString("username",uName);
+                            editor.putString("password",pas);
+                            editor.putString("key",key);
+                            editor.putString("type",type);
+                            editor.putBoolean("loginFlag",true);
+                            editor.apply();
+
+                            loginSuccess();
 
                             break;
 //                            422
@@ -295,17 +323,16 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    private void loginSuccess(JSONObject jresp) throws JSONException {
-        User user=new User();
-        MyApplication.globalUserInfo.user=user;
-        MyApplication.globalUserInfo.token=jresp.getString("access_token");
-        MyApplication.globalUserInfo.tokenType=jresp.getString("token_type");
-
-
-
+    //    获取当前用户信息
+    private void loginSuccess()  {
+        loadingDraw.show();
         HttpUtil.sendOkHttpRequestGet(USER_INFORMATION, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
+                Message msg1=new Message();
+                msg1.what=DISMISS_DIALOG;
+                msg1.obj=loadingDraw;
+                msgHandler.sendMessage(msg1);
 
                 Message msg2=new Message();
                 msg2.what=MESSAGE_ERROR;
@@ -315,10 +342,19 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
+                Message msg1=new Message();
+                msg1.what=DISMISS_DIALOG;
+                msg1.obj=loadingDraw;
+                msgHandler.sendMessage(msg1);
+
+                JSONObject jresp = null;
+                JSONArray jsonArray=null;
                 try {
-                    JSONObject jresp=new JSONObject(response.body().string());
+                    jresp=new JSONObject(response.body().string());
                     switch (response.code()){
                         case HTTP_USER_GET_INFORMATION:
+                            User user=new User();
+                            MyApplication.globalUserInfo.user=user;
                             MyApplication.globalUserInfo.user.setUserId(jresp.getString("id"));
                             MyApplication.globalUserInfo.user.setUserName(jresp.getString("name"));
                             MyApplication.globalUserInfo.user.setUserEmail(jresp.getString("email"));
@@ -329,11 +365,11 @@ public class LoginActivity extends AppCompatActivity {
                             }else {
                                 MyApplication.globalUserInfo.user.setUserIntroduction(introduction);
                             }
-//                            是否绑定
+                            //                            是否绑定
                             MyApplication.globalUserInfo.user.setBoundPhone(jresp.getBoolean("bound_phone"));
-//                            是否验证邮箱
+                            //                            是否验证邮箱
                             MyApplication.globalUserInfo.user.setEmail_verified(jresp.getBoolean("email_verified"));
-//                            注册
+                            //                            注册
                             MyApplication.globalUserInfo.user.setUserBornDate(jresp.getString("created_at"));
 
                             Log.e("userImg","img:"+    MyApplication.globalUserInfo.user.getUserPassKey());
@@ -345,24 +381,17 @@ public class LoginActivity extends AppCompatActivity {
                                     msgHandler.sendMessage(msg5);
                                 }
                             }.start();
-//登录成功后，返回调用之前的界面
+                            //登录成功后，返回调用之前的界面
                             finish();
                             break;
-//                            令牌失效，重新请求
-//                        case HTTP_USER_ERROR:
-//                            Message msg4=new Message();
-//                            msg4.what=DISMISS_DIALOG;
-//                            msg4.obj=loadingDraw;
-//                            msgHandler.sendMessage(msg4);
-//
-//                            Authenticator authenticator=new Authenticator() {
-//                                @Override
-//                                public Request authenticate(Route route, Response response) throws IOException {
-////    刷新token
-//                                    return response.request().newBuilder().addHeader("Authorization", GlobalUserInfo.userInfo.tokenType+GlobalUserInfo.userInfo.token).build();
-//                                }
-//                            };
-//                            break;
+                        //                            令牌失效，重新请求
+                        case HTTP_USER_ERROR:
+                            Message msg4=new Message();
+                            msg4.what=DISMISS_DIALOG;
+                            msg4.obj=loadingDraw;
+                            msgHandler.sendMessage(msg4);
+
+                            break;
                         default:
                             break;
                     }
@@ -372,5 +401,6 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
     }
+
 
 }
