@@ -129,6 +129,7 @@
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/attention_to_list"
                     android:layout_width="match_parent"
                     android:layout_height="30dp"
                     android:layout_marginTop="5dp"
@@ -197,6 +198,7 @@
                 <View
                     android:layout_width="20dp"
                     android:layout_height="20dp"
+                    android:layout_gravity="center_vertical"
                     android:background="@mipmap/ic_user_topics" />
 
                 <TextView
@@ -265,6 +267,7 @@
                 <View
                     android:layout_width="20dp"
                     android:layout_height="20dp"
+                    android:layout_gravity="center_vertical"
                     android:background="@mipmap/ic_user_reply" />
 
                 <TextView
@@ -334,6 +337,7 @@
                 <View
                     android:layout_width="20dp"
                     android:layout_height="20dp"
+                    android:layout_gravity="center_vertical"
                     android:background="@mipmap/ic_user_collect" />
 
                 <TextView

@@ -62,9 +62,9 @@ public class RecommendActiveAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        RecommendActiveAdapter.listItem listViewItem=null;
+        listItem listViewItem=null;
         if (convertView==null){
-            listViewItem=new RecommendActiveAdapter.listItem();
+            listViewItem=new listItem();
 //            获得组件并实例化
             convertView=layoutInflater.inflate(R.layout.fragment_recommend_active_item,null);
             listViewItem.userAvatar=convertView.findViewById(R.id.recommend_user_avatar);
@@ -72,7 +72,7 @@ public class RecommendActiveAdapter extends BaseAdapter {
             listViewItem.userIntroduction=convertView.findViewById(R.id.recommend_user_introduction);
             convertView.setTag(listViewItem);
         }else {
-            listViewItem= (RecommendActiveAdapter.listItem) convertView.getTag();
+            listViewItem= (listItem) convertView.getTag();
         }
         if (null==data) return convertView;
 //        绑定数据

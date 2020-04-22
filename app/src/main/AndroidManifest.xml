@@ -79,7 +79,11 @@
             android:name=".TopicLikeListActivity"
             android:label="@string/title_activity_topic_like_list"
             android:theme="@style/AppTheme" />
-        <activity android:name=".UserLikeListActivity"></activity>
+        <activity android:name=".UserLikeListActivity" />
+        <activity
+            android:name=".UserAttentionFansActivity"
+            android:label="@string/title_activity_user_attention_fans"
+            android:theme="@style/AppTheme"></activity>
     </application>
 
 </manifest>

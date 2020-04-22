@@ -43,7 +43,6 @@ import static com.example.my.mamer.config.Config.HTTP_USER_GET_INFORMATION;
 import static com.example.my.mamer.config.Config.HTTP_USER_NULL;
 import static com.example.my.mamer.config.Config.MESSAGE_ERROR;
 import static com.example.my.mamer.config.Config.UNLOGIN;
-import static com.example.my.mamer.config.Config.USER_SET_INFORMATION;
 
 public class UserFragment extends Fragment {
     private LoadingDraw loadingDraw;
@@ -58,6 +57,7 @@ public class UserFragment extends Fragment {
 //    关注
     private TextView tvFans;
     private TextView tvAttention;
+    private LinearLayout layoutAttention;
 //    话题
     private ArrayList<TopicContent> contentArrayList=new ArrayList<>();
     private TextView tvTopicsCount;
@@ -103,10 +103,6 @@ public class UserFragment extends Fragment {
                 case MESSAGE_ERROR:
                     Toast.makeText(getContext(),(String)msg.obj,Toast.LENGTH_SHORT).show();
                     break;
-                case USER_SET_INFORMATION:
-                    UserBaseAdapter mAdapter= (UserBaseAdapter) msg.obj;
-                    mAdapter.notifyDataSetChanged();
-                    break;
                 default:
                     break;
             }
@@ -130,7 +126,7 @@ public class UserFragment extends Fragment {
 
         tvFans=view.findViewById(R.id.user_attention_);
         tvAttention=view.findViewById(R.id.user_to_attention_);
-
+        layoutAttention=view.findViewById(R.id.attention_to_list);
         tvTopicsCount=view.findViewById(R.id.user_my_topic_count);
         layoutTopics=view.findViewById(R.id.user_topics_more);
         tvReplysCount=view.findViewById(R.id.user_my_reply_count);
@@ -212,6 +208,19 @@ public class UserFragment extends Fragment {
                     msgHandler.sendMessage(msg1);
                 }else {
                     Intent intent = new Intent(getActivity(), UserHomePageActivity.class);
+                    startActivity(intent);
+                }
+            }
+        });
+        layoutAttention.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (MyApplication.globalUserInfo.token==null){
+                    Message msg1=new Message();
+                    msg1.what=UNLOGIN;
+                    msgHandler.sendMessage(msg1);
+                }else {
+                    Intent intent = new Intent(getActivity(), UserAttentionFansActivity.class);
                     startActivity(intent);
                 }
             }

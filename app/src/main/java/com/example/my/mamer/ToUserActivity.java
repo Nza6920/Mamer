@@ -1,10 +1,12 @@
 package com.example.my.mamer;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -34,6 +36,7 @@ import okhttp3.FormBody;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import static com.example.my.mamer.MyApplication.getContext;
 import static com.example.my.mamer.config.Config.HTTP_DEL_REPLY_OK;
 import static com.example.my.mamer.config.Config.HTTP_MORE_REQUEST;
 import static com.example.my.mamer.config.Config.HTTP_NOT_FOUND;
@@ -57,6 +60,7 @@ public class ToUserActivity extends AppCompatActivity {
     private String userId;
     private LinearLayout layoutAttention;
     private boolean attentionFlag=false;
+    private SharedPreferences.Editor editor;
 
 
 
@@ -91,12 +95,18 @@ public class ToUserActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_to_user);
         init();
+
         mAdapter=new ToUserTopicAdapter(getApplication());
         listView.setAdapter(mAdapter);
+
         intent=getIntent();
         userId=intent.getStringExtra("userId");
         onDataLoad(1);
         getAttention(userId);
+
+        editor=PreferenceManager.getDefaultSharedPreferences(getContext()).edit();
+        editor.putBoolean("changeAttentionStatus",false);
+        editor.apply();
 
     }
 
@@ -148,8 +158,6 @@ public class ToUserActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     Log.e("attention:layout",attentionFlag+"");
-
-
                     if (attentionFlag){
                         Log.e("attention:layout",attentionFlag+"已关注");
                         delAttention();
@@ -191,7 +199,7 @@ public class ToUserActivity extends AppCompatActivity {
                                 if (jsonArray==null){
                                     Message msg2 = new Message();
                                     msg2.what = MESSAGE_ERROR;
-                                    msg2.obj="您还没有发表过文章呢";
+                                    msg2.obj="Ta还没有发表过文章呢";
                                     msgHandler.sendMessage(msg2);
                                 }else {
                                     int jsonSize=jsonArray.length();
@@ -207,9 +215,7 @@ public class ToUserActivity extends AppCompatActivity {
                                         msg3.what = USER_SET_INFORMATION;
                                         msgHandler.sendMessage(msg3);
                                     }
-
-
-                                    //       notifyDataSetChanged方法通过一个外部的方法控制如果适配器的内容改变时需要强制调用getView来刷新每个Item的内容
+//       notifyDataSetChanged方法通过一个外部的方法控制如果适配器的内容改变时需要强制调用getView来刷新每个Item的内容
                                 }
                             }
                             break;
@@ -305,6 +311,9 @@ public class ToUserActivity extends AppCompatActivity {
                         msg3.obj = attentionFlag;
                         msgHandler.sendMessage(msg3);
 
+                        editor.putBoolean("changeAttentionStatus",true);
+                        editor.apply();
+
                         Message msg1 = new Message();
                         msg1.what = MESSAGE_ERROR;
                         msg1.obj = "关注成功";
@@ -343,6 +352,10 @@ public class ToUserActivity extends AppCompatActivity {
                 switch (response.code()) {
                         case HTTP_DEL_REPLY_OK:
                             attentionFlag = false;
+
+                            editor.putBoolean("changeAttentionStatus",true);
+                            editor.apply();
+
                             Log.e("attention:", attentionFlag + "");
                             Message msg3 = new Message();
                             msg3.what = SET_TEXTVIEW;

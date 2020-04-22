@@ -11,7 +11,7 @@ tools:context=".TopicLikeListActivity">
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/title_bar"
-        android:paddingLeft="15dp"
+        android:paddingLeft="16dp"
         android:background="#afefeded"/>
     <FrameLayout
         android:layout_width="match_parent"
@@ -21,6 +21,6 @@ tools:context=".TopicLikeListActivity">
             android:id="@+id/topic_like_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"/>
+            android:layout_marginLeft="16dp"/>
     </FrameLayout>
 </RelativeLayout>

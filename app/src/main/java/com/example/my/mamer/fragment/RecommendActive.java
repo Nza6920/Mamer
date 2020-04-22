@@ -111,7 +111,7 @@ public class RecommendActive extends BaseLazyLoadFragment  {
                                         recommendResource.setRecommendUserAvatar(jsonObject.getString("avatar"));
                                         String m=jsonObject.getString("introduction");
                                         if (m.equals("null")){
-                                            recommendResource.setRecommendUserIntroduction("");
+                                            recommendResource.setRecommendUserIntroduction("Ta什么也没留下");
                                         }else {
                                             recommendResource.setRecommendUserIntroduction(jsonObject.getString("introduction"));
                                         }

@@ -200,16 +200,14 @@ public class TopicParticularsActivity extends AppCompatActivity {
                     }
                 }
             });
-        }else {
-            tvBtnNext.setOnClickListener(new View.OnClickListener() {
+        }
+        tvBtnNext.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     getmm("reader");
                 }
             });
-            //        点赞
 
-        }
 //        返回调用界面
         tvBack.setOnClickListener(new View.OnClickListener() {
             @Override

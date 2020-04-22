@@ -110,11 +110,9 @@ public class PopupStyle {
 
         linearLayout.setId(IdUtils.generateViewId());
 
-
         Drawable tvClosePic2=ContextCompat.getDrawable(context,R.mipmap.ic_popup_topic_manage_dislike);
         tvPic.setBackground(tvClosePic2);
         tvText.setText("点赞列表");
-
 
         linearLayout.addView(tvPic);
         linearLayout.addView(tvText);
@@ -134,6 +132,21 @@ public class PopupStyle {
             linearLayout.addView(tvPic);
             linearLayout.addView(tvText);
             return linearLayout;
+    }
+//    退出登录
+    public LinearLayout getLoginOut(Context context){
+        init(context);
+        initUI(context);
+
+        linearLayout.setId(IdUtils.generateViewId());
+
+        Drawable tvClosePic=ContextCompat.getDrawable(context,R.mipmap.ic_popup_topic_manage_out);
+        tvPic.setBackground(tvClosePic);
+        tvText.setText("退出登录");
+
+        linearLayout.addView(tvPic);
+        linearLayout.addView(tvText);
+        return linearLayout;
     }
 
     private int withPx(int withdip){

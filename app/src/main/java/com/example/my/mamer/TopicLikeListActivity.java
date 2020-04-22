@@ -186,7 +186,7 @@ public class TopicLikeListActivity extends AppCompatActivity {
                                 }
                                     Message msg1=new Message();
                                     msg1.what=SET_TEXTVIEW;
-                                    msg.obj=jsonArray.length();
+                                    msg1.obj=jsonArray.length();
                                     msgHandler.sendMessage(msg1);
 
                             }

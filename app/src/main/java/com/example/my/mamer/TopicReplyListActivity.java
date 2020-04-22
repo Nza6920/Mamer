@@ -122,6 +122,7 @@ public class TopicReplyListActivity extends AppCompatActivity {
         editor.apply();
 
     }
+
     public ArrayList<ReplyUser> getListData() {
         return listData;
     }
@@ -325,6 +326,7 @@ public class TopicReplyListActivity extends AppCompatActivity {
         });
 
     }
+
 //    每个itemView的点击事件，点击可以跳到当前回复对象的个人首页
     private void initEvent(){
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

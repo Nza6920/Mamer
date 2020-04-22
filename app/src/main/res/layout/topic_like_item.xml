@@ -4,15 +4,16 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="8dp"
     android:id="@+id/like_list_layout"
     android:background="@drawable/divid_line"
-    android:layout_margin="8dp">
+    android:layout_marginTop="16dp"
+    android:paddingTop="8dp"
+    android:paddingRight="8dp">
 
     <ImageView
         android:id="@+id/like_list_avatar"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         android:layout_marginRight="8dp"/>
 
     <TextView

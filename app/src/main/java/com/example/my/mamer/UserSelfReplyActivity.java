@@ -106,7 +106,6 @@ public class UserSelfReplyActivity extends AppCompatActivity {
             }
         });
         tvTitle.setText("我的回复");
-        tvTitle.setTextSize(18);
     }
 
 //    回复列表数据
