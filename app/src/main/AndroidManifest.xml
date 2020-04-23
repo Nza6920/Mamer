@@ -38,10 +38,6 @@
         </provider>
 
         <activity android:name=".BottomNavigationBarActivity"/>
-        <activity
-            android:name=".TopicsNewTopicActivity"
-            android:launchMode="singleTask"
-            android:screenOrientation="portrait" />
         <activity android:name=".UserSelfTopicListActivity" />
         <activity
             android:name=".TopicParticularsActivity"

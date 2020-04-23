@@ -210,15 +210,9 @@ public class LoginVerifyActivity extends AppCompatActivity {
 
     //    获取当前用户信息
     private void loginSuccess()  {
-        loadingDraw.show();
         HttpUtil.sendOkHttpRequestGet(USER_INFORMATION, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                Message msg1=new Message();
-                msg1.what=DISMISS_DIALOG;
-                msg1.obj=loadingDraw;
-                msgHandler.sendMessage(msg1);
-
                 Message msg2=new Message();
                 msg2.what=MESSAGE_ERROR;
                 msg2.obj="服务器异常,请检查网络";
@@ -227,10 +221,6 @@ public class LoginVerifyActivity extends AppCompatActivity {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                Message msg1=new Message();
-                msg1.what=DISMISS_DIALOG;
-                msg1.obj=loadingDraw;
-                msgHandler.sendMessage(msg1);
 
                 JSONObject jresp = null;
                 JSONArray jsonArray=null;
@@ -274,11 +264,6 @@ public class LoginVerifyActivity extends AppCompatActivity {
                             break;
                         //                            令牌失效，重新请求
                         case HTTP_USER_ERROR:
-                            Message msg4=new Message();
-                            msg4.what=DISMISS_DIALOG;
-                            msg4.obj=loadingDraw;
-                            msgHandler.sendMessage(msg4);
-
                             break;
                         default:
                             break;
