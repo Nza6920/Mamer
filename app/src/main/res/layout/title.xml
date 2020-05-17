@@ -3,8 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/title_bar"
     android:layout_width="match_parent"
-    android:layout_height="?attr/actionBarSize"
-    android:layout_marginTop="8dp">
+    android:layout_height="wrap_content">
 
     <TextView
         android:id="@+id/title_tv_close"
@@ -19,19 +18,19 @@
         android:id="@+id/title_tv_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="18sp"
+        android:textSize="13sp"
         android:layout_centerInParent="true"
         android:layout_centerVertical="true"/>
 
     <Button
         android:id="@+id/title_btn_next"
         android:layout_width="?attr/actionBarSize"
-        android:layout_height="wrap_content"
+        android:layout_height="32dp"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:layout_marginRight="10dp"
         android:background="#00000000"
         android:textAllCaps="true"
-        android:textSize="16sp" />
+        android:textSize="13sp" />
 
 </RelativeLayout>

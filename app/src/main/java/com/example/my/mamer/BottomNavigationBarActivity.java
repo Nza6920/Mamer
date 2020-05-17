@@ -10,9 +10,11 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,12 +25,15 @@ import com.ashokvarma.bottomnavigation.TextBadgeItem;
 import com.example.my.mamer.bean.TopicDIvid;
 import com.example.my.mamer.config.GlobalTopicReply;
 import com.example.my.mamer.util.HttpUtil;
+import com.example.my.mamer.util.PopupItemStyle.PopupStyle;
+import com.example.my.mamer.util.TopicManagePopup;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -66,11 +71,11 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
     private RelativeLayout recommendlayout;
 //    消息,未读消息数
     private RelativeLayout notificationlayout;
+    private Button btnNotification;
     private String notificationNum;
 //    我的user bar,用户名，跳转个人资料
     private RelativeLayout userlayout;
-    private TextView tvUserName;
-    private Button btnUserHomePage;
+    private TextView btnUserHomePage;
 
     private Handler msgHandler=new Handler(new Handler.Callback() {
         @Override
@@ -99,8 +104,8 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
         btnTopicNewTopic=findViewById(R.id.topic_top_bar_new);
         recommendlayout=findViewById(R.id.recommend_top_bar);
         notificationlayout=findViewById(R.id.notification_top_bar);
+        btnNotification=findViewById(R.id.notification_top_bar_right);
         userlayout=findViewById(R.id.user_top_bar);
-        tvUserName=findViewById(R.id.user_top_bar_name);
         btnUserHomePage=findViewById(R.id.user_top_bar_right);
 //        userMenuRightFragment= (UserMenuRightFragment) mFragmentManager.findFragmentById(R.id.user_menu_right);
 
@@ -171,14 +176,19 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
                 }
             }
         });
+//        消息设置
+        btnNotification.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
 //        我的(右上角)-->个人信息界面
         btnUserHomePage.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                if (MyApplication.globalUserInfo.token!=null){
-                    Intent intent=new Intent(BottomNavigationBarActivity.this,UserHomePageActivity.class);
-                    startActivity(intent);
-                    finish();
+            public void onClick(View v) {
+                if (MyApplication.globalUserInfo.token !=null){
+                   getmm();
                 }else {
                     Message msg1 = new Message();
                     msg1.what = MESSAGE_ERROR;
@@ -187,6 +197,7 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
                 }
             }
         });
+
     }
 //    设置默认开启的fragment
     private void setDefaultFragment(){
@@ -500,4 +511,44 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
             }
         });
     }
+
+    //    popupwindow
+    private void getmm(){
+        //    popupwindow
+        PopupStyle popupStyle=new PopupStyle();
+        ArrayList<LinearLayout> views=new ArrayList<>();
+        final SparseArray<LinearLayout> viewSparseArray=new SparseArray<>();
+        //退出登录
+        LinearLayout viewOut=popupStyle.getLoginOut(this);
+        final  int idOut=viewOut.getId();
+
+
+        views.add(viewOut);
+
+        viewSparseArray.put(idOut,viewOut);
+
+
+
+        final TopicManagePopup popup=new TopicManagePopup(BottomNavigationBarActivity.this,viewSparseArray,views, new TopicManagePopup.ClickListener() {
+            @Override
+            public void setUplistener(final TopicManagePopup.TopicManagePopupUtil popupUtil) {
+
+                popupUtil.getView(idOut).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getContext()).edit();
+                        editor.putString("username", "");
+                        editor.putString("password", "");
+                        editor.putBoolean("loginFlag", false);
+                        editor.putString("key", "");
+                        editor.putString("type", "");
+                        editor.apply();
+                        MyApplication.globalUserInfo.token=null;
+                        finish();
+                    }
+                });
+
+            }
+        });
+}
 }

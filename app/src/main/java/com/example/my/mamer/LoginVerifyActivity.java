@@ -11,6 +11,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.example.my.mamer.bean.User;
+import com.example.my.mamer.util.BaseUtils;
 import com.example.my.mamer.util.HttpUtil;
 import com.example.my.mamer.util.LoadingDraw;
 
@@ -35,7 +36,6 @@ import static com.example.my.mamer.config.Config.HTTP_USER_NULL;
 import static com.example.my.mamer.config.Config.JSON;
 import static com.example.my.mamer.config.Config.LOGIN;
 import static com.example.my.mamer.config.Config.MESSAGE_ERROR;
-import static com.example.my.mamer.config.Config.REFRESH_TOKEN;
 import static com.example.my.mamer.config.Config.USER_INFORMATION;
 import static com.example.my.mamer.config.Config.USER_SET_INFORMATION;
 
@@ -91,10 +91,14 @@ public class LoginVerifyActivity extends AppCompatActivity {
         if (loginFlag){
             postInformation(prefsName,prefsPas);
         }else {
+//             MyApplication.globalUserInfo.token="";
+
             Intent intent=new Intent(LoginVerifyActivity.this,BottomNavigationBarActivity.class);
             startActivity(intent);
             finish();
         }
+        //        界面停留1.5秒
+        msgHandler.sendEmptyMessageDelayed(0,1500);
     }
     //    post
     private void postInformation(String name,String password)  {
@@ -155,23 +159,26 @@ public class LoginVerifyActivity extends AppCompatActivity {
                             editor.putBoolean("loginFlag",false);
                             editor.apply();
 
-                            Intent i=new Intent(LoginVerifyActivity.this,LoginActivity.class);
-                            startActivity(i);
+                            Intent i_ftt=new Intent(LoginVerifyActivity.this,LoginActivity.class);
+                            startActivity(i_ftt);
                             finish();
                             break;
 //                            401
                         case HTTP_USER_ERROR:
-                            refreshKey();
-                            break;
-//                            500
-                        case HTTP_OVERTIME:
-                            Message msg7=new Message();
-                            msg7.what=response.code();
-                            msg7.obj="请求次数过多,请稍后再试";
-                            msgHandler.sendMessage(msg7);
+                            editor=PreferenceManager.getDefaultSharedPreferences(getContext()).edit();
+                            editor.putBoolean("loginFlag",false);
+                            editor.apply();
 
-//                            postInformation(prefsName,prefsPas);
+                            Intent i_fzo=new Intent(LoginVerifyActivity.this,LoginActivity.class);
+                            startActivity(i_fzo);
+                            finish();
                             break;
+//                            429
+                        case HTTP_OVERTIME:
+
+
+                            break;
+
                         default:
                             break;
                     }
@@ -182,31 +189,6 @@ public class LoginVerifyActivity extends AppCompatActivity {
         });
     }
 
-    //    刷新
-    public  void  refreshKey(){
-        HttpUtil.sendOkHttpRefreshToken(REFRESH_TOKEN, new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                Message msg1 = new Message();
-                msg1.what = MESSAGE_ERROR;
-                msg1.obj = "登录已失效，请重新登录";
-                msgHandler.sendMessage(msg1);
-            }
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                try {
-                    JSONObject jrep= new JSONObject(response.body().string());
-                    String key=jrep.getString("access_token");
-                    String type=jrep.getString("token_type");
-                    MyApplication.globalUserInfo.token=key;
-                    MyApplication.globalUserInfo.tokenType=type;
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-    }
 
     //    获取当前用户信息
     private void loginSuccess()  {
@@ -234,6 +216,7 @@ public class LoginVerifyActivity extends AppCompatActivity {
                             MyApplication.globalUserInfo.user.setUserName(jresp.getString("name"));
                             MyApplication.globalUserInfo.user.setUserEmail(jresp.getString("email"));
                             MyApplication.globalUserInfo.user.setUserImg(jresp.getString("avatar"));
+                            MyApplication.globalUserInfo.user.setAvatarType(BaseUtils.reverseString(jresp.getString("avatar")));
                             String introduction=jresp.getString("introduction");
                             if (introduction.equals("null")){
                                 MyApplication.globalUserInfo.user.setUserIntroduction("");

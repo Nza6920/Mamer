@@ -1,6 +1,8 @@
 package com.example.my.mamer.adapter;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,7 +12,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.load.resource.gif.GifDrawable;
+import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.Target;
 import com.chinalwb.are.android.inner.Html;
 import com.example.my.mamer.R;
 import com.example.my.mamer.bean.NotificationUser;
@@ -75,15 +82,36 @@ public class NotificationAdapter extends BaseAdapter {
         }
         Log.e("Tag","设置数据显示");
         if (null==notificationData)return view;
+
         RequestOptions options=new RequestOptions()
                 .error(R.mipmap.ic_image_error)
                 .placeholder(R.mipmap.ic_image_error);
+        if (notificationData.get(i).getUserImg().equals("fig")){
+            Glide.with(getContext())
+                    .load(notificationData.get(i).getUserImg())
+                    .apply(options)
+                    .listener(new RequestListener<Drawable>() {
+                        @Override
+                        public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
 
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                            if (resource instanceof GifDrawable){
+                                ((GifDrawable) resource).setLoopCount(5);
+                            }
+                            return false;
+                        }
+                    }).into(listViewItem.userImg);
+        }else {
             Glide.with(getContext())
                     .asBitmap()
                     .load(notificationData.get(i).getUserImg())
                     .apply(options)
                     .into(listViewItem.userImg);
+        }
 
         listViewItem.tvUserName.setText(notificationData.get(i).getUserName());
         listViewItem.tvTopic.setText(notificationData.get(i).getTopicName());

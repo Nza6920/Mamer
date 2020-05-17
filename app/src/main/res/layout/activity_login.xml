@@ -25,7 +25,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="mamer遇见未知"
-            android:textSize="16sp"
+            android:textSize="8sp"
             android:textColor="#717171"
             android:gravity="center"/>
 
@@ -96,13 +96,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="免密码登录"
-                android:textSize="16sp"
+                android:textSize="13sp"
                 android:layout_alignParentLeft="true"/>
             <TextView
                 android:id="@+id/login_help"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="16sp"
+                android:textSize="13sp"
                 android:text="帮助"
                 android:layout_alignParentRight="true"/>
         </RelativeLayout>

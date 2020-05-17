@@ -8,6 +8,7 @@ public class RecommendResource {
     private String recommendUserName;
     private String recommendUserAvatar;
     private String recommendUserIntroduction;
+    private String recommendUserAvatarType;
 
 
     public  RecommendResource(){}
@@ -71,5 +72,13 @@ public class RecommendResource {
 
     public void setRecommendUserId(String recommendUserId) {
         this.recommendUserId = recommendUserId;
+    }
+
+    public String getRecommendUserAvatarType() {
+        return recommendUserAvatarType;
+    }
+
+    public void setRecommendUserAvatarType(String recommendUserAvatarType) {
+        this.recommendUserAvatarType = recommendUserAvatarType;
     }
 }

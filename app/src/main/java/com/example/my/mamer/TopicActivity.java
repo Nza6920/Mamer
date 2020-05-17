@@ -43,11 +43,9 @@ import com.chinalwb.are.styles.toolitems.ARE_ToolItem_ListNumber;
 import com.chinalwb.are.styles.toolitems.ARE_ToolItem_Quote;
 import com.chinalwb.are.styles.toolitems.ARE_ToolItem_Underline;
 import com.chinalwb.are.styles.toolitems.IARE_ToolItem;
-import com.example.my.mamer.bean.TopicDIvid;
 import com.example.my.mamer.util.HttpUtil;
 import com.example.my.mamer.util.LoadingDraw;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -104,8 +102,7 @@ public class TopicActivity extends AppCompatActivity implements View.OnClickList
 //    富文本
     private AREditText mEditText;
     private String editText;
-//    键盘的收起与弹出
-    private TextView tvKeyboardDown;
+
 
     private SharedPreferences prefs;
     private String editTopicId;
@@ -173,7 +170,6 @@ public class TopicActivity extends AppCompatActivity implements View.OnClickList
         tvFlag=findViewById(R.id.topic_flag_t);
         tvFlagClose=findViewById(R.id.topic_flag_t_close);
         layoutBottom=findViewById(R.id.topic_bottombar);
-        tvKeyboardDown=findViewById(R.id.topic_keybaord_down);
 
         Drawable tvClosePic=ContextCompat.getDrawable(this,R.mipmap.ic_title_close);
         tvClose.setBackground(tvClosePic);
@@ -204,7 +200,7 @@ public class TopicActivity extends AppCompatActivity implements View.OnClickList
         layoutFlag.setOnClickListener(this);
         layoutFlagT.setOnClickListener(this);
         tvFlagClose.setOnClickListener(this);
-        tvKeyboardDown.setOnClickListener(this);
+
 
     }
 
@@ -286,7 +282,7 @@ public class TopicActivity extends AppCompatActivity implements View.OnClickList
                         }else {
                             Message msg1 = new Message();
                             msg1.what = MESSAGE_ERROR;
-                            msg1.obj = "内容应大于3个字";
+                            msg1.obj = "内容不少于3个字";
                             msgHandler.sendMessage(msg1);
                         }
                     } catch (JSONException e) {
@@ -296,27 +292,33 @@ public class TopicActivity extends AppCompatActivity implements View.OnClickList
                 break;
             case R.id.topic_flag_:
 //                話題選擇標簽列表爲空，請求數據
+                Log.i("話題選擇標簽列表爲空，請求數據",arrayList.size()+"");
                 if (arrayList.size()==0){
-                    loadingDraw.show();
                     getTopicDivid();
+                    Message msg = new Message();
+                    msg.what = SHOW_DIALOG;
+                    msg.obj = arrayList;
+                    msgHandler.sendMessage(msg);
                 }
+                break;
 //                选择标签弹出dialog,选择后显示#xxxx#
-                break;
-            case R.id.layout_topic_flag:
+            case R.id.topic_flag_t:
+                Log.i("点击标签，請求數據",arrayList.size()+"");
                 if (arrayList.size()==0){
-                    loadingDraw.show();
                     getTopicDivid();
+                    Message msg = new Message();
+                    msg.what = SHOW_DIALOG;
+                    msg.obj = arrayList;
+                    msgHandler.sendMessage(msg);
                 }
                 break;
+            //                删除标签
             case R.id.topic_flag_t_close:
+                Log.i("删除标签，請求數據",arrayList.size()+"");
                 Message msg1 = new Message();
                 msg1.what = SHOW_DIALOG;
                 msg1.obj = arrayList;
                 msgHandler.sendMessage(msg1);
-                break;
-//                隐藏键盘
-            case R.id.topic_keybaord_down:
-
                 break;
                 default:
                     break;
@@ -372,12 +374,16 @@ public class TopicActivity extends AppCompatActivity implements View.OnClickList
             Log.e("listItem",listItem.size()+"---------");
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("请选择标签");
-            builder.setSingleChoiceItems((String[])list.toArray(new String[list.size()]), 0,
+            builder.setSingleChoiceItems((String[])list.toArray(new String[list.size()]), -1,
                     new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             Log.e("tag:", String.valueOf(list.get(which)));
-                            flagStr=list.get(which);
+                            if (which == 0){
+                                flagStr=list.get(0);
+                            }else {
+                                flagStr=list.get(which);
+                            }
                         }
                     });
             builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
@@ -514,65 +520,17 @@ public class TopicActivity extends AppCompatActivity implements View.OnClickList
     }
     //    获取话题分类
     private void getTopicDivid(){
-        HttpUtil.sendOkHttpGetTopicDivid(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                Message msg9 = new Message();
-                msg9.what = DISMISS_DIALOG;
-                msg9.obj = loadingDraw;
-                msgHandler.sendMessage(msg9);
+        Log.i("进入获取话题分类","==============");
+        arrayList.add("分享");
+        arrayList.add("教程");
+        arrayList.add("问答");
+        arrayList.add("公告");
+        map.put("分享","1");
+        map.put("教程","2");
+        map.put("问答","3");
+        map.put("公告","4");
+        Log.i("结束获取话题分类","==============");
 
-                Message msg1 = new Message();
-                msg1.what = MESSAGE_ERROR;
-                msg1.obj = "服务器异常,请检查网络";
-                msgHandler.sendMessage(msg1);
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                Message msg9 = new Message();
-                msg9.what = DISMISS_DIALOG;
-                msg9.obj = loadingDraw;
-                msgHandler.sendMessage(msg9);
-
-                JSONObject jresp=null;
-                JSONArray jsonArray=null;
-                try {
-                    jresp=new JSONObject(response.body().string());
-                    switch (response.code()){
-                        case HTTP_USER_GET_INFORMATION:
-                            if (jresp.has("data")){
-                                jsonArray=jresp.getJSONArray("data");
-                                int jsonSize=jsonArray.length();
-                                for (int i = 0; i < jsonSize; i++) {
-                                    JSONObject jsonObject = jsonArray.getJSONObject(i);
-                                    TopicDIvid topicDIvid=new TopicDIvid();
-                                    topicDIvid.setCategoryId(jsonObject.getString("id"));
-                                    topicDIvid.setCategoryName(jsonObject.getString("name"));
-                                    topicDIvid.setCategoryDesc(jsonObject.getString("description"));
-                                    arrayList.add(topicDIvid.getCategoryName());
-                                    map.put(topicDIvid.getCategoryName(),topicDIvid.getCategoryId());
-                                }
-
-
-                                Message msg1 = new Message();
-                                msg1.what = SHOW_DIALOG;
-                                msg1.obj = arrayList;
-                                msgHandler.sendMessage(msg1);
-                                //                修改标签
-
-
-                            }
-                            break;
-                        default:
-                            break;
-                    }
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
     }
 
     //提交文本

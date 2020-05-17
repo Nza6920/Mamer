@@ -4,14 +4,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="10dp">
+    android:paddingLeft="10dp"
+    android:paddingTop="5dp">
 
         <TextView
             android:id="@+id/to_user_topics_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="标题"
-            android:textSize="18sp"
+            android:textSize="15sp"
             android:lines="1"
             android:ellipsize="end"
             android:textColor="#000000"/>
@@ -23,6 +24,6 @@
             android:textColor="#2D2D2D"
             android:lines="2"
             android:ellipsize="end"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="5dp"
             />
 </LinearLayout>

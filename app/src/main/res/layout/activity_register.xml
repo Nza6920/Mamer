@@ -29,8 +29,8 @@
             android:layout_marginTop="8dp">
 
             <EditText
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:layout_gravity="center_vertical"
                 android:background="@mipmap/ic_register_username"
                 android:enabled="false" />
@@ -60,8 +60,8 @@
             android:layout_height="48dp">
 
             <EditText
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:layout_gravity="center_vertical"
                 android:background="@mipmap/ic_register_password"
                 android:clickable="false"
@@ -89,8 +89,8 @@
             android:layout_height="48dp">
 
             <EditText
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:layout_gravity="center_vertical"
                 android:background="@mipmap/ic_register_password_again"
                 android:clickable="false"
@@ -121,8 +121,8 @@
             android:layout_height="48dp">
 
             <EditText
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:layout_gravity="center_vertical"
                 android:background="@mipmap/ic_register_emil"
                 android:clickable="false"
@@ -152,8 +152,8 @@
             android:layout_height="48dp">
 
             <EditText
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:layout_gravity="center_vertical"
                 android:background="@mipmap/ic_register_verification"
                 android:clickable="false"

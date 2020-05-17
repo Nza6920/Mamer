@@ -66,4 +66,12 @@ public class BaseUtils {
             inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(),InputMethodManager.HIDE_IMPLICIT_ONLY);
         }
     }
+//    字符串反转，输出前三位
+    public static String reverseString(String s){
+        StringBuffer stringBuffer=new StringBuffer(s);
+        String stringT=stringBuffer.reverse().toString().substring(0,3);
+        return stringT;
+
+
+    }
 }

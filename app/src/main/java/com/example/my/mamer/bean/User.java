@@ -37,6 +37,8 @@ public  HashMap<Integer,String> imagePaths=new HashMap<>();
 //     暂存上传后返回的图片path
     public  ArrayList<String> imageContentPaths=new ArrayList<>();
 
+//    头像类型
+    public String avatarType;
     public User() {
     }
 
@@ -165,6 +167,14 @@ public  HashMap<Integer,String> imagePaths=new HashMap<>();
 
     public void setImageContentPaths(ArrayList<String> imageContentPaths) {
         this.imageContentPaths = imageContentPaths;
+    }
+
+    public String getAvatarType() {
+        return avatarType;
+    }
+
+    public void setAvatarType(String avatarType) {
+        this.avatarType = avatarType;
     }
 
     @Override

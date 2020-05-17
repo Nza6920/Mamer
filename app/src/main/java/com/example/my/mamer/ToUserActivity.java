@@ -137,7 +137,7 @@ public class ToUserActivity extends AppCompatActivity {
                 tvTitle.setText(intent.getStringExtra("userName"));
                 tvUserName.setText(intent.getStringExtra("userName"));
                 String infoStr=intent.getStringExtra("userIntro");
-                if (infoStr.equals("")){
+                if (infoStr==null){
                     tvIntroduction.setText("Ta什么也没留下");
                 }else {
                     tvIntroduction.setText(intent.getStringExtra("userIntro"));
@@ -150,10 +150,16 @@ public class ToUserActivity extends AppCompatActivity {
             }
         }.start();
 
+        tvClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
         if (MyApplication.globalUserInfo.token==null){
-            layoutAttention.setVisibility(View.GONE);
             Log.e("attention:layout",attentionFlag+"未登录");
         }else {
+            layoutAttention.setVisibility(View.VISIBLE);
             layoutAttention.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

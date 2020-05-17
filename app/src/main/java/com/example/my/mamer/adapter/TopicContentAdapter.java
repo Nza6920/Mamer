@@ -95,15 +95,7 @@ public class TopicContentAdapter extends BaseAdapter {
         listViewItem.topicDiscussCount.setText((data.get(position)).getReplyCount());
         return convertView;
     }
-    //    更新数据，并且清除之前的数据
-//    public void updateData(ArrayList<TopicContent> list){
-//        Log.e("更新数据:","-----------------------");
-//        if (null==list)
-//            return;
-//        this.data=list;
-//        notifyDataSetChanged();
-//        Log.e("更新视图:","-----------------------");
-//    }
+
     public void clearData(){
         this.data.clear();
     }

@@ -15,6 +15,7 @@ import com.example.my.mamer.R;
 import com.example.my.mamer.ToUserActivity;
 import com.example.my.mamer.adapter.RecommendActiveAdapter;
 import com.example.my.mamer.bean.RecommendResource;
+import com.example.my.mamer.util.BaseUtils;
 import com.example.my.mamer.util.HttpUtil;
 import com.example.my.mamer.util.LoadingDraw;
 
@@ -109,6 +110,7 @@ public class RecommendActive extends BaseLazyLoadFragment  {
                                         recommendResource.setRecommendUserId(jsonObject.getString("id"));
                                         recommendResource.setRecommendUserName(jsonObject.getString("name"));
                                         recommendResource.setRecommendUserAvatar(jsonObject.getString("avatar"));
+                                        recommendResource.setRecommendUserAvatarType(BaseUtils.reverseString(jsonObject.getString("avatar")));
                                         String m=jsonObject.getString("introduction");
                                         if (m.equals("null")){
                                             recommendResource.setRecommendUserIntroduction("Ta什么也没留下");

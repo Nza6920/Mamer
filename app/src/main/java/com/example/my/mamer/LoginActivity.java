@@ -23,9 +23,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.my.mamer.bean.User;
+import com.example.my.mamer.util.BaseUtils;
 import com.example.my.mamer.util.HttpUtil;
 import com.example.my.mamer.util.LoadingDraw;
 import com.example.my.mamer.util.NCopyPaste;
+import com.example.my.mamer.util.StringToDate;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -359,6 +361,7 @@ public class LoginActivity extends AppCompatActivity {
                             MyApplication.globalUserInfo.user.setUserName(jresp.getString("name"));
                             MyApplication.globalUserInfo.user.setUserEmail(jresp.getString("email"));
                             MyApplication.globalUserInfo.user.setUserImg(jresp.getString("avatar"));
+                            MyApplication.globalUserInfo.user.setAvatarType(BaseUtils.reverseString(jresp.getString("avatar")));
                             String introduction=jresp.getString("introduction");
                             if (introduction.equals("null")){
                                 MyApplication.globalUserInfo.user.setUserIntroduction("");
@@ -370,7 +373,7 @@ public class LoginActivity extends AppCompatActivity {
                             //                            是否验证邮箱
                             MyApplication.globalUserInfo.user.setEmail_verified(jresp.getBoolean("email_verified"));
                             //                            注册
-                            MyApplication.globalUserInfo.user.setUserBornDate(jresp.getString("created_at"));
+                            MyApplication.globalUserInfo.user.setUserBornDate(StringToDate.stringToShort(jresp.getString("created_at")));
 
                             Log.e("userImg","img:"+    MyApplication.globalUserInfo.user.getUserPassKey());
 

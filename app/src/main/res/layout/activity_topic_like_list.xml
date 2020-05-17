@@ -12,6 +12,7 @@ tools:context=".TopicLikeListActivity">
         android:layout_height="wrap_content"
         android:layout_below="@+id/title_bar"
         android:paddingLeft="16dp"
+        android:textSize="13sp"
         android:background="#afefeded"/>
     <FrameLayout
         android:layout_width="match_parent"

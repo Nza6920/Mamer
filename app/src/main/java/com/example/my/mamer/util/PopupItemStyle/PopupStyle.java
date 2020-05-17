@@ -149,6 +149,22 @@ public class PopupStyle {
         return linearLayout;
     }
 
+    //    退出登录
+    public LinearLayout getUserOut(Context context){
+        init(context);
+        initUI(context);
+
+        linearLayout.setId(IdUtils.generateViewId());
+
+        Drawable tvClosePic=ContextCompat.getDrawable(context,R.mipmap.ic_popup_topic_manage_author);
+        tvPic.setBackground(tvClosePic);
+        tvText.setText("切换用户");
+
+        linearLayout.addView(tvPic);
+        linearLayout.addView(tvText);
+        return linearLayout;
+    }
+
     private int withPx(int withdip){
         return baseUtils.dip2px(withdip);
     }

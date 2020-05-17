@@ -140,6 +140,7 @@ public class TopicParticularsActivity extends AppCompatActivity {
         MyApplication.globalTopicReply.reply.replyUser.setUserId(intentStr.getStringExtra("userId"));
         MyApplication.globalTopicReply.reply.tagId=intentStr.getStringExtra("tagId");
 
+//        监听评论列表是否发生变化（在该页面置标识为false）
         editor=PreferenceManager.getDefaultSharedPreferences(getContext()).edit();
         editor.putBoolean("topicReplyListToTopicParticulars",false);
         editor.apply();
@@ -189,6 +190,13 @@ public class TopicParticularsActivity extends AppCompatActivity {
                         getmm("author");
                     }
                 });
+            }else {
+                tvBtnNext.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        getmm("reader");
+                    }
+                });
             }
             layoutLike.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -201,12 +209,7 @@ public class TopicParticularsActivity extends AppCompatActivity {
                 }
             });
         }
-        tvBtnNext.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    getmm("reader");
-                }
-            });
+
 
 //        返回调用界面
         tvBack.setOnClickListener(new View.OnClickListener() {
@@ -255,6 +258,7 @@ public class TopicParticularsActivity extends AppCompatActivity {
     }
 //    获得话题详情
     private void getTopicParticulas(){
+        Log.e("获取话题详情：","+++++++++++++");
         listData.clear();
         String essayId=MyApplication.globalTopicReply.reply.replyUser.getEssayId();
         loadingDraw.show();
@@ -273,6 +277,7 @@ public class TopicParticularsActivity extends AppCompatActivity {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
+                Log.e("请求响应：","------------------"+response.code());
                 Message msg=new Message();
                 msg.what=DISMISS_DIALOG;
                 msgHandler.sendMessage(msg);
@@ -662,20 +667,23 @@ public class TopicParticularsActivity extends AppCompatActivity {
         //        编辑
         LinearLayout viewEdit=popupStyle.getEditView(this);
         final int idEdit=viewEdit.getId();
-        //        返回首页
-        LinearLayout viewHome=popupStyle.getHomeView(this);
-        final int idHome=viewHome.getId();
+
 //        取消点赞
         LinearLayout viewDisLike=popupStyle.getLikeView(this);
         final int idDisLike=viewDisLike.getId();
+        //        返回首页
+        LinearLayout viewHome=popupStyle.getHomeView(this);
+        final int idHome=viewHome.getId();
 
         switch (tag){
             case "author":
                 views.add(viewEdit);
                 views.add(viewDel);
+                views.add(viewDisLike);
                 views.add(viewHome);
                 viewSparseArray.put(idEdit,viewEdit);
                 viewSparseArray.put(idDel,viewDel);
+                viewSparseArray.put(idDisLike,viewDisLike);
                 viewSparseArray.put(idHome,viewHome);
                 break;
             case "reader":
@@ -750,5 +758,13 @@ public class TopicParticularsActivity extends AppCompatActivity {
         if (prefs.getBoolean("topicEditToTopicParticulars",false)){
             getTopicParticulas();
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Log.e("退出详情：","==================");
+        finish();
+        Log.e("执行finish:","============++++++++");
     }
 }

@@ -307,7 +307,6 @@ public class RegisterActivity extends AppCompatActivity {
             }
         }
 
-
     //    计算位数
     private static int calculatePlaces(String str) {
         int m = 0;
@@ -324,7 +323,7 @@ public class RegisterActivity extends AppCompatActivity {
         return m;
     }
 
-//再次输入密码合法判断
+    //再次输入密码合法判断
     private Boolean isPasSame(){
         getEditString();
         if (pas.equals(pasAgain)){

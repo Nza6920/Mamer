@@ -23,7 +23,8 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="color" value="1278b4" />
+                                                <entry key="color" value="727272" />
+                                                <entry key="trimmed" value="true" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -34,7 +35,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="url" value="jar:file:/D:/android/android-studio/plugins/android/lib/android.jar!/images/material_design_icons/action/ic_favorite_border_black_24dp.xml" />
+                                                <entry key="url" value="jar:file:/D:/android/android-studio/plugins/android/lib/android.jar!/images/material_design_icons/communication/ic_call_missed_outgoing_black_24dp.xml" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -56,7 +57,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="paddingPercent" value="25" />
+                                                <entry key="color" value="1278b4" />
                                                 <entry key="trimmed" value="true" />
                                               </map>
                                             </option>
@@ -68,8 +69,8 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="fontFamily" value="Dialog" />
-                                                <entry key="text" value="读取图片失败" />
+                                                <entry key="fontFamily" value="MV Boli" />
+                                                <entry key="text" value="M" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -79,8 +80,9 @@
                                   </option>
                                   <option name="values">
                                     <map>
+                                      <entry key="assetType" value="TEXT" />
                                       <entry key="iconShape" value="NONE" />
-                                      <entry key="outputName" value="ic_popup_topic_manage_like" />
+                                      <entry key="outputName" value="ic_login_verify" />
                                     </map>
                                   </option>
                                 </PersistentState>

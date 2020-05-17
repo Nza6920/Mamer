@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +24,7 @@ public abstract class BaseLazyLoadFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater,ViewGroup container,Bundle savedInstanceState) {
         View view=initView(inflater,container);
         initEvent();
+        Log.e("BaseLazy: onCreateView",view+"====");
         return view;
     }
 
@@ -51,4 +53,9 @@ public abstract class BaseLazyLoadFragment extends Fragment {
 //    初始化事件接口
     public  abstract void initEvent();
 
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
 }

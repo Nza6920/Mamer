@@ -60,20 +60,21 @@
             android:layout_height="wrap_content"
             android:text="看不清，换一张"
             android:textColor="#5687f1"
-            android:textSize="16sp"
+            android:textSize="13sp"
             android:layout_gravity="end"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="16dp"
             android:enabled="true"/>
+
         <Button
             android:id="@+id/register_pic_code_btn"
             android:layout_width="match_parent"
             android:layout_height="45dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/register_phone_num_btn"
+            android:enabled="false"
             android:text="验证"
             android:textColor="#fff"
-            android:textSize="16sp"
-            android:layout_marginTop="20dp"
-            android:background="@drawable/register_phone_num_btn"
-            android:enabled="false"/>
+            android:textSize="16sp" />
 
 
     </LinearLayout>

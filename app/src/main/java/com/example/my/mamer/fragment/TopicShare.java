@@ -193,4 +193,16 @@ public class TopicShare extends BaseLazyLoadFragment {
             onLazyLoad(1);
         }
     }
+
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.e("TopicShare: destroy","onDestroy" );
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+    }
 }
