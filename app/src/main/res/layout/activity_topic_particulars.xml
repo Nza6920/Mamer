@@ -13,27 +13,34 @@
         <RelativeLayout
             android:id="@+id/author"
             android:layout_width="match_parent"
-            android:layout_height="80dp"
+            android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:paddingRight="15dp"
+            android:layout_marginTop="8dp"
             android:paddingLeft="15dp">
 
-            <ImageView
-                android:id="@+id/topic_particulars_author_pic"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
+            <android.support.v7.widget.CardView
+                android:id="@+id/topic_cardview"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
                 android:layout_marginTop="10dp"
-                android:layout_gravity="center"/>
+                android:layout_centerVertical="true"
+                app:cardCornerRadius="16dp">
+
+                <ImageView
+                    android:id="@+id/topic_particulars_author_pic"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+            </android.support.v7.widget.CardView>
             <TextView
                 android:id="@+id/topic_particulars_author_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#000"
-                android:textSize="15sp"
-                android:layout_gravity="center"
+                android:textSize="13sp"
+                android:layout_centerVertical="true"
                 android:layout_marginLeft="10dp"
-                android:layout_centerInParent="true"
-                android:layout_toRightOf="@id/topic_particulars_author_pic"/>
+                android:layout_toRightOf="@id/topic_cardview"/>
 
         </RelativeLayout>
         <ScrollView
@@ -53,23 +60,22 @@
                     android:id="@+id/topic_particulars_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="15dp"
+                    android:layout_marginTop="8dp"
                     android:textColor="#000"
-                    android:textSize="20sp"/>
+                    android:textSize="16sp"/>
 
                 <com.chinalwb.are.AREditText
                     android:id="@+id/topic_particulars_content"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="top|left"
-                    android:textSize="17sp"
-                    android:layout_marginTop="15dp"/>
+                    android:layout_marginTop="8dp"/>
                 <TextView
                     android:id="@+id/topic_particulars_time"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="15sp"
-                    android:layout_marginTop="10dp"
+                    android:textSize="11sp"
+                    android:layout_marginTop="8dp"
                     android:gravity="right"/>
 
                 <RelativeLayout
@@ -88,13 +94,13 @@
                             android:layout_height="wrap_content"
                             android:layout_centerVertical="true"
                             android:text="评论"
-                            android:textSize="18sp" />
+                            android:textSize="13sp" />
                         <TextView
                             android:id="@+id/reply_count"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="0"
-                            android:textSize="15sp"
+                            android:text=" "
+                            android:textSize="13sp"
                             android:layout_marginLeft="5dp"/>
                     </LinearLayout>
 
@@ -105,16 +111,16 @@
                         android:layout_alignParentRight="true">
                         <TextView
                             android:id="@+id/like_touch_event"
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
                             android:layout_gravity="center_vertical"
                             android:background="@mipmap/ic_popup_topic_manage_like_"/>
                         <TextView
                             android:id="@+id/like_count"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="0"
-                            android:textSize="15sp"/>
+                            android:text=" "
+                            android:textSize="13sp"/>
                     </LinearLayout>
 
                 </RelativeLayout>
@@ -167,21 +173,20 @@
                         android:visibility="gone"/>
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="24dp"
                         android:layout_marginTop="10dp"
                         android:layout_marginBottom="5dp"
                         android:orientation="horizontal"
                         android:background="@drawable/register_phone_num_tab">
                         <TextView
-                            android:layout_width="25dp"
-                            android:layout_height="25dp"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
                             android:background="@mipmap/ic_reply_comment"/>
                         <TextView
-                            android:layout_width="0dp"
+                            android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:layout_weight="1"
                             android:text="添加评论..."
-                            android:layout_marginLeft="10dp"
+                            android:textSize="13sp"
                             android:gravity="center_vertical"
                             />
                     </LinearLayout>

@@ -1,5 +1,6 @@
 package com.example.my.mamer;
 
+import android.Manifest;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -20,11 +21,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import pub.devrel.easypermissions.EasyPermissions;
 
 import static com.example.my.mamer.MyApplication.getContext;
 import static com.example.my.mamer.config.Config.DISMISS_DIALOG;
@@ -42,7 +45,7 @@ import static com.example.my.mamer.config.Config.USER_SET_INFORMATION;
 /**
  * 首先进入校验是否登录（欢迎）的界面
  */
-public class LoginVerifyActivity extends AppCompatActivity {
+public class LoginVerifyActivity extends AppCompatActivity implements EasyPermissions.PermissionCallbacks {
 
     private LoadingDraw loadingDraw;
     private SharedPreferences prefs;
@@ -83,20 +86,14 @@ public class LoginVerifyActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login_verify);
         loadingDraw=new LoadingDraw(this);
+        //        所需要申请的权限
+        String[] perms={Manifest.permission.ACCESS_WIFI_STATE,
+                Manifest.permission.CAMERA,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_EXTERNAL_STORAGE};
+        checkPermission(perms);
 
-        prefs= PreferenceManager.getDefaultSharedPreferences(getContext());
-        prefsName=prefs.getString("username","");
-        prefsPas=prefs.getString("password","");
-        loginFlag=prefs.getBoolean("loginFlag",false);
-        if (loginFlag){
-            postInformation(prefsName,prefsPas);
-        }else {
-//             MyApplication.globalUserInfo.token="";
 
-            Intent intent=new Intent(LoginVerifyActivity.this,BottomNavigationBarActivity.class);
-            startActivity(intent);
-            finish();
-        }
         //        界面停留1.5秒
         msgHandler.sendEmptyMessageDelayed(0,1500);
     }
@@ -189,7 +186,6 @@ public class LoginVerifyActivity extends AppCompatActivity {
         });
     }
 
-
     //    获取当前用户信息
     private void loginSuccess()  {
         HttpUtil.sendOkHttpRequestGet(USER_INFORMATION, new Callback() {
@@ -256,5 +252,51 @@ public class LoginVerifyActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private void checkPermission(String[] perms){
+        //        检查自己是否得到该权限
+
+        if (EasyPermissions.hasPermissions(this,perms)){
+            Log.e("Tag","已获得权限:"+perms);
+            prefs= PreferenceManager.getDefaultSharedPreferences(getContext());
+            prefsName=prefs.getString("username","");
+            prefsPas=prefs.getString("password","");
+            loginFlag=prefs.getBoolean("loginFlag",false);
+            if (loginFlag){
+                postInformation(prefsName,prefsPas);
+            }else {
+                Intent intent=new Intent(LoginVerifyActivity.this,BottomNavigationBarActivity.class);
+                startActivity(intent);
+                finish();
+            }
+
+        } else {
+            EasyPermissions.requestPermissions(this,"必要权限",0,perms);
+
+        }
+    }
+
+
+    //    请求权限回调
+    @Override
+    public void onRequestPermissionsResult(int requestCode,String[] permissions,int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+//将结果转发到easyPermission
+        EasyPermissions.onRequestPermissionsResult(requestCode,permissions,grantResults,this);
+        Log.i("TAG:",requestCode+"~~~~~"+permissions+"~~~~~~~~"+grantResults);
+    }
+
+
+    @Override
+    public void onPermissionsGranted(int requestCode,List<String> perms) {
+        Log.i("TAG","获取成功的权限:"+perms);
+    }
+
+    @Override
+    public void onPermissionsDenied(int requestCode,List<String> perms) {
+        Toast.makeText(this,"该功能需要授权方能使用",Toast.LENGTH_SHORT).show();
+        Log.i("TAG","获取失败的权限:"+perms);
+        finish();
     }
 }

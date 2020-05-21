@@ -31,8 +31,8 @@
 
             <ImageView
                 android:id="@+id/rteEmoji"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:padding="5dp"
                 android:src="@drawable/emoji"
                 android:visibility="gone"
@@ -40,8 +40,8 @@
 
             <ImageView
                 android:id="@+id/rteFontsize"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:padding="5dp"
                 android:src="@drawable/fontsize"
                 android:visibility="visible"
@@ -49,8 +49,8 @@
 
             <ImageView
                 android:id="@+id/rteFontface"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:padding="5dp"
                 android:src="@drawable/fontface"
                 android:visibility="gone"
@@ -58,103 +58,103 @@
 
             <ImageView
                 android:id="@+id/rteBold"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:padding="5dp"
                 android:src="@drawable/bold" />
 
             <ImageView
                 android:id="@+id/rteItalic"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:padding="5dp"
                 android:src="@drawable/italic" />
 
             <ImageView
                 android:id="@+id/rteUnderline"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:padding="5dp"
                 android:src="@drawable/underline" />
 
             <ImageView
                 android:id="@+id/rteStrikethrough"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:padding="5dp"
                 android:src="@drawable/strikethrough" />
 
             <ImageView
                 android:id="@+id/rteHr"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:padding="5dp"
                 android:src="@drawable/hr" />
 
 
             <ImageView
-                android:id="@+id/rteSubscript"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:padding="5dp"
-                android:src="@drawable/subscript" />
-
-            <ImageView
                 android:id="@+id/rteSuperscript"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:padding="5dp"
                 android:src="@drawable/superscript" />
 
             <ImageView
                 android:id="@+id/rteQuote"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:padding="5dp"
                 android:src="@drawable/quote" />
 
 
             <ImageView
                 android:id="@+id/rteFontColor"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:padding="5dp"
                 android:src="@drawable/foregroundcolor" />
 
             <ImageView
                 android:id="@+id/rteBackground"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:padding="5dp"
                 android:src="@drawable/background"
                 />
 
             <ImageView
+                android:id="@+id/rteSubscript"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:padding="5dp"
+                android:src="@drawable/subscript" />
+
+            <ImageView
                 android:id="@+id/rteLink"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:padding="5dp"
                 android:src="@drawable/ic_insert_link_black_48dp"
                 />
 
             <ImageView
                 android:id="@+id/rteListNumber"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:padding="5dp"
                 android:src="@drawable/listnumber" />
 
             <ImageView
                 android:id="@+id/rteListBullet"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:padding="5dp"
                 android:src="@drawable/listbullet" />
 
             <ImageView
                 android:id="@+id/rteIndentRight"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:padding="5dp"
                 android:src="@drawable/indentright"
                 android:visibility="gone"
@@ -162,8 +162,8 @@
 
             <ImageView
                 android:id="@+id/rteIndentLeft"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:padding="5dp"
                 android:src="@drawable/indentleft"
                 android:visibility="gone"
@@ -171,44 +171,44 @@
 
             <ImageView
                 android:id="@+id/rteAlignLeft"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:padding="5dp"
                 android:src="@drawable/alignleft" />
 
             <ImageView
                 android:id="@+id/rteAlignCenter"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:padding="5dp"
                 android:src="@drawable/aligncenter" />
 
             <ImageView
                 android:id="@+id/rteAlignRight"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:padding="5dp"
                 android:src="@drawable/alignright" />
 
             <ImageView
                 android:id="@+id/rteInsertImage"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:padding="5dp"
                 android:src="@drawable/image" />
 
             <ImageView
                 android:id="@+id/rteInsertVideo"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:padding="5dp"
                 android:src="@drawable/video"
                 />
 
             <ImageView
                 android:id="@+id/rteAt"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:padding="5dp"
                 android:src="@drawable/at"
                 android:visibility="gone" />

@@ -32,14 +32,6 @@
             android:layout_alignParentBottom="true"
             />
     </LinearLayout>
-
-    <fragment
-        android:id="@+id/user_menu_right"
-        android:name="com.example.my.mamer.UserMenuRightFragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="end"
-        android:tag="RIGHT"
-        tools:layout="@layout/user_menu_right" />
+    
 
 </android.support.v4.widget.DrawerLayout>

@@ -211,6 +211,7 @@ public class RegisterPicCode extends AppCompatActivity {
 }
 //    POST方式！！！！
     private void postInformation(String address){
+        loadingDraw.show();
         String jsonStr="";
         try {
             jsonStr=getJson(codeStr);

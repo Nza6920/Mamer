@@ -229,4 +229,11 @@ public class HttpUtil {
         Request request=new Request.Builder().delete().addHeader("Authorization",MyApplication.globalUserInfo.tokenType+MyApplication.globalUserInfo.token).url(DEL_LIKE).build();
         client.newCall(request).enqueue(callback);
     }
+//    获取当前用户是否已经为该篇文章点赞
+    public static void sendOkHttpGetLike(String essayId,okhttp3.Callback callback){
+        String Get_Like=BASE_URL+"/topics/"+essayId+"/voted";
+        Request request=new Request.Builder().addHeader("Authorization", MyApplication.globalUserInfo.tokenType+MyApplication.globalUserInfo.token).url(Get_Like).build();
+        client.newCall(request).enqueue(callback);
+    }
+
 }

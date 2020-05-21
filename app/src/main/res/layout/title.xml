@@ -7,11 +7,11 @@
 
     <TextView
         android:id="@+id/title_tv_close"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
         android:layout_alignParentLeft="true"
         android:layout_marginLeft="10dp"
-        android:textSize="16sp"
+        android:textSize="13sp"
         android:layout_centerVertical="true"
         android:enabled="true"/>
     <TextView
@@ -24,7 +24,7 @@
 
     <Button
         android:id="@+id/title_btn_next"
-        android:layout_width="?attr/actionBarSize"
+        android:layout_width="32dp"
         android:layout_height="32dp"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"

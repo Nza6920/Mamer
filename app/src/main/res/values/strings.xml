@@ -11,4 +11,5 @@
     <string name="title_activity_topic_like_list">TopicLikeListActivity</string>
     <string name="title_activity_user_attention_fans">UserAttentionFansActivity</string>
     <string name="title_activity_login_verify">mamer</string>
+    <string name="title_activity_smsverify">SMSVerifyActivity</string>
 </resources>

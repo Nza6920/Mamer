@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SMSVerifyActivity">
+    <include layout="@layout/title"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="32dp"
+        android:layout_marginRight="32dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="短信登录"
+            android:textColor="#000"
+            android:textSize="24sp"
+            android:gravity="center"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="mamer遇见未知"
+            android:textSize="8sp"
+            android:textColor="#717171"
+            android:gravity="center"/>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp">
+            <TextView
+                android:id="@+id/sms_p_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="帐号:"
+                android:textSize="13sp"
+                android:textColor="#000"
+                android:layout_centerVertical="true"
+                android:layout_alignParentStart="true"/>
+            <EditText
+                android:id="@+id/sms_p"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="13sp"
+                android:layout_marginLeft="8dp"
+                android:layout_toRightOf="@+id/sms_p_name"
+                android:layout_centerVertical="true"/>
+
+
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/sms_pic"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/sms_pic_img"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_centerVertical="true"/>
+
+            <EditText
+                android:id="@+id/sms_pic_num"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="15sp"
+                android:layout_marginLeft="8dp"
+                android:layout_toRightOf="@+id/sms_pic_img"
+                android:layout_centerVertical="true"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/sms"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone">
+            <EditText
+                android:id="@+id/sms_num"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="15sp"
+                android:layout_centerVertical="true"/>
+
+        </RelativeLayout>
+
+        <Button
+            android:id="@+id/sms_pic_btn"
+            android:layout_width="match_parent"
+            android:layout_height="32dp"
+            android:text="点击获取图片验证码"
+            android:textColor="#fff"
+            android:textSize="13sp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/register_phone_num_btn" />
+        <Button
+            android:id="@+id/sms_pic_code"
+            android:layout_width="match_parent"
+            android:layout_height="32dp"
+            android:text="验证"
+            android:textColor="#fff"
+            android:textSize="13sp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/register_phone_num_btn"
+            android:visibility="gone"/>
+        <Button
+            android:id="@+id/sms_login_btn"
+            android:layout_width="match_parent"
+            android:layout_height="32dp"
+            android:text="登录"
+            android:textColor="#fff"
+            android:textSize="13sp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/register_phone_num_btn"
+            android:visibility="gone"/>
+
+
+    </LinearLayout>
+
+
+
+</LinearLayout>

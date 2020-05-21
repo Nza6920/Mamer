@@ -52,6 +52,9 @@ import static com.example.my.mamer.config.Config.HTTP_OVERTIME;
 import static com.example.my.mamer.config.Config.HTTP_USER_GET_INFORMATION;
 import static com.example.my.mamer.config.Config.JSON;
 import static com.example.my.mamer.config.Config.MESSAGE_ERROR;
+import static com.example.my.mamer.config.Config.REQUEST_OK_GETLIKE;
+import static com.example.my.mamer.config.Config.REQUEST_OK_TopicParticulas;
+import static com.example.my.mamer.config.Config.REQUEST_OK_TopicReply;
 import static com.example.my.mamer.config.Config.SET_TEXTVIEW;
 import static com.example.my.mamer.config.Config.UNLOGIN;
 
@@ -65,6 +68,7 @@ public class TopicParticularsActivity extends AppCompatActivity {
     private TextView tvAuthorName;
     private TextView tvCreatedTime;
 //    文章
+    private String essayId;
     private TextView tvEssayTitle;
     private AREditText mEditTextArticle;
 //    当前用户
@@ -90,7 +94,7 @@ public class TopicParticularsActivity extends AppCompatActivity {
     private TextView tvLike;
     private TextView tvLikeCount;
     private Boolean likeTag=false;
-    private int likeCount=-1;
+    private int likeCount;
 
 
     public final Handler msgHandler=new Handler(new Handler.Callback() {
@@ -107,16 +111,144 @@ public class TopicParticularsActivity extends AppCompatActivity {
                         Toast.makeText(TopicParticularsActivity.this,"登录以体验更多",Toast.LENGTH_SHORT).show();
                         break;
                     case SET_TEXTVIEW:
-                        if (likeTag&&likeCount>-1){
+                        if (likeTag){
                             Drawable tvLikePic=ContextCompat.getDrawable(getContext(),R.mipmap.ic_popup_topic_manage_like);
                             tvLike.setBackground(tvLikePic);
-                            tvLikeCount.setText(""+(likeCount+1));
+                            likeCount+=1;
+                            tvLikeCount.setText(String.valueOf(likeCount));
                             tvLikeCount.setTextColor(getResources().getColor(R.color.colorTV));
                         }else {
                             Drawable tvLikePic=ContextCompat.getDrawable(getContext(),R.mipmap.ic_popup_topic_manage_like_);
                             tvLike.setBackground(tvLikePic);
-                            tvLikeCount.setText(""+(likeCount-1));
+                            likeCount-=1;
+                            tvLikeCount.setText(String.valueOf(likeCount));
                             tvLikeCount.setTextColor(getResources().getColor(R.color.colorDel));
+
+                        }
+
+                        break;
+                    case REQUEST_OK_GETLIKE:
+                        try {
+                            JSONObject resp = new JSONObject((String)msg.obj);
+                            likeTag=resp.getBoolean("voted");
+                            if (likeTag){
+                                Drawable tvLikePic=ContextCompat.getDrawable(getContext(),R.mipmap.ic_popup_topic_manage_like);
+                                tvLike.setBackground(tvLikePic);
+                                tvLikeCount.setTextColor(getResources().getColor(R.color.colorTV));
+                            }else {
+                                Drawable tvLikePic=ContextCompat.getDrawable(getContext(),R.mipmap.ic_popup_topic_manage_like_);
+                                tvLike.setBackground(tvLikePic);
+                                tvLikeCount.setTextColor(getResources().getColor(R.color.colorDel));
+                            }
+
+                        } catch (JSONException e) {
+                            Toast.makeText(TopicParticularsActivity.this, "点赞填充异常", Toast.LENGTH_SHORT).show();
+                            e.printStackTrace();
+                        }
+                        break;
+                    case REQUEST_OK_TopicParticulas:
+                        try {
+                            JSONObject jresp = new JSONObject((String)msg.obj);
+                            Log.e("Tag","话题详情--获取具体数据");
+                            TopicContent topicContent=new TopicContent();
+                            topicContent.setTopicId(jresp.getString("id"));
+                            topicContent.setTopicTitle(jresp.getString("title"));
+                            topicContent.setTopicConten(jresp.getString("body"));
+                            topicContent.setReplyCount(jresp.getString("reply_count"));
+                            topicContent.setCreateTime(StringToDate.stringToShort(jresp.getString("updated_at")));
+                            if (jresp.has("user")){
+                                Log.e("Tag","话题详情--获取作者数据");
+                                JSONObject user=jresp.getJSONObject("user");
+                                topicContent.setTopicAuthorName(user.getString("name"));
+                                topicContent.setTopicAuthorPic(user.getString("avatar"));
+                                topicContent.setTopicAuthorId(user.getString("id"));
+                            }
+                            Log.e("Tag","话题详情--暂存数据");
+                            if (jresp.has("category")){
+                                JSONObject category=jresp.getJSONObject("category");
+                                topicContent.setCategoryId(category.getString("id"));
+                                topicContent.setCategoryName(category.getString("name"));
+                            }
+                            if (jresp.has("voters")){
+                                jresp=jresp.getJSONObject("voters");
+                                JSONArray jsonArray=jresp.getJSONArray("data");
+                                if (jsonArray.length()!=0){
+                                    likeCount=jsonArray.length();
+                                    topicContent.setTopiclikeCount(likeCount);
+                                }
+                            }
+                            listData.add(topicContent);
+                            Log.e("Tag","话题详情--更新数据");
+                                    RequestOptions options=new RequestOptions()
+                                            .error(R.mipmap.ic_image_error)
+                                            .placeholder(R.mipmap.ic_image_error);
+                                    Glide.with(getContext())
+                                            .asBitmap()
+                                            .load(listData.get(0).getTopicAuthorPic())
+                                            .apply(options)
+                                            .into(tvAuthorPic);
+                                    Log.e("Tag","话题详情--设置头像");
+                                    tvAuthorName.setText(listData.get(0).getTopicAuthorName());
+                                    Log.e("Tag","话题详情--姓名");
+                                    tvEssayTitle.setText(listData.get(0).getTopicTitle());
+                                    Log.e("Tag","话题详情--标题");
+                                    tvCreatedTime.setText("更新于"+listData.get(0).getCreateTime());
+                                    Log.e("Tag","话题详情--创建时间");
+
+                                    BaseUtils.contentUtil(getContext(),mEditTextArticle,listData.get(0).getTopicConten());
+                                    tvTitle.setText(listData.get(0).getCategoryName());
+                                    tvLikeCount.setText(String.valueOf(listData.get(0).getTopiclikeCount()));
+                        } catch (JSONException e) {
+                            Toast.makeText(TopicParticularsActivity.this, "内容填充异常", Toast.LENGTH_SHORT).show();
+                            e.printStackTrace();
+                        }
+                        break;
+                    case REQUEST_OK_TopicReply:
+                        try {
+                            JSONObject jresp = new JSONObject((String)msg.obj);
+                            if (jresp.has("data")){
+                                JSONArray jsonArray=jresp.getJSONArray("data");
+//                               有评论
+                                if (jsonArray!=null){
+                                    JSONObject jsonObject=jsonArray.getJSONObject(0);
+                                    final ReplyUser replyUser=new ReplyUser();
+                                    replyUser.setReplyId(jsonObject.getString("id"));
+                                    replyUser.setEssayId(jsonObject.getString("topic_id"));
+                                    replyUser.setContent(jsonObject.getString("content"));
+                                    replyUser.setTime(StringToDate.stringToShort(jsonObject.getString("updated_at")));
+                                    if (jsonObject.has("user")){
+                                        JSONObject userStr=jsonObject.getJSONObject("user");
+                                        replyUser.setUserId(userStr.getString("id"));
+                                        replyUser.setUserName(userStr.getString("name"));
+                                        replyUser.setUserImg(userStr.getString("avatar"));
+                                    }
+                                            layoutCommentList.setVisibility(View.VISIBLE);
+                                            tvReplyTime.setVisibility(View.VISIBLE);
+                                            RequestOptions options=new RequestOptions()
+                                                    .error(R.mipmap.ic_image_error)
+                                                    .placeholder(R.mipmap.ic_image_error);
+                                            Glide.with(getContext())
+                                                    .asBitmap()
+                                                    .load(replyUser.getUserImg())
+                                                    .apply(options)
+                                                    .into(imgAvatar);
+                                            tvReplyUserName.setText(replyUser.getUserName());
+                                            tvComment.setText(" ");
+                                            tvComment.setText(Html.fromHtml(replyUser.getContent(),Html.FROM_HTML_MODE_COMPACT));
+                                            tvReplyTime.setText(replyUser.getTime());
+                                }
+                            }
+                            if (jresp.has("meta")){
+                                jresp=jresp.getJSONObject("meta");
+                                if (jresp.has("pagination")){
+                                    jresp=jresp.getJSONObject("pagination");
+                                    final String count=jresp.getString("total");
+                                    tvReplyCount.setText(count);
+                                }
+                            }
+                        } catch (JSONException e) {
+                            Toast.makeText(TopicParticularsActivity.this, "暂无评论", Toast.LENGTH_SHORT).show();
+                            e.printStackTrace();
                         }
 
                         break;
@@ -144,10 +276,12 @@ public class TopicParticularsActivity extends AppCompatActivity {
         editor=PreferenceManager.getDefaultSharedPreferences(getContext()).edit();
         editor.putBoolean("topicReplyListToTopicParticulars",false);
         editor.apply();
+        essayId=MyApplication.globalTopicReply.reply.replyUser.getEssayId();
 
         init();
         getTopicParticulas();
         getTopicReply();
+        getTopicLike();
 
 
     }
@@ -177,6 +311,7 @@ public class TopicParticularsActivity extends AppCompatActivity {
         tvBack.setBackground(tvBackPic);
         Drawable tvBtnNextPic=ContextCompat.getDrawable(this,R.mipmap.ic_reply_popup_show);
         tvBtnNext.setBackground(tvBtnNextPic);
+        mEditTextArticle.setTextSize(13);
 
 
 //        判断用户是否登陆，
@@ -260,7 +395,6 @@ public class TopicParticularsActivity extends AppCompatActivity {
     private void getTopicParticulas(){
         Log.e("获取话题详情：","+++++++++++++");
         listData.clear();
-        String essayId=MyApplication.globalTopicReply.reply.replyUser.getEssayId();
         loadingDraw.show();
         HttpUtil.sendOkHttpGetTopicParticulars(essayId,new Callback() {
             @Override
@@ -281,73 +415,14 @@ public class TopicParticularsActivity extends AppCompatActivity {
                 Message msg=new Message();
                 msg.what=DISMISS_DIALOG;
                 msgHandler.sendMessage(msg);
-                JSONObject jresp = null;
-                JSONArray jsonArray=null;
 
                 try {
-                    jresp=new JSONObject(response.body().string());
                     switch (response.code()){
                         case HTTP_USER_GET_INFORMATION:
-                            Log.e("Tag","话题详情--获取具体数据");
-                            TopicContent topicContent=new TopicContent();
-                            topicContent.setTopicId(jresp.getString("id"));
-                            topicContent.setTopicTitle(jresp.getString("title"));
-                            topicContent.setTopicConten(jresp.getString("body"));
-                            topicContent.setReplyCount(jresp.getString("reply_count"));
-                            topicContent.setCreateTime(StringToDate.stringToShort(jresp.getString("updated_at")));
-                            if (jresp.has("user")){
-                                Log.e("Tag","话题详情--获取作者数据");
-                                JSONObject user=jresp.getJSONObject("user");
-                                topicContent.setTopicAuthorName(user.getString("name"));
-                                topicContent.setTopicAuthorPic(user.getString("avatar"));
-                                topicContent.setTopicAuthorId(user.getString("id"));
-                            }
-                            Log.e("Tag","话题详情--暂存数据");
-                            if (jresp.has("category")){
-                                JSONObject category=jresp.getJSONObject("category");
-                                topicContent.setCategoryId(category.getString("id"));
-                                topicContent.setCategoryName(category.getString("name"));
-                            }
-                            if (jresp.has("voters")){
-                                jresp=jresp.getJSONObject("voters");
-                                jsonArray=jresp.getJSONArray("data");
-                                if (jsonArray.length()!=0){
-                                    likeCount=jsonArray.length();
-                                    topicContent.setTopiclikeCount(likeCount);
-                                }
-                            }
-                            listData.add(topicContent);
-//处理内容
-//                            jsoupUtil(topicContent.getTopicConten());
-                            Log.e("Tag","话题详情--更新数据");
-                            final Runnable setAvatarRunable=new Runnable() {
-                                @Override
-                                public void run() {
-                                    RequestOptions options=new RequestOptions()
-                                            .error(R.mipmap.ic_image_error)
-                                            .placeholder(R.mipmap.ic_image_error);
-                                    Glide.with(getContext())
-                                            .asBitmap()
-                                            .load(listData.get(0).getTopicAuthorPic())
-                                            .apply(options)
-                                            .into(tvAuthorPic);
-                                    Log.e("Tag","话题详情--设置头像");
-                                    tvAuthorName.setText(listData.get(0).getTopicAuthorName());
-                                    Log.e("Tag","话题详情--姓名");
-                                    tvEssayTitle.setText(listData.get(0).getTopicTitle());
-                                    Log.e("Tag","话题详情--标题");
-                                    tvCreatedTime.setText("更新于"+listData.get(0).getCreateTime());
-                                    Log.e("Tag","话题详情--创建时间");
-                                    BaseUtils.contentUtil(getContext(),mEditTextArticle,listData.get(0).getTopicConten());
-                                    tvTitle.setText(listData.get(0).getCategoryName());
-                                    tvLikeCount.setText(String.valueOf(listData.get(0).getTopiclikeCount()));
-                                }};
-                            new Thread(){
-                                public void run(){
-                                    msgHandler.post(setAvatarRunable);
-                                }
-                            }.start();
-
+                            Message msg1 = new Message();
+                            msg1.what = REQUEST_OK_TopicParticulas;
+                            msg1.obj = new JSONObject(response.body().string()).toString();
+                            msgHandler.sendMessage(msg1);
                             break;
                             default:
                                 break;
@@ -380,72 +455,16 @@ public class TopicParticularsActivity extends AppCompatActivity {
                 msg.what=DISMISS_DIALOG;
                 msgHandler.sendMessage(msg);
 
-                JSONObject jresp = null;
-                JSONArray jsonArray=null;
                 try {
-                    jresp=new JSONObject(response.body().string());
                     switch (response.code()){
                         case HTTP_USER_GET_INFORMATION:
-                            if (jresp.has("data")){
-                                jsonArray=jresp.getJSONArray("data");
-//                               有评论
-                                if (jsonArray!=null){
-                                    JSONObject jsonObject=jsonArray.getJSONObject(0);
-                                    final ReplyUser replyUser=new ReplyUser();
-                                    replyUser.setReplyId(jsonObject.getString("id"));
-                                    replyUser.setEssayId(jsonObject.getString("topic_id"));
-                                    replyUser.setContent(jsonObject.getString("content"));
-                                    replyUser.setTime(StringToDate.stringToShort(jsonObject.getString("updated_at")));
-                                    if (jsonObject.has("user")){
-                                        JSONObject userStr=jsonObject.getJSONObject("user");
-                                        replyUser.setUserId(userStr.getString("id"));
-                                        replyUser.setUserName(userStr.getString("name"));
-                                        replyUser.setUserImg(userStr.getString("avatar"));
-                                        }
-                                    final Runnable setAvatarRunable=new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            layoutCommentList.setVisibility(View.VISIBLE);
-                                            tvReplyTime.setVisibility(View.VISIBLE);
-                                            RequestOptions options=new RequestOptions()
-                                                    .error(R.mipmap.ic_image_error)
-                                                    .placeholder(R.mipmap.ic_image_error);
-                                            Glide.with(getContext())
-                                                    .asBitmap()
-                                                    .load(replyUser.getUserImg())
-                                                    .apply(options)
-                                                    .into(imgAvatar);
-                                            tvReplyUserName.setText(replyUser.getUserName());
-                                            tvComment.setText(" ");
-                                            tvComment.setText(Html.fromHtml(replyUser.getContent(),Html.FROM_HTML_MODE_COMPACT));
-                                            tvReplyTime.setText(replyUser.getTime());
-
-
-                                        }};
-                                    new Thread(){
-                                        public void run(){
-                                            msgHandler.post(setAvatarRunable);
-                                        }
-                                    }.start();
-                                }
-                            }
-                            if (jresp.has("meta")){
-                                jresp=jresp.getJSONObject("meta");
-                                if (jresp.has("pagination")){
-                                    jresp=jresp.getJSONObject("pagination");
-                                    final String count=jresp.getString("total");
-                                    final Runnable setCountRunable=new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            tvReplyCount.setText(count);
-                                        }};
-                                    new Thread(){
-                                        public void run(){
-                                            msgHandler.post(setCountRunable);
-                                        }
-                                    }.start();
-                                }
-                                }
+                            Message msg1 = new Message();
+                            msg1.what = REQUEST_OK_TopicReply;
+                            msg1.obj = new JSONObject(response.body().string()).toString();
+                            msgHandler.sendMessage(msg1);
+                            break;
+                            default:
+                                break;
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -475,12 +494,6 @@ public class TopicParticularsActivity extends AppCompatActivity {
                             }
                         });
                 delDialogBuilder.show();
-                break;
-            case "like":
-                if (likeTag){
-//
-                }
-
                 break;
                 default:
                     break;
@@ -534,6 +547,46 @@ public class TopicParticularsActivity extends AppCompatActivity {
                                 break;
 
                     }
+
+            }
+        });
+    }
+//    是否已点赞
+    public void getTopicLike(){
+        HttpUtil.sendOkHttpGetLike(essayId, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Message msg=new Message();
+                msg.what=DISMISS_DIALOG;
+                msgHandler.sendMessage(msg);
+
+                Message msg2 = new Message();
+                msg2.what = MESSAGE_ERROR;
+                msg2.obj = "服务器异常,请检查网络";
+                msgHandler.sendMessage(msg2);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+
+                Message msg=new Message();
+                msg.what=DISMISS_DIALOG;
+                msgHandler.sendMessage(msg);
+
+                try {
+                    switch (response.code()){
+                        case HTTP_USER_GET_INFORMATION:
+                            Message msg1 = new Message();
+                            msg1.what = REQUEST_OK_GETLIKE;
+                            msg1.obj = new JSONObject(response.body().string()).toString();
+                            msgHandler.sendMessage(msg1);
+                            break;
+                        default:
+                            break;
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
 
             }
         });

@@ -107,10 +107,7 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
         btnNotification=findViewById(R.id.notification_top_bar_right);
         userlayout=findViewById(R.id.user_top_bar);
         btnUserHomePage=findViewById(R.id.user_top_bar_right);
-//        userMenuRightFragment= (UserMenuRightFragment) mFragmentManager.findFragmentById(R.id.user_menu_right);
-
         init();
-//        initView();
     }
 
 //初始底部导航栏
@@ -395,31 +392,6 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
     }
 
 
-//    private  void  initView(){
-//        drawerLayout=findViewById(R.id.drawer_layout);
-//        drawerLayout.setDrawerListener(new DrawerLayout.DrawerListener() {
-//            @Override
-//            public void onDrawerSlide(View view, float v) {
-//
-//            }
-//
-//            @Override
-//            public void onDrawerOpened( View view) {
-//
-//            }
-//
-//            @Override
-//            public void onDrawerClosed(View view) {
-//                drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED,Gravity.END);
-//            }
-//
-//            @Override
-//            public void onDrawerStateChanged(int i) {
-//
-//            }
-//        });
-//        userMenuRightFragment.setDrawerLayout(drawerLayout);
-//    }
 
 //    获取通知消息数
     private void getNotification(){
@@ -521,11 +493,15 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
         //退出登录
         LinearLayout viewOut=popupStyle.getLoginOut(this);
         final  int idOut=viewOut.getId();
-
+//        切换用户
+        LinearLayout viewUserOut=popupStyle.getUserOut(this);
+        final  int idUserOut=viewUserOut.getId();
 
         views.add(viewOut);
+        views.add(viewUserOut);
 
         viewSparseArray.put(idOut,viewOut);
+        viewSparseArray.put(idUserOut,viewUserOut);
 
 
 
@@ -544,7 +520,16 @@ public class BottomNavigationBarActivity extends AppCompatActivity implements Bo
                         editor.putString("type", "");
                         editor.apply();
                         MyApplication.globalUserInfo.token=null;
+                        popupUtil.dismiss();
                         finish();
+                    }
+                });
+                popupUtil.getView(idUserOut).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(BottomNavigationBarActivity.this, LoginActivity.class);
+                        startActivity(intent);
+                        popupUtil.dismiss();
                     }
                 });
 

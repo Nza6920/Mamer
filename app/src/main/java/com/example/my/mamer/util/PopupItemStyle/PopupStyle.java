@@ -34,6 +34,7 @@ public class PopupStyle {
     }
 
     private void initUI(Context context){
+        init(context);
         tvPic=new TextView(context);
         tvText=new TextView(context);
         linearLayout= new LinearLayout(context);
@@ -60,7 +61,6 @@ public class PopupStyle {
     }
 //    编辑
     public LinearLayout getEditView(Context context) {
-        init(context);
         initUI(context);
 
         linearLayout.setId(IdUtils.generateViewId());
@@ -74,7 +74,6 @@ public class PopupStyle {
     }
 //    删除
     public LinearLayout getDelView(Context context) {
-        init(context);
         initUI(context);
 
         linearLayout.setId(IdUtils.generateViewId());
@@ -88,16 +87,15 @@ public class PopupStyle {
 
         return linearLayout;
     }
-//    关注，取关，关注列表
+//    切换账号
     public LinearLayout getFocusView(Context context,String author) {
-        init(context);
         initUI(context);
 
         linearLayout.setId(IdUtils.generateViewId());
 
         Drawable tvClosePic=ContextCompat.getDrawable(context,R.mipmap.ic_popup_topic_manage_author);
         tvPic.setBackground(tvClosePic);
-        tvText.setText(author);
+        tvText.setText("切换账号");
 
         linearLayout.addView(tvPic);
         linearLayout.addView(tvText);
@@ -105,7 +103,6 @@ public class PopupStyle {
     }
 //    点赞，取消点赞，点赞列表
     public LinearLayout getLikeView(Context context) {
-        init(context);
         initUI(context);
 
         linearLayout.setId(IdUtils.generateViewId());
@@ -120,7 +117,6 @@ public class PopupStyle {
     }
 //    返回首页
     public LinearLayout getHomeView(Context context){
-            init(context);
             initUI(context);
 
             linearLayout.setId(IdUtils.generateViewId());
@@ -135,7 +131,6 @@ public class PopupStyle {
     }
 //    退出登录
     public LinearLayout getLoginOut(Context context){
-        init(context);
         initUI(context);
 
         linearLayout.setId(IdUtils.generateViewId());
@@ -151,7 +146,6 @@ public class PopupStyle {
 
     //    退出登录
     public LinearLayout getUserOut(Context context){
-        init(context);
         initUI(context);
 
         linearLayout.setId(IdUtils.generateViewId());

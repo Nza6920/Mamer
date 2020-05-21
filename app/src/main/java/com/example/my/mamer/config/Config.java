@@ -39,7 +39,7 @@ public class Config {
     public static final String NOTIFICATION_READ="http://www.mamer.club/api/user/read/notifications";
     public static final String TOPIC_DIVID="http://www.mamer.club/api/categories";
     public static final String ATTENTION="http://www.mamer.club/api/users/followers";
-
+    public static final String SMS_LOGIN="http://www.mamer.club/api/msg/authorizations";
 
 
     //    http返回码
@@ -61,9 +61,13 @@ public class Config {
     public final static int UNLOGIN=10;
     public final static int SET_TEXTVIEW=1;
     public final static int KEYBOARD_UP=3;
-    public final static int USER_TOPIC_DEL=14;
     public final static int KEYBOARD_DOWN=11;
     public final static int SHOW_DIALOG=17;
+//    ========================请求成功
+    public final static int REQUEST_OK=1005;
+    public final static int REQUEST_OK_GETLIKE=1001;
+    public final static int REQUEST_OK_TopicParticulas=1002;
+    public final static int REQUEST_OK_TopicReply=1003;
 
 //    拍摄
     public final static int RESULT_CAMERA_IMAGE=6;

@@ -74,7 +74,8 @@
                 android:textSize="16sp"
                 android:inputType="textPassword"
                 android:paddingLeft="10dp"
-                android:maxLength="16"/>
+                android:maxLength="16"
+                />
         </LinearLayout>
 
         <Button

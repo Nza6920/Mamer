@@ -58,7 +58,7 @@ public  class TopicManagePopup  {
             TopicManagePopupUtil popupUtil=new TopicManagePopupUtil(context,callback,viewSparseArray);
 //        获取屏幕高宽
             int weight= context.getResources().getDisplayMetrics().widthPixels;
-            final int height=context.getResources().getDisplayMetrics().heightPixels*1/6;
+            final int height=context.getResources().getDisplayMetrics().heightPixels*1/3;
 //            实例化popupwindow
             popupWindow=new PopupWindow(popupView,weight,height);
             popupWindow.setAnimationStyle(R.style.popup_window_anim);
@@ -108,13 +108,11 @@ public  class TopicManagePopup  {
             if (t ==null){
                 t=item.findViewById(id);
             }
-
             return t;
         }
 
         public void dismiss() {
                 popupWindow.dismiss();
-
         }
 
     }

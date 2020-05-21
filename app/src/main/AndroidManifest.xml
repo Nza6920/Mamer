@@ -5,6 +5,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CAMERA"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
@@ -18,11 +19,10 @@
         android:theme="@style/AppTheme"
         android:windowSoftInputMode="adjustResize|adjustUnspecified|stateHidden"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".MainActivity" />
         <activity android:name=".RegisterPhoneNumActivity" />
         <activity android:name=".RegisterPicCode" />
         <activity android:name=".RegisterActivity" />
-        <activity android:name=".TestActivity"/>
+        <activity android:name=".TestActivity" />
         <activity android:name=".LoginActivity" />
         <activity android:name=".UserHomePageActivity" />
         <activity android:name=".UserEditorInformationActivity" />
@@ -37,7 +37,7 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <activity android:name=".BottomNavigationBarActivity"/>
+        <activity android:name=".BottomNavigationBarActivity" />
         <activity android:name=".UserSelfTopicListActivity" />
         <activity
             android:name=".TopicParticularsActivity"
@@ -47,7 +47,7 @@
         <activity
             android:name=".TopicActivity"
             android:label="@string/title_activity_topic_particulars_test"
-            android:theme="@style/AppTheme"/>
+            android:theme="@style/AppTheme" />
         <activity android:name=".TopicReplyListActivity" />
         <activity
             android:name=".ToUserActivity"
@@ -66,11 +66,16 @@
             android:name=".LoginVerifyActivity"
             android:label="@string/title_activity_login_verify"
             android:theme="@style/AppTheme">
-             <intent-filter>
-             <action android:name="android.intent.action.MAIN" />
-             <category android:name="android.intent.category.LAUNCHER" />
-             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
+        <activity
+            android:name=".SMSVerifyActivity"
+            android:label="@string/title_activity_smsverify"
+            android:theme="@style/AppTheme"></activity>
     </application>
 
 </manifest>

@@ -71,6 +71,7 @@ public class LoginActivity extends AppCompatActivity {
     private SharedPreferences prefs;
     private String prefsName;
     private String prefsPas;
+    private TextView smslogin;
 //ui
     private final Handler msgHandler=new Handler(new Handler.Callback() {
     @Override
@@ -117,6 +118,7 @@ public class LoginActivity extends AppCompatActivity {
         etUName=findViewById(R.id.login_username);
         etPas=findViewById(R.id.login_password);
         btnLogin=findViewById(R.id.login_btn);
+        smslogin=findViewById(R.id.other_login_message);
 
 //        设置
         Drawable tvClosePic=ContextCompat.getDrawable(this,R.mipmap.ic_title_close);
@@ -170,7 +172,7 @@ public class LoginActivity extends AppCompatActivity {
                 if (TextUtils.isEmpty(userName)) {
                     btnLogin.getBackground().setAlpha(111);
                     btnLogin.setEnabled(false);
-                }else if (pas.length()<5) {
+                }else if (pas.length()<6) {
                     btnLogin.getBackground().setAlpha(111);
                     btnLogin.setEnabled(false);
                 }else {
@@ -185,18 +187,17 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 loadingDraw.show();
-                if (prefs.getBoolean("loginFlag",false)){
-                    postInformation(prefsName,prefsPas);
-
-                }else {
-                    getEditString();
-                    postInformation(uName,pas);
-                }
-
-
+                getEditString();
+                postInformation(uName,pas);
             }
         });
-
+        smslogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(LoginActivity.this,SMSVerifyActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 //    hint设置
     private void setHintAll(EditText editText,String s){
