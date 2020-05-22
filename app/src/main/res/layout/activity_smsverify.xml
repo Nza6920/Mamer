@@ -48,6 +48,7 @@
                 android:layout_height="wrap_content"
                 android:text=""
                 android:textSize="13sp"
+                android:hint="请输入账号"
                 android:layout_marginLeft="8dp"
                 android:layout_toRightOf="@+id/sms_p_name"
                 android:layout_centerVertical="true"/>
@@ -59,15 +60,14 @@
         <RelativeLayout
             android:id="@+id/sms_pic"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="64dp"
             android:visibility="gone">
 
             <ImageView
                 android:id="@+id/sms_pic_img"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_centerVertical="true"/>
+                android:layout_gravity="center_vertical"/>
 
             <EditText
                 android:id="@+id/sms_pic_num"
@@ -75,9 +75,18 @@
                 android:layout_height="wrap_content"
                 android:text=""
                 android:textSize="15sp"
+                android:hint="请输入图片验证码"
                 android:layout_marginLeft="8dp"
-                android:layout_toRightOf="@+id/sms_pic_img"
-                android:layout_centerVertical="true"/>
+                android:layout_toRightOf="@+id/sms_pic_img"/>
+            <TextView
+                android:id="@+id/sms_pic_refresh"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="看不清？换一张"
+                android:textSize="13sp"
+                android:textColor="#5687f1"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true"/>
 
         </RelativeLayout>
 
@@ -86,13 +95,22 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:visibility="gone">
+            <TextView
+                android:id="@+id/sms_num_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="短信验证码："
+                android:textColor="#000"
+                android:layout_centerVertical="true"/>
             <EditText
                 android:id="@+id/sms_num"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text=""
+                android:hint="请输入短信验证码"
                 android:textSize="15sp"
-                android:layout_centerVertical="true"/>
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@+id/sms_num_name"/>
 
         </RelativeLayout>
 

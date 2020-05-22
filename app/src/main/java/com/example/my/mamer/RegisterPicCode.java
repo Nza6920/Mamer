@@ -299,10 +299,8 @@ public class RegisterPicCode extends AppCompatActivity {
 //    重新请求
     private void requestAgain() throws JSONException {
         SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(this);
-        String picCodekey=prefs.getString("next_key","");
         String phoneNum=prefs.getString("phoneNum","");
         JSONObject jsonParam=new JSONObject();
-        jsonParam.put("next_key",picCodekey);
         jsonParam.put("phone",phoneNum);
         String jsonStr=jsonParam.toString();
 

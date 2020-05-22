@@ -65,6 +65,8 @@ public class Config {
     public final static int SHOW_DIALOG=17;
 //    ========================请求成功
     public final static int REQUEST_OK=1005;
+    public final static int REQUEST_OK_TOKENREFRESH=1007;
+    public final static int REQUEST_OK_SMSLOGIN=1006;
     public final static int REQUEST_OK_GETLIKE=1001;
     public final static int REQUEST_OK_TopicParticulas=1002;
     public final static int REQUEST_OK_TopicReply=1003;

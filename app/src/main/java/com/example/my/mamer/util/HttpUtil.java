@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.example.my.mamer.MyApplication;
 
+import okhttp3.FormBody;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -159,12 +160,14 @@ public class HttpUtil {
 //    刷新token
     public static void sendOkHttpRefreshToken(String address,okhttp3.Callback callback){
 //        OkHttpClient client=new OkHttpClient();
-        Request request=new Request.Builder().addHeader("Authorization",MyApplication.globalUserInfo.tokenType+MyApplication.globalUserInfo.token).url(address).build();
+        RequestBody requestBody=new FormBody.Builder().build();
+        Request request=new Request.Builder().put(requestBody).addHeader("Authorization",MyApplication.globalUserInfo.tokenType+MyApplication.globalUserInfo.token).url(address).build();
         client.newCall(request).enqueue(callback);
     }
 //    获取话题分类
     public static void sendOkHttpGetTopicDivid(okhttp3.Callback callback){
 //        OkHttpClient client=new OkHttpClient();
+
         Request request=new Request.Builder().url(TOPIC_DIVID).build();
         client.newCall(request).enqueue(callback);
     }

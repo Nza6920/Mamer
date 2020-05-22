@@ -1,5 +1,6 @@
 package com.example.my.mamer;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -417,6 +418,10 @@ public class RegisterActivity extends AppCompatActivity {
                                         msg5.what=response.code();
                                         msg5.obj=errors.getString("email");
                                         msgHandler.sendMessage(msg5);
+//!!!!!!!!!!
+                                        Intent intent=new Intent(RegisterActivity.this,LoginActivity.class);
+                                        startActivity(intent);
+                                        finish();
                                     }else if (errors.has("password")){
                                         Message msg5=new Message();
                                         msg5.what=response.code();
